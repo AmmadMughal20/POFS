@@ -3,11 +3,148 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary: #2563EB;
+  --primary-hover: #1E40AF;
+  --primary-light: #DBEAFE;
+
+  --secondary: #475569;
+  --secondary-hover: #334155;
+
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #0EA5E9;
+
+  --border: #E2E8F0;
+
+  --font-outfit: 'Outfit', sans-serif;
+
+  --transition-base: all 100ms ease-in-out 25ms;
+}
+
+[data-theme='dark'] {
+  --primary: #3B82F6;
+  --primary-hover: #2563EB;
+  --primary-light: #1E3A8A;
+
+  --secondary: #94A3B8;
+  --secondary-hover: #CBD5E1;
+
+  --background: #0F172A;
+  --surface: #1E293B;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --info: #38BDF8;
+
+  --border: #334155;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../assets/fonts/Outfit/Outfit-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Optional: set default font family */
+:root {
+  --font-outfit: 'Outfit', sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-neutral: var(--neutral);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
+  --color-textprimary: var(--text-primary);
+  --color-textsecondary: var(--text-secondary);
+
+  --color-border: var(--border);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -16,11 +153,99 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --primary: #cb4623;
+    --secondary: #ffe7ae
   }
 }
 
 body {
+  @apply text-xs text-textprimary;
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit);
+}
+
+
+.form-cl {
+  @apply shadow-xl max-w-[800px] rounded-2xl bg-white p-10 w-auto min-w-75;
+}
+
+.transitions {
+  @apply transition-all duration-100 ease-in-out delay-25
+}
+
+.form-title {
+  @apply text-2xl font-bold text-primary
+}
+
+button {
+  @apply cursor-pointer rounded-lg text-xs;
+  transition: var(--transition-base);
+}
+
+button:hover {
+  @apply shadow
+}
+
+button:disabled {
+  @apply bg-gray-300 text-gray-400 border-0 cursor-not-allowed;
+  transition: none !important;
+  box-shadow: none !important;
+}
+
+button:disabled:hover,
+button[disabled]:hover,
+button:disabled:focus,
+button:disabled:active {
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-primary {
+  @apply bg-primary text-white
+}
+
+.btn-primary:hover {
+  @apply shadow-primary bg-primary/70
+}
+
+.btn-primary:active {
+  @apply shadow-primary bg-primary/90
+}
+
+.btn-secondary {
+  @apply bg-white text-black border border-primary
+}
+
+.btn-secondary:hover {
+  @apply text-primary shadow-primary bg-gray-50
+}
+
+.btn-small {
+  @apply px-3 py-1
+}
+
+.btn-medium {
+  @apply px-3.5 py-1.5
+}
+
+.btn-large {
+  @apply px-4 py-2
+}
+
+input {
+  @apply rounded shadow text-xs p-2
+}
+
+a {
+  @apply text-textsecondary;
+  transition: var(--transition-base);
+}
+
+a:hover {
+  @apply text-textsecondary/50;
+  transition: var(--transition-base);
 }
