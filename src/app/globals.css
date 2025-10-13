@@ -187,7 +187,9 @@ button:hover {
   @apply shadow
 }
 
-button:disabled {
+button:disabled,
+input:disabled,
+select:disabled {
   @apply bg-gray-300 text-gray-400 border-0 cursor-not-allowed;
   transition: none !important;
   box-shadow: none !important;
@@ -236,8 +238,25 @@ button:disabled:active {
   @apply px-4 py-2
 }
 
-input {
+input, textarea {
   @apply rounded shadow text-xs p-2
+}
+
+.small {
+  @apply px-1 py-1
+}
+
+.medium {
+  @apply px-2 py-2
+}
+
+.large {
+  @apply px-3 py-3
+}
+
+
+input:focus {
+  @apply outline-primary
 }
 
 a {
@@ -248,4 +267,41 @@ a {
 a:hover {
   @apply text-textsecondary/50;
   transition: var(--transition-base);
+}
+
+select {
+  @apply rounded shadow text-xs p-2
+}
+
+.radio-group, .checkbox-group {
+  @apply flex gap-2 mt-2
+}
+
+
+h1 {
+  @apply text-6xl font-bold
+}
+
+h2 {
+  @apply text-5xl font-bold
+}
+
+h3 {
+  @apply text-4xl font-semibold
+}
+
+h4 {
+  @apply text-3xl font-semibold
+}
+
+h5 {
+  @apply text-2xl font-medium
+}
+
+h6 {
+  @apply text-xl font-medium
+}
+
+img {
+  @apply cursor-pointer
 }
