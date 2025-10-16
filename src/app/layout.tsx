@@ -1,11 +1,9 @@
 
+import SidebarWrapper from "@/components/ui/Sidebar/SidebarWrapper";
+import { SidebarProvider } from "@/context/SidebarContext";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { MenuIcon } from "lucide-react";
-import SidebarMenuItem from "@/components/ui/SidebarMenuItem/SidebarMenuItem";
-import Sidebar from "@/components/ui/Sidebar/Sidebar";
-import SidebarWrapper from "@/components/ui/Sidebar/SidebarWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarWrapper />
-        {children}
+        <SidebarProvider>
+          <SidebarWrapper variant="primary" />
+          {children}
+        </SidebarProvider>
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { handleLoginAction } from './formHandler'
 import SubmitButton from './SubmitButton'
+import FormGroup from '@/components/ui/FormGroup/FormGroup'
 
 const LoginForm = () =>
 {
@@ -25,9 +26,8 @@ const LoginForm = () =>
     }
 
     return (
-        <Form title='Login' action={formAction}>
-            <div className='flex flex-col'>
-
+        <Form title='Login' action={formAction} className='!min-w-75'>
+            <FormGroup>
                 <Label htmlFor='username'>Username</Label>
                 <Input name='username' placeholder='Enter Username' />
                 {
@@ -35,7 +35,7 @@ const LoginForm = () =>
                         <p className="text-error">{state.errors.username[0]}</p>
                     )
                 }
-            </div>
+            </FormGroup>
             <div className='flex flex-col'>
                 <Label htmlFor='password'>Password</Label>
                 <PasswordInput name='password' placeholder='Enter Password' type={fieldType} onTypeChange={handleTypeChange} />

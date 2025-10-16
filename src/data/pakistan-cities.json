@@ -1,0 +1,182 @@
+[
+    {
+        "id": 1,
+        "name": "Lahore",
+        "district": "Lahore",
+        "province": "Punjab"
+    },
+    {
+        "id": 2,
+        "name": "Faisalabad",
+        "district": "Faisalabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 3,
+        "name": "Rawalpindi",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 4,
+        "name": "Multan",
+        "district": "Multan",
+        "province": "Punjab"
+    },
+    {
+        "id": 5,
+        "name": "Gujranwala",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 6,
+        "name": "Sialkot",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 7,
+        "name": "Karachi",
+        "district": "Karachi",
+        "province": "Sindh"
+    },
+    {
+        "id": 8,
+        "name": "Hyderabad",
+        "district": "Hyderabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 9,
+        "name": "Sukkur",
+        "district": "Sukkur",
+        "province": "Sindh"
+    },
+    {
+        "id": 10,
+        "name": "Larkana",
+        "district": "Larkana",
+        "province": "Sindh"
+    },
+    {
+        "id": 11,
+        "name": "Peshawar",
+        "district": "Peshawar",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 12,
+        "name": "Mardan",
+        "district": "Mardan",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 13,
+        "name": "Abbottabad",
+        "district": "Abbottabad",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 14,
+        "name": "Swat",
+        "district": "Swat",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 15,
+        "name": "Quetta",
+        "district": "Quetta",
+        "province": "Balochistan"
+    },
+    {
+        "id": 16,
+        "name": "Gwadar",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 17,
+        "name": "Turbat",
+        "district": "Kech",
+        "province": "Balochistan"
+    },
+    {
+        "id": 18,
+        "name": "Khuzdar",
+        "district": "Khuzdar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 19,
+        "name": "Gilgit",
+        "district": "Gilgit",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 20,
+        "name": "Skardu",
+        "district": "Skardu",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 21,
+        "name": "Muzaffarabad",
+        "district": "Muzaffarabad",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 22,
+        "name": "Mirpur",
+        "district": "Mirpur",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 23,
+        "name": "Islamabad",
+        "district": "Islamabad",
+        "province": "Islamabad Capital Territory"
+    },
+    {
+        "id": 24,
+        "name": "Bahawalpur",
+        "district": "Bahawalpur",
+        "province": "Punjab"
+    },
+    {
+        "id": 25,
+        "name": "Rahim Yar Khan",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 26,
+        "name": "Sheikhupura",
+        "district": "Sheikhupura",
+        "province": "Punjab"
+    },
+    {
+        "id": 27,
+        "name": "Okara",
+        "district": "Okara",
+        "province": "Punjab"
+    },
+    {
+        "id": 28,
+        "name": "Kasur",
+        "district": "Kasur",
+        "province": "Punjab"
+    },
+    {
+        "id": 29,
+        "name": "Sargodha",
+        "district": "Sargodha",
+        "province": "Punjab"
+    },
+    {
+        "id": 30,
+        "name": "Gujrat",
+        "district": "Gujrat",
+        "province": "Punjab"
+    }
+]

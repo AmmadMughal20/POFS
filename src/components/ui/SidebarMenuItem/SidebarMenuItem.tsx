@@ -1,15 +1,14 @@
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import ButtonLink from './ButtonLink'
 import NormalLink from './NormalLink'
 
 export interface ISidebarMenuItem
 {
-    title: string
+    title?: string
     link: string | (() => void)
     icon: React.ReactElement<React.SVGProps<SVGSVGElement>> | string
     selected?: boolean,
-    isCollapsed?: boolean
     variant?: 'primary'
 }
 
@@ -19,16 +18,15 @@ const SidebarMenuItem: React.FC<ISidebarMenuItem> = ({
     link,
     icon,
     selected = false,
-    isCollapsed
 }) =>
 {
 
     const isLink = typeof link === 'string'
 
     return isLink ? (
-        <NormalLink link={link} title={title} icon={icon} variant={variant} selected={selected} isCollapsed={isCollapsed} />
+        <NormalLink link={link} title={title} icon={icon} variant={variant} selected={selected} />
     ) : (
-        <ButtonLink link={link} title={title} icon={icon} variant={variant} selected={selected} isCollapsed={isCollapsed} />
+        <ButtonLink link={link} title={title} icon={icon} variant={variant} selected={selected} />
     )
 }
 

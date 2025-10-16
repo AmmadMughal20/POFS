@@ -2,15 +2,19 @@ import Link from 'next/link'
 import React from 'react'
 import { ISidebarMenuItem } from './SidebarMenuItem'
 import Image from 'next/image'
+import { useSidebar } from '@/context/SidebarContext'
 
 
 interface INormalLink extends ISidebarMenuItem
 {
     link: string
 }
-const NormalLink: React.FC<INormalLink> = ({ link, selected, icon, title, isCollapsed, variant }) =>
+const NormalLink: React.FC<INormalLink> = ({ link, selected, icon, title, variant }) =>
 {
     const isIconString = typeof icon === 'string'
+
+    const { isSidebarCollapsed } = useSidebar();
+
     return (
         <Link href={link} className="block">
             <div
@@ -24,7 +28,7 @@ const NormalLink: React.FC<INormalLink> = ({ link, selected, icon, title, isColl
                 {isIconString ? (
                     <Image
                         src={icon}
-                        alt={title}
+                        alt={title ?? 'menuitem'}
                         width={20}
                         height={20}
                         className="w-5 h-5 object-contain"
@@ -36,13 +40,15 @@ const NormalLink: React.FC<INormalLink> = ({ link, selected, icon, title, isColl
                             } transition-colors`,
                     })
                 )}
-                <p
-                    className={!variant ? `${isCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-white font-semibold' : 'hover: hover:text-primary/80'
-                        } transition-all ` : `${isCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-black font-semibold' : 'hover: hover:text-primary/80'
-                        } transition-all`}
-                >
-                    {title}
-                </p>
+                {title &&
+                    <p
+                        className={!variant ? `${isSidebarCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-white font-semibold' : 'hover: hover:text-primary/80'
+                            } transition-all ` : `${isSidebarCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-black font-semibold' : 'hover: hover:text-primary/80'
+                            } transition-all`}
+                    >
+                        {title}
+                    </p>
+                }
             </div>
         </Link>
     )

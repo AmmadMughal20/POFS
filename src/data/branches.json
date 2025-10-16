@@ -1,0 +1,22 @@
+{
+  "branches": [
+    {
+      "id": "GR-012",
+      "city": "Lahore",
+      "area": "Gulshan-e-Ravi F Block",
+      "address": "51 Main building Johar block Gulshan-e-Ravi, Lhr",
+      "phoneNo": "03211234567",
+      "openingTime": "08:00",
+      "closingTime": "22:00"
+    },
+    {
+      "id": "GR-036",
+      "address": "286-B ground floor Awan-e-Iqbal Gareshow, Lhr",
+      "city": "Lahore",
+      "area": "Gareshow",
+      "phoneNo": "03211234568",
+      "openingTime": "08:00",
+      "closingTime": "22:00"
+    }
+  ]
+}

@@ -3,15 +3,18 @@
 import Image from 'next/image'
 import React from 'react'
 import { ISidebarMenuItem } from './SidebarMenuItem'
+import { useSidebar } from '@/context/SidebarContext'
 
 interface IButtonLink extends ISidebarMenuItem
 {
     link: () => void
 }
 
-const ButtonLink: React.FC<IButtonLink> = ({ variant, link, selected, icon, title, isCollapsed }) =>
+const ButtonLink: React.FC<IButtonLink> = ({ variant, link, selected, icon, title }) =>
 {
     const isIconString = typeof icon === 'string'
+    const { isSidebarCollapsed } = useSidebar();
+
     return (
         <div onClick={link} className="block">
             <div
@@ -25,7 +28,7 @@ const ButtonLink: React.FC<IButtonLink> = ({ variant, link, selected, icon, titl
                 {isIconString ? (
                     <Image
                         src={icon}
-                        alt={title}
+                        alt={title ?? "menuicon"}
                         width={20}
                         height={20}
                         className="w-5 h-5 object-contain"
@@ -38,8 +41,8 @@ const ButtonLink: React.FC<IButtonLink> = ({ variant, link, selected, icon, titl
                     })
                 )}
                 <p
-                    className={!variant ? ` ${isCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-white font-semibold' : 'hover: hover:text-primary/80'
-                        } transition-all` : `${selected ? 'text-black font-semibold' : 'hover: hover:text-primary/80'
+                    className={!variant ? ` ${isSidebarCollapsed ? 'hidden transition-all' : 'block transition-all'} ${selected ? 'text-white font-semibold' : 'hover: hover:text-primary/80'
+                        } transition-all` : ` ${isSidebarCollapsed ? 'hidden transition-all' : 'block transition-all'}  ${selected ? 'text-black font-semibold' : 'hover: hover:text-primary/80'
                         } transition-all `}
                 >
                     {title}

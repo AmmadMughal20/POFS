@@ -1,11 +1,13 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Sidebar from './Sidebar'
 import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMenuItem'
 import { ArrowLeft, ArrowRight, Globe, Home, LogOut, MenuIcon, Phone, Settings } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Button from '../Button/Button'
+import Topbar from '../Topbar/Topbar'
+import { useSidebar } from '@/context/SidebarContext'
 
 export const sidebarMenuItems: ISidebarMenuItem[] = [
     {
@@ -15,8 +17,8 @@ export const sidebarMenuItems: ISidebarMenuItem[] = [
         selected: true,
     },
     {
-        title: 'About Us',
-        link: '/',
+        title: 'Branches',
+        link: '/branch-management',
         icon: <Globe />,
         selected: false,
     },
@@ -42,40 +44,38 @@ export const sidebarMenuItems: ISidebarMenuItem[] = [
 
 interface ISidebarWrapper
 {
-    collapsed: boolean,
     variant?: 'primary'
 }
 
-const SidebarWrapper: React.FC<ISidebarWrapper> = ({ collapsed, variant }) =>
+const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
 {
-
-    const [collapsedSideBar, setCollapsedSideBar] = useState<boolean>(collapsed)
-
-
-    const handleSideBarCollapse = () =>
-    {
-        setCollapsedSideBar(collapsedSideBar ? false : true)
-    }
+    const { isSidebarCollapsed, toggleSidebar } = useSidebar();
 
     return (
-        <Sidebar isCollapsed={collapsedSideBar} variant={variant}>
-            <div className='flex flex-col items-center justify-between'>
-                <Link href="/">
-                    <Image src={"globe.svg"} width={1000} height={1000} className='max-w-10 max-h-10' alt="logo" />
-                </Link>
-            </div>
-            <div className='flex flex-col items-center justify-between'>
-                <Button onClick={handleSideBarCollapse} variant='secondary' className={`!rounded-full absolute w-10 h-10 flex justify-center items-center ${collapsedSideBar ? 'left-15 top-16' : 'left-25 top-16'}`}>
-                    {collapsedSideBar ? <ArrowRight /> : <ArrowLeft />}
-                </Button>
-            </div>
-            <hr className='my-2 text-primary mb-6' />
-            {
-                sidebarMenuItems.map((item, index) => (
-                    <SidebarMenuItem key={index} title={item.title} link={item.link} icon={item.icon} selected={item.selected} />
-                ))
-            }
-        </Sidebar>
+        <>
+            <Topbar collapsed={isSidebarCollapsed ?? false} />
+            <Sidebar isCollapsed={isSidebarCollapsed} variant={variant} className={` ${isSidebarCollapsed ? 'bg-white' : 'bg-primary'} transition-colors`}>
+                <div className='flex flex-col items-center justify-between'>
+                    <Link href="/">
+                        <Image src={"globe.svg"} width={1000} height={1000} className='max-w-7.5 max-h-7.5' alt="logo" />
+                    </Link>
+                </div>
+                <hr className={`my-1 ${isSidebarCollapsed ? 'text-primary/50' : 'text-gray-300'}`} />
+                <div className='flex flex-col items-center justify-between' onClick={toggleSidebar}>
+                    <Button className={`!rounded-full w-7.5 h-7.5 !p-0 flex justify-center items-center !bg-accent !shadow-accent`}>
+                        {isSidebarCollapsed ? <ArrowRight /> : <ArrowLeft />}
+                    </Button>
+                </div>
+                <hr className={`my-1 ${isSidebarCollapsed ? 'text-primary/50' : 'text-gray-300'}`} />
+                <div className={`h-100 overflow-scroll scrollbar-hide`}>
+                    {
+                        sidebarMenuItems.map((item, index) => (
+                            <SidebarMenuItem key={index} title={item.title} variant={isSidebarCollapsed ? undefined : variant} link={item.link} icon={item.icon} selected={item.selected} />
+                        ))
+                    }
+                </div>
+            </Sidebar>
+        </>
     )
 }
 

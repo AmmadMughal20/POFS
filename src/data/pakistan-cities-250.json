@@ -1,0 +1,1502 @@
+[
+    {
+        "id": 1,
+        "name": "Karachi",
+        "district": "Karachi",
+        "province": "Sindh"
+    },
+    {
+        "id": 2,
+        "name": "Lahore",
+        "district": "Lahore",
+        "province": "Punjab"
+    },
+    {
+        "id": 3,
+        "name": "Faisalabad",
+        "district": "Faisalabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 4,
+        "name": "Rawalpindi",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 5,
+        "name": "Gujranwala",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 6,
+        "name": "Multan",
+        "district": "Multan",
+        "province": "Punjab"
+    },
+    {
+        "id": 7,
+        "name": "Hyderabad",
+        "district": "Hyderabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 8,
+        "name": "Peshawar",
+        "district": "Peshawar",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 9,
+        "name": "Quetta",
+        "district": "Quetta",
+        "province": "Balochistan"
+    },
+    {
+        "id": 10,
+        "name": "Islamabad",
+        "district": "Islamabad",
+        "province": "Islamabad Capital Territory"
+    },
+    {
+        "id": 11,
+        "name": "Sialkot",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 12,
+        "name": "Sargodha",
+        "district": "Sargodha",
+        "province": "Punjab"
+    },
+    {
+        "id": 13,
+        "name": "Bahawalpur",
+        "district": "Bahawalpur",
+        "province": "Punjab"
+    },
+    {
+        "id": 14,
+        "name": "Sukkur",
+        "district": "Sukkur",
+        "province": "Sindh"
+    },
+    {
+        "id": 15,
+        "name": "Larkana",
+        "district": "Larkana",
+        "province": "Sindh"
+    },
+    {
+        "id": 16,
+        "name": "Okara",
+        "district": "Okara",
+        "province": "Punjab"
+    },
+    {
+        "id": 17,
+        "name": "Sheikhupura",
+        "district": "Sheikhupura",
+        "province": "Punjab"
+    },
+    {
+        "id": 18,
+        "name": "Rahim Yar Khan",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 19,
+        "name": "Mardan",
+        "district": "Mardan",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 20,
+        "name": "Gilgit",
+        "district": "Gilgit",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 21,
+        "name": "Abbottabad",
+        "district": "Abbottabad",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 22,
+        "name": "Skardu",
+        "district": "Skardu",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 23,
+        "name": "Gwadar",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 24,
+        "name": "Mingora",
+        "district": "Swat",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 25,
+        "name": "Kotli",
+        "district": "Kotli",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 26,
+        "name": "Sahiwal",
+        "district": "Sahiwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 27,
+        "name": "Kot Addu",
+        "district": "Muzaffargarh",
+        "province": "Punjab"
+    },
+    {
+        "id": 28,
+        "name": "Bannu",
+        "district": "Bannu",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 29,
+        "name": "Kohat",
+        "district": "Kohat",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 30,
+        "name": "Dera Ghazi Khan",
+        "district": "Dera Ghazi Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 31,
+        "name": "Charsadda",
+        "district": "Charsadda",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 32,
+        "name": "Bahawalnagar",
+        "district": "Bahawalnagar",
+        "province": "Punjab"
+    },
+    {
+        "id": 33,
+        "name": "Khuzdar",
+        "district": "Khuzdar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 34,
+        "name": "Swabi",
+        "district": "Swabi",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 35,
+        "name": "Haripur",
+        "district": "Haripur",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 36,
+        "name": "Chaman",
+        "district": "Killa Abdullah",
+        "province": "Balochistan"
+    },
+    {
+        "id": 37,
+        "name": "Narowal",
+        "district": "Narowal",
+        "province": "Punjab"
+    },
+    {
+        "id": 38,
+        "name": "Gujrat",
+        "district": "Gujrat",
+        "province": "Punjab"
+    },
+    {
+        "id": 39,
+        "name": "Jhang",
+        "district": "Jhang",
+        "province": "Punjab"
+    },
+    {
+        "id": 40,
+        "name": "Jhelum",
+        "district": "Jhelum",
+        "province": "Punjab"
+    },
+    {
+        "id": 41,
+        "name": "Kasur",
+        "district": "Kasur",
+        "province": "Punjab"
+    },
+    {
+        "id": 42,
+        "name": "Wah Cantonment",
+        "district": "Taxila",
+        "province": "Punjab"
+    },
+    {
+        "id": 43,
+        "name": "Kamoke",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 44,
+        "name": "Muzaffargarh",
+        "district": "Muzaffargarh",
+        "province": "Punjab"
+    },
+    {
+        "id": 45,
+        "name": "Burewala",
+        "district": "Vehari",
+        "province": "Punjab"
+    },
+    {
+        "id": 46,
+        "name": "Khanewal",
+        "district": "Khanewal",
+        "province": "Punjab"
+    },
+    {
+        "id": 47,
+        "name": "Mandi Bahauddin",
+        "district": "Mandi Bahauddin",
+        "province": "Punjab"
+    },
+    {
+        "id": 48,
+        "name": "Sadiqabad",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 49,
+        "name": "Chiniot",
+        "district": "Chiniot",
+        "province": "Punjab"
+    },
+    {
+        "id": 50,
+        "name": "Kamalia",
+        "district": "Toba Tek Singh",
+        "province": "Punjab"
+    },
+    {
+        "id": 51,
+        "name": "Hafizabad",
+        "district": "Hafizabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 52,
+        "name": "Daska",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 53,
+        "name": "Gojra",
+        "district": "Toba Tek Singh",
+        "province": "Punjab"
+    },
+    {
+        "id": 54,
+        "name": "Muridke",
+        "district": "Sheikhupura",
+        "province": "Punjab"
+    },
+    {
+        "id": 55,
+        "name": "Bhimber",
+        "district": "Bhimber",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 56,
+        "name": "Sialkot Cantonment",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 57,
+        "name": "Khairpur",
+        "district": "Khairpur",
+        "province": "Sindh"
+    },
+    {
+        "id": 58,
+        "name": "Mirpur Khas",
+        "district": "Mirpur Khas",
+        "province": "Sindh"
+    },
+    {
+        "id": 59,
+        "name": "Nawabshah (Shaheed Benazirabad)",
+        "district": "Shaheed Benazirabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 60,
+        "name": "Jacobabad",
+        "district": "Jacobabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 61,
+        "name": "Badin",
+        "district": "Badin",
+        "province": "Sindh"
+    },
+    {
+        "id": 62,
+        "name": "Thatta",
+        "district": "Thatta",
+        "province": "Sindh"
+    },
+    {
+        "id": 63,
+        "name": "Dadu",
+        "district": "Dadu",
+        "province": "Sindh"
+    },
+    {
+        "id": 64,
+        "name": "Shikarpur",
+        "district": "Shikarpur",
+        "province": "Sindh"
+    },
+    {
+        "id": 65,
+        "name": "Sanghar",
+        "district": "Sanghar",
+        "province": "Sindh"
+    },
+    {
+        "id": 66,
+        "name": "Tando Adam",
+        "district": "Sanghar",
+        "province": "Sindh"
+    },
+    {
+        "id": 67,
+        "name": "Shahdadkot",
+        "district": "Qambar Shahdadkot",
+        "province": "Sindh"
+    },
+    {
+        "id": 68,
+        "name": "Umerkot",
+        "district": "Umerkot",
+        "province": "Sindh"
+    },
+    {
+        "id": 69,
+        "name": "Larkana Cantonment",
+        "district": "Larkana",
+        "province": "Sindh"
+    },
+    {
+        "id": 70,
+        "name": "Kotli (AJK)",
+        "district": "Kotli",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 71,
+        "name": "Rahim Yar Khan Cantonment",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 72,
+        "name": "Mianwali",
+        "district": "Mianwali",
+        "province": "Punjab"
+    },
+    {
+        "id": 73,
+        "name": "Bhakkar",
+        "district": "Bhakkar",
+        "province": "Punjab"
+    },
+    {
+        "id": 74,
+        "name": "Khushab",
+        "district": "Khushab",
+        "province": "Punjab"
+    },
+    {
+        "id": 75,
+        "name": "Vehari",
+        "district": "Vehari",
+        "province": "Punjab"
+    },
+    {
+        "id": 76,
+        "name": "Pakpattan",
+        "district": "Pakpattan",
+        "province": "Punjab"
+    },
+    {
+        "id": 77,
+        "name": "Lodhran",
+        "district": "Lodhran",
+        "province": "Punjab"
+    },
+    {
+        "id": 78,
+        "name": "Toba Tek Singh",
+        "district": "Toba Tek Singh",
+        "province": "Punjab"
+    },
+    {
+        "id": 79,
+        "name": "Chishtian",
+        "district": "Bahawalnagar",
+        "province": "Punjab"
+    },
+    {
+        "id": 80,
+        "name": "Ahmadpur East",
+        "district": "Bahawalpur",
+        "province": "Punjab"
+    },
+    {
+        "id": 81,
+        "name": "Jaranwala",
+        "district": "Faisalabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 82,
+        "name": "Bhowana",
+        "district": "Chiniot",
+        "province": "Punjab"
+    },
+    {
+        "id": 83,
+        "name": "Ali Pur",
+        "district": "Muzaffargarh",
+        "province": "Punjab"
+    },
+    {
+        "id": 84,
+        "name": "Dinga",
+        "district": "Gujrat",
+        "province": "Punjab"
+    },
+    {
+        "id": 85,
+        "name": "Gujar Khan",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 86,
+        "name": "Kallar Kahar",
+        "district": "Chakwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 87,
+        "name": "Talagang",
+        "district": "Chakwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 88,
+        "name": "Attock",
+        "district": "Attock",
+        "province": "Punjab"
+    },
+    {
+        "id": 89,
+        "name": "Chakwal",
+        "district": "Chakwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 90,
+        "name": "Narowal Cantonment",
+        "district": "Narowal",
+        "province": "Punjab"
+    },
+    {
+        "id": 91,
+        "name": "Khushab Cantonment",
+        "district": "Khushab",
+        "province": "Punjab"
+    },
+    {
+        "id": 92,
+        "name": "Sialkot Industrial Estate",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 93,
+        "name": "Kot Radha Kishan",
+        "district": "Kasur",
+        "province": "Punjab"
+    },
+    {
+        "id": 94,
+        "name": "Burewala Cantonment",
+        "district": "Vehari",
+        "province": "Punjab"
+    },
+    {
+        "id": 95,
+        "name": "Hasilpur",
+        "district": "Bahawalpur",
+        "province": "Punjab"
+    },
+    {
+        "id": 96,
+        "name": "Dadu Cantonment",
+        "district": "Dadu",
+        "province": "Sindh"
+    },
+    {
+        "id": 97,
+        "name": "Rohri",
+        "district": "Sukkur",
+        "province": "Sindh"
+    },
+    {
+        "id": 98,
+        "name": "Ghotki",
+        "district": "Ghotki",
+        "province": "Sindh"
+    },
+    {
+        "id": 99,
+        "name": "Benazirabad",
+        "district": "Shaheed Benazirabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 100,
+        "name": "Qambar",
+        "district": "Qambar Shahdadkot",
+        "province": "Sindh"
+    },
+    {
+        "id": 101,
+        "name": "Mastung",
+        "district": "Mastung",
+        "province": "Balochistan"
+    },
+    {
+        "id": 102,
+        "name": "Kalat",
+        "district": "Kalat",
+        "province": "Balochistan"
+    },
+    {
+        "id": 103,
+        "name": "Sibi",
+        "district": "Sibi",
+        "province": "Balochistan"
+    },
+    {
+        "id": 104,
+        "name": "Zhob",
+        "district": "Zhob",
+        "province": "Balochistan"
+    },
+    {
+        "id": 105,
+        "name": "Nushki",
+        "district": "Chagai",
+        "province": "Balochistan"
+    },
+    {
+        "id": 106,
+        "name": "Chagai",
+        "district": "Chagai",
+        "province": "Balochistan"
+    },
+    {
+        "id": 107,
+        "name": "Lasbela (Hub)",
+        "district": "Lasbela",
+        "province": "Balochistan"
+    },
+    {
+        "id": 108,
+        "name": "Kharan",
+        "district": "Kharan",
+        "province": "Balochistan"
+    },
+    {
+        "id": 109,
+        "name": "Dera Bugti",
+        "district": "Dera Bugti",
+        "province": "Balochistan"
+    },
+    {
+        "id": 110,
+        "name": "Sui",
+        "district": "Dera Bugti",
+        "province": "Balochistan"
+    },
+    {
+        "id": 111,
+        "name": "Gwadar Cantonment",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 112,
+        "name": "Nowshera",
+        "district": "Nowshera",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 113,
+        "name": "Charsadda Cantonment",
+        "district": "Charsadda",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 114,
+        "name": "Hangu",
+        "district": "Hangu",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 115,
+        "name": "Karak",
+        "district": "Karak",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 116,
+        "name": "Lakki Marwat",
+        "district": "Lakki Marwat",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 117,
+        "name": "Buner",
+        "district": "Buner",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 118,
+        "name": "Mansehra",
+        "district": "Mansehra",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 119,
+        "name": "Batkhela",
+        "district": "Malakand",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 120,
+        "name": "Kohistan",
+        "district": "Kohistan",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 121,
+        "name": "Upper Dir",
+        "district": "Upper Dir",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 122,
+        "name": "Lower Dir",
+        "district": "Lower Dir",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 123,
+        "name": "Peshawar Cantonment",
+        "district": "Peshawar",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 124,
+        "name": "Kohlu",
+        "district": "Kohlu",
+        "province": "Balochistan"
+    },
+    {
+        "id": 125,
+        "name": "Barkhan",
+        "district": "Barkhan",
+        "province": "Balochistan"
+    },
+    {
+        "id": 126,
+        "name": "Musakhel",
+        "district": "Musakhel",
+        "province": "Balochistan"
+    },
+    {
+        "id": 127,
+        "name": "Awaran",
+        "district": "Awaran",
+        "province": "Balochistan"
+    },
+    {
+        "id": 128,
+        "name": "Lasbela",
+        "district": "Lasbela",
+        "province": "Balochistan"
+    },
+    {
+        "id": 129,
+        "name": "Harnai",
+        "district": "Harnai",
+        "province": "Balochistan"
+    },
+    {
+        "id": 130,
+        "name": "Gwadar Old Town",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 131,
+        "name": "Dera Ismail Khan",
+        "district": "Dera Ismail Khan",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 132,
+        "name": "Tank",
+        "district": "Tank",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 133,
+        "name": "Bannu Cantonment",
+        "district": "Bannu",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 134,
+        "name": "Shangla",
+        "district": "Shangla",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 135,
+        "name": "Karakorum (Skardu area)",
+        "district": "Skardu",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 136,
+        "name": "Hunza",
+        "district": "Hunza",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 137,
+        "name": "Ganche",
+        "district": "Ghanche",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 138,
+        "name": "Astore",
+        "district": "Astore",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 139,
+        "name": "Diamer",
+        "district": "Diamer",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 140,
+        "name": "Neelum",
+        "district": "Neelum",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 141,
+        "name": "Bhimber Cantonment",
+        "district": "Bhimber",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 142,
+        "name": "Kotli Cantt",
+        "district": "Kotli",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 143,
+        "name": "Mirpur",
+        "district": "Mirpur",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 144,
+        "name": "Rawalakot",
+        "district": "Poonch",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 145,
+        "name": "Bagh",
+        "district": "Bagh",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 146,
+        "name": "Chakwal",
+        "district": "Chakwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 147,
+        "name": "Bhalwal",
+        "district": "Sargodha",
+        "province": "Punjab"
+    },
+    {
+        "id": 148,
+        "name": "Pindi Bhattian",
+        "district": "Hafizabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 149,
+        "name": "Khushab Cantt",
+        "district": "Khushab",
+        "province": "Punjab"
+    },
+    {
+        "id": 150,
+        "name": "Tarnol",
+        "district": "Islamabad",
+        "province": "Islamabad Capital Territory"
+    },
+    {
+        "id": 151,
+        "name": "Gadag",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 152,
+        "name": "Hasilpur",
+        "district": "Bahawalpur",
+        "province": "Punjab"
+    },
+    {
+        "id": 153,
+        "name": "Harappa",
+        "district": "Sahiwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 154,
+        "name": "Noorpur Thal",
+        "district": "Khushab",
+        "province": "Punjab"
+    },
+    {
+        "id": 155,
+        "name": "Khairpur Tamewali",
+        "district": "Khanewal",
+        "province": "Punjab"
+    },
+    {
+        "id": 156,
+        "name": "Shorkot",
+        "district": "Jhang",
+        "province": "Punjab"
+    },
+    {
+        "id": 157,
+        "name": "Chunian",
+        "district": "Kasur",
+        "province": "Punjab"
+    },
+    {
+        "id": 158,
+        "name": "Shahkot",
+        "district": "Nankana Sahib",
+        "province": "Punjab"
+    },
+    {
+        "id": 159,
+        "name": "Nankana Sahib",
+        "district": "Nankana Sahib",
+        "province": "Punjab"
+    },
+    {
+        "id": 160,
+        "name": "Qila Didar Singh",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 161,
+        "name": "Basirpur",
+        "district": "Sahiwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 162,
+        "name": "Sahiwal Cantonment",
+        "district": "Sahiwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 163,
+        "name": "Tando Muhammad Khan",
+        "district": "Tando Muhammad Khan",
+        "province": "Sindh"
+    },
+    {
+        "id": 164,
+        "name": "Matiari",
+        "district": "Matiari",
+        "province": "Sindh"
+    },
+    {
+        "id": 165,
+        "name": "Badin Cantonment",
+        "district": "Badin",
+        "province": "Sindh"
+    },
+    {
+        "id": 166,
+        "name": "Daur",
+        "district": "Shaheed Benazirabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 167,
+        "name": "Kotri",
+        "district": "Jamshoro",
+        "province": "Sindh"
+    },
+    {
+        "id": 168,
+        "name": "Jacobabad Cantt",
+        "district": "Jacobabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 169,
+        "name": "Pakka Anna",
+        "district": "Vehari",
+        "province": "Punjab"
+    },
+    {
+        "id": 170,
+        "name": "Fateh Jang",
+        "district": "Attock",
+        "province": "Punjab"
+    },
+    {
+        "id": 171,
+        "name": "Murree",
+        "district": "Murree",
+        "province": "Punjab"
+    },
+    {
+        "id": 172,
+        "name": "Kotli Sattian",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 173,
+        "name": "Gujar Khan Cantt",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 174,
+        "name": "Islamkot",
+        "district": "Umerkot",
+        "province": "Sindh"
+    },
+    {
+        "id": 175,
+        "name": "Sui Northern Town",
+        "district": "Dera Bugti",
+        "province": "Balochistan"
+    },
+    {
+        "id": 176,
+        "name": "Saddar Jacobabad",
+        "district": "Jacobabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 177,
+        "name": "Hala",
+        "district": "Sanghar",
+        "province": "Sindh"
+    },
+    {
+        "id": 178,
+        "name": "Kandhkot",
+        "district": "Kandhkot",
+        "province": "Sindh"
+    },
+    {
+        "id": 179,
+        "name": "Moro",
+        "district": "Naushahro Feroze",
+        "province": "Sindh"
+    },
+    {
+        "id": 180,
+        "name": "Bhit Shah",
+        "district": "Sanghar",
+        "province": "Sindh"
+    },
+    {
+        "id": 181,
+        "name": "Sukkur Cantonment",
+        "district": "Sukkur",
+        "province": "Sindh"
+    },
+    {
+        "id": 182,
+        "name": "Ghotki Cantt",
+        "district": "Ghotki",
+        "province": "Sindh"
+    },
+    {
+        "id": 183,
+        "name": "Farooqabad",
+        "district": "Sheikhupura",
+        "province": "Punjab"
+    },
+    {
+        "id": 184,
+        "name": "Saddar Jhang",
+        "district": "Jhang",
+        "province": "Punjab"
+    },
+    {
+        "id": 185,
+        "name": "Chawinda",
+        "district": "Sialkot",
+        "province": "Punjab"
+    },
+    {
+        "id": 186,
+        "name": "Qila Saifullah",
+        "district": "Qila Saifullah",
+        "province": "Balochistan"
+    },
+    {
+        "id": 187,
+        "name": "Killa Saifullah",
+        "district": "Killa Saifullah",
+        "province": "Balochistan"
+    },
+    {
+        "id": 188,
+        "name": "Pishin",
+        "district": "Pishin",
+        "province": "Balochistan"
+    },
+    {
+        "id": 189,
+        "name": "Ziarat",
+        "district": "Ziarat",
+        "province": "Balochistan"
+    },
+    {
+        "id": 190,
+        "name": "Khuzdar Cantonment",
+        "district": "Khuzdar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 191,
+        "name": "Matiari Cantt",
+        "district": "Matiari",
+        "province": "Sindh"
+    },
+    {
+        "id": 192,
+        "name": "Tando Allahyar",
+        "district": "Tando Allahyar",
+        "province": "Sindh"
+    },
+    {
+        "id": 193,
+        "name": "Sanghar Cantt",
+        "district": "Sanghar",
+        "province": "Sindh"
+    },
+    {
+        "id": 194,
+        "name": "Jhang Cantt",
+        "district": "Jhang",
+        "province": "Punjab"
+    },
+    {
+        "id": 195,
+        "name": "Harnai Cantt",
+        "district": "Harnai",
+        "province": "Balochistan"
+    },
+    {
+        "id": 196,
+        "name": "Sadiqabad Cantt",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 197,
+        "name": "Islamabad G-6",
+        "district": "Islamabad",
+        "province": "Islamabad Capital Territory"
+    },
+    {
+        "id": 198,
+        "name": "Islamabad F-8",
+        "district": "Islamabad",
+        "province": "Islamabad Capital Territory"
+    },
+    {
+        "id": 199,
+        "name": "Faisal Town",
+        "district": "Lahore",
+        "province": "Punjab"
+    },
+    {
+        "id": 200,
+        "name": "Wazirabad",
+        "district": "Gujranwala",
+        "province": "Punjab"
+    },
+    {
+        "id": 201,
+        "name": "Gojra Cantt",
+        "district": "Toba Tek Singh",
+        "province": "Punjab"
+    },
+    {
+        "id": 202,
+        "name": "Mian Channu",
+        "district": "Khanewal",
+        "province": "Punjab"
+    },
+    {
+        "id": 203,
+        "name": "Dera Allah Yar",
+        "district": "Jaffarabad",
+        "province": "Balochistan"
+    },
+    {
+        "id": 204,
+        "name": "Gojra Town",
+        "district": "Toba Tek Singh",
+        "province": "Punjab"
+    },
+    {
+        "id": 205,
+        "name": "Aliabad",
+        "district": "Hunza",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 206,
+        "name": "Sui Gas Colony",
+        "district": "Dera Bugti",
+        "province": "Balochistan"
+    },
+    {
+        "id": 207,
+        "name": "Kot Samaba",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 208,
+        "name": "Lalian",
+        "district": "Chiniot",
+        "province": "Punjab"
+    },
+    {
+        "id": 209,
+        "name": "Shorkot Cantt",
+        "district": "Jhang",
+        "province": "Punjab"
+    },
+    {
+        "id": 210,
+        "name": "Hafizabad Cantt",
+        "district": "Hafizabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 211,
+        "name": "Turbat Cantt",
+        "district": "Kech",
+        "province": "Balochistan"
+    },
+    {
+        "id": 212,
+        "name": "Ormara",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 213,
+        "name": "Pasni",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 214,
+        "name": "Gadani",
+        "district": "Lasbela",
+        "province": "Balochistan"
+    },
+    {
+        "id": 215,
+        "name": "Uthal",
+        "district": "Lasbela",
+        "province": "Balochistan"
+    },
+    {
+        "id": 216,
+        "name": "Sadiqabad Town",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 217,
+        "name": "Kohat Cantt",
+        "district": "Kohat",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 218,
+        "name": "Mastung Cantt",
+        "district": "Mastung",
+        "province": "Balochistan"
+    },
+    {
+        "id": 219,
+        "name": "Moro Cantt",
+        "district": "Naushahro Feroze",
+        "province": "Sindh"
+    },
+    {
+        "id": 220,
+        "name": "Sui Town",
+        "district": "Dera Bugti",
+        "province": "Balochistan"
+    },
+    {
+        "id": 221,
+        "name": "Jacobabad Town",
+        "district": "Jacobabad",
+        "province": "Sindh"
+    },
+    {
+        "id": 222,
+        "name": "Jatoi",
+        "district": "Muzaffargarh",
+        "province": "Punjab"
+    },
+    {
+        "id": 223,
+        "name": "Tando Bago",
+        "district": "Badin",
+        "province": "Sindh"
+    },
+    {
+        "id": 224,
+        "name": "Sukkur New Town",
+        "district": "Sukkur",
+        "province": "Sindh"
+    },
+    {
+        "id": 225,
+        "name": "Kashmore",
+        "district": "Kashmore",
+        "province": "Sindh"
+    },
+    {
+        "id": 226,
+        "name": "Shabqadar",
+        "district": "Charsadda",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 227,
+        "name": "Karak City",
+        "district": "Karak",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 228,
+        "name": "Hangu Cantt",
+        "district": "Hangu",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 229,
+        "name": "Pabbi",
+        "district": "Nowshera",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 230,
+        "name": "Nowshera Cantt",
+        "district": "Nowshera",
+        "province": "Khyber Pakhtunkhwa"
+    },
+    {
+        "id": 231,
+        "name": "Ghizer",
+        "district": "Ghizer",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 232,
+        "name": "Ghanche Town",
+        "district": "Ghanche",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 233,
+        "name": "Astore Town",
+        "district": "Astore",
+        "province": "Gilgit-Baltistan"
+    },
+    {
+        "id": 234,
+        "name": "Bagh Town",
+        "district": "Bagh",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 235,
+        "name": "Kotli Town",
+        "district": "Kotli",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 236,
+        "name": "Mirpur Cantonment",
+        "district": "Mirpur",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 237,
+        "name": "Hattian Bala",
+        "district": "Hattian Bala",
+        "province": "Azad Jammu and Kashmir"
+    },
+    {
+        "id": 238,
+        "name": "Chaklala",
+        "district": "Rawalpindi",
+        "province": "Punjab"
+    },
+    {
+        "id": 239,
+        "name": "Pind Dadan Khan",
+        "district": "Jhelum",
+        "province": "Punjab"
+    },
+    {
+        "id": 240,
+        "name": "Chichawatni",
+        "district": "Sahiwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 241,
+        "name": "Talagang Cantonment",
+        "district": "Chakwal",
+        "province": "Punjab"
+    },
+    {
+        "id": 242,
+        "name": "Samundri",
+        "district": "Faisalabad",
+        "province": "Punjab"
+    },
+    {
+        "id": 243,
+        "name": "Dajal",
+        "district": "Dera Ghazi Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 244,
+        "name": "Shakargarh",
+        "district": "Narowal",
+        "province": "Punjab"
+    },
+    {
+        "id": 245,
+        "name": "Ziarat Town",
+        "district": "Ziarat",
+        "province": "Balochistan"
+    },
+    {
+        "id": 246,
+        "name": "Dalbandin",
+        "district": "Chagai",
+        "province": "Balochistan"
+    },
+    {
+        "id": 247,
+        "name": "Ormara Cantt",
+        "district": "Gwadar",
+        "province": "Balochistan"
+    },
+    {
+        "id": 248,
+        "name": "Ghauspur",
+        "district": "Rahim Yar Khan",
+        "province": "Punjab"
+    },
+    {
+        "id": 249,
+        "name": "Burewala Town",
+        "district": "Vehari",
+        "province": "Punjab"
+    },
+    {
+        "id": 250,
+        "name": "Raiwind",
+        "district": "Lahore",
+        "province": "Punjab"
+    }
+]
