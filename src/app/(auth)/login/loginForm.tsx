@@ -12,8 +12,7 @@ import FormGroup from '@/components/ui/FormGroup/FormGroup'
 const LoginForm = () =>
 {
     const initialState = {
-        errors: {
-        }
+        errors: {}
     }
 
     const [state, formAction] = useActionState(handleLoginAction, initialState)
