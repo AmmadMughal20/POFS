@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("pofs_POSTGRES_URL")
+}
+
+enum BranchStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum OrderMode {
+  ONLINE
+  OFFLINE
+}
+
+model Permission {
+  id        Int              @id @default(autoincrement())
+  title     String           @db.VarChar(100)
+  rolePerms RolePermission[]
+}
+
+model RolePermission {
+  roleId     Int
+  permId     Int
+  Role       Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Permission Permission @relation(fields: [permId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([roleId, permId])
+}
+
+model Role {
+  id        Int              @id @default(autoincrement())
+  title     String           @db.VarChar(100)
+  User      User[]
+  rolePerms RolePermission[]
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  email     String     @unique @db.VarChar(255)
+  name      String?    @db.VarChar(255)
+  phoneNo   String     @unique @db.VarChar(15)
+  password  String     @db.VarChar(255)
+  roleId    Int
+  Role      Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status    UserStatus @default(ACTIVE)
+  Branch    Branch?    @relation("UserBranch")
+  Customer  Customer?
+  SalesMan  SalesMan?  @relation("UserSalesMan")
+}
+
+model Branch {
+  id            String       @id
+  address       String       @db.VarChar(200)
+  city          String       @db.VarChar(70)
+  area          String       @db.VarChar(100)
+  status        BranchStatus @default(ACTIVE)
+  openingTime   DateTime     @db.Time // stores only time, not date
+  closingTime   DateTime     @db.Time
+  branchManager Int          @unique
+  BranchManager User         @relation("UserBranch", fields: [branchManager], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  stocks        Stock[]      @relation("BranchStock")
+  salesMen      SalesMan[]   @relation("SalesManBranch")
+}
+
+model SalesMan {
+  id       Int    @unique
+  branchId String
+  User     User   @relation("UserSalesMan", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Branch   Branch @relation("SalesManBranch", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  title       String      @db.VarChar(200)
+  description String      @db.VarChar(500)
+  sku         String      @db.VarChar(20)
+  rate        Float
+  stocks      Stock[]     @relation("ProductStock")
+  orderItems  OrderItem[] @relation("ProductOrderItem")
+}
+
+model Stock {
+  branchId   String
+  productId  Int
+  Branch     Branch  @relation("BranchStock", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Product    Product @relation("ProductStock", fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  stockUnits Int
+
+  @@id([branchId, productId])
+}
+
+model Customer {
+  id      Int     @id
+  address String? @db.VarChar(200)
+  city    String  @db.VarChar(70)
+  area    String  @db.VarChar(100)
+  User    User    @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders  Order[]
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  customerId  Int
+  Customer    Customer    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderMode   OrderMode   @default(OFFLINE)
+  totalAmount Float
+  orderItems  OrderItem[] @relation("OrderOrderItem")
+}
+
+model OrderItem {
+  orderId   Int
+  productId Int
+  qty       Int
+  amount    Float
+  Order     Order   @relation("OrderOrderItem", fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Product   Product @relation("ProductOrderItem", fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([orderId, productId])
+}
