@@ -1,13 +1,13 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import Sidebar from './Sidebar'
-import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMenuItem'
-import { ArrowLeft, ArrowRight, Globe, Home, LogOut, MenuIcon, Phone, Settings } from 'lucide-react'
+import { useSidebar } from '@/context/SidebarContext'
+import { ArrowLeft, ArrowRight, Globe, Home, LogOut, Phone, Settings } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
 import Button from '../Button/Button'
+import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMenuItem'
 import Topbar from '../Topbar/Topbar'
-import { useSidebar } from '@/context/SidebarContext'
+import Sidebar from './Sidebar'
 
 export const sidebarMenuItems: ISidebarMenuItem[] = [
     {

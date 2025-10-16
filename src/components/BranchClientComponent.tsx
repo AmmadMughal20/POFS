@@ -11,6 +11,7 @@ import ViewBranchDetialsPopup from '@/components/ViewBranchDetailsPopup/ViewBran
 import { handleBranchAddAction, handleBranchDeleteAction, handleBranchEditAction } from '@/server/BranchFormHandlers';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Branch } from '@/schemas/BranchSchema';
 
 export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
@@ -22,15 +23,6 @@ const config = {
     alternateRowColors: true,
 };
 
-type Branch = {
-    id: string;
-    address: string;
-    city: string;
-    area: string;
-    phoneNo: string;
-    openingTime: string;
-    closingTime: string;
-};
 
 interface Props
 {
@@ -39,7 +31,7 @@ interface Props
 
 export default function BranchesPageClient({ initialBranches }: Props)
 {
-    const [branches, setBranches] = useState(initialBranches);
+    const branches = initialBranches;
     const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
     const [branchAddPopup, setBranchAddPopup] = useState(false);
     const [branchEditPopup, setBranchEditPopup] = useState(false);
@@ -58,12 +50,11 @@ export default function BranchesPageClient({ initialBranches }: Props)
         }
     };
 
-    const branchCols: Column[] = Object.keys(branches[0] as Branch)
+    const branchCols: Column<Branch>[] = Object.keys(branches[0] as Branch)
         .map((key) =>
         {
-            const isId = key === 'id';
             return {
-                key,
+                key: key as keyof Branch,
                 label: key.toUpperCase(),
                 sortable: true,
                 align: Align.CENTER,
@@ -78,32 +69,35 @@ export default function BranchesPageClient({ initialBranches }: Props)
             return a.key.localeCompare(b.key);
         });
 
-    const columnsWithActions = [
+    const columnsWithActions: Column<Branch>[] = [
         ...branchCols,
         {
-            key: 'actions',
+            key: 'actions', // ✅ now allowed
             label: 'ACTIONS',
             align: Align.CENTER,
-            render: (_: any, row: Record<string, any>) => (
-                <RowActions
-                    onView={() =>
-                    {
-                        const branch = branches.find(b => b.id === row.id);
-                        if (branch) setSelectedBranch(branch);
-                        setViewBranchDetails(true);
-                    }}
-                    onEdit={() =>
-                    {
-                        const branch = branches.find(b => b.id === row.id);
-                        if (branch) setSelectedBranch(branch);
-                        setBranchEditPopup(true);
-                    }}
-                    onDelete={() => handleDelete(row.id)}
-                    showView
-                    showEdit
-                    showDelete
-                />
-            ),
+            render: (row) =>
+            {
+                return (
+                    <RowActions
+                        onView={() =>
+                        {
+                            const branch = branches.find((b: Branch) => b.id === row.id);
+                            if (branch) setSelectedBranch(branch);
+                            setViewBranchDetails(true);
+                        }}
+                        onEdit={() =>
+                        {
+                            const branch = branches.find(b => b.id === row.id);
+                            if (branch) setSelectedBranch(branch);
+                            setBranchEditPopup(true);
+                        }}
+                        onDelete={() => handleDelete(row.id)}
+                        showView
+                        showEdit
+                        showDelete
+                    />
+                )
+            },
         },
     ];
 

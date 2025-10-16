@@ -5,6 +5,18 @@ import areaCodeList from '@/data/areanames.json';
 
 const citiesToCompare = citiesList.map(city => (city.name))
 const areasToCompare = areaCodeList.map(area => (area.name))
+type City = (typeof citiesToCompare)[number]
+type Area = (typeof areasToCompare)[number]
+
+export type Branch = {
+    id: string
+    phoneNo: string
+    address: string
+    area: Area,
+    city: City,
+    openingTime: string
+    closingTime: string
+}
 
 export const BranchSchema = z.object({
     id: z.string().min(1, 'Branch Id is required'),

@@ -1,7 +1,13 @@
 'use server'
 import { OTPSchema } from "./schema"
 
-export async function handleOtpAction(prevState: any, formData: FormData)
+export interface OTPState
+{
+    errors?: Record<string, string[]>;
+    success?: boolean;
+}
+
+export async function handleOtpAction(prevState: OTPState, formData: FormData)
 {
     await new Promise((resolve) => setTimeout(resolve, 2000))
 

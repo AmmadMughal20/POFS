@@ -7,6 +7,7 @@ import Label from '../ui/Label/Label'
 import Button from '../ui/Button/Button'
 import citiesList from "@/data/pakistan-cities-250.json"
 import areasList from "@/data/areanames.json"
+import { BranchesState } from '@/server/BranchFormHandlers'
 
 interface BranchFormProps
 {
@@ -20,7 +21,7 @@ interface BranchFormProps
         openingTime: string;
         closingTime: string;
     }>;
-    onSubmitAction: (prevState: any, formData: FormData) => Promise<any>;
+    onSubmitAction: (prevState: BranchesState, formData: FormData) => Promise<BranchesState>;
 }
 
 const BranchForm: React.FC<BranchFormProps> = ({
@@ -36,7 +37,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
     const initialState = { errors: {} }
 
     const [state, formAction] = useActionState(
-        async (prevState: any, formData: FormData) =>
+        async (prevState: BranchesState, formData: FormData) =>
         {
             return await onSubmitAction(prevState, formData);
         },
@@ -106,7 +107,13 @@ const BranchForm: React.FC<BranchFormProps> = ({
     };
 
     return (
-        <Form title={mode === 'add' ? 'Add Branch' : 'Edit Branch'} action={formAction}>
+        <Form title={mode === 'add' ? 'Add Branch' : 'Edit Branch'} onSubmit={(e: React.FormEvent<HTMLFormElement>) =>
+        {
+            e.preventDefault(); // prevent page reload
+
+            const formData = new FormData(e.currentTarget);
+            formAction(formData); // call your useActionState handler
+        }}>
             {/* Branch ID */}
             <FormGroup>
                 <Label htmlFor='branchId'>Branch Id</Label>
@@ -114,10 +121,10 @@ const BranchForm: React.FC<BranchFormProps> = ({
                     name='branchId'
                     placeholder='Enter unique branch Id e.g. GR-32'
                     readOnly={mode === 'edit'}
-                    defaultValue={state?.values?.branchId ?? initialData.branchId ?? ''}
+                    defaultValue={state?.values?.id ?? initialData.branchId ?? ''}
                 />
-                {state.errors?.branchId && (
-                    <p className="text-error">{state.errors.branchId[0]}</p>
+                {state.errors?.id && (
+                    <p className="text-error">{state.errors.id[0]}</p>
                 )}
             </FormGroup>
 
@@ -156,9 +163,9 @@ const BranchForm: React.FC<BranchFormProps> = ({
                         ))}
                     </ul>
                 )}
-                {state.errors?.area && (
+                {state.errors?.area ? (
                     <p className="text-error">{state.errors.area[0]}</p>
-                )}
+                ) : null}
             </FormGroup>
 
             {/* Address */}
@@ -169,9 +176,9 @@ const BranchForm: React.FC<BranchFormProps> = ({
                     placeholder='Enter Address e.g. 41 Usman Street'
                     defaultValue={state?.values?.address ?? initialData.address ?? ''}
                 />
-                {state.errors?.address && (
+                {state.errors?.address ? (
                     <p className="text-error">{state.errors.address[0]}</p>
-                )}
+                ) : null}
             </FormGroup>
 
             {/* City */}
@@ -196,9 +203,9 @@ const BranchForm: React.FC<BranchFormProps> = ({
                         ))}
                     </ul>
                 )}
-                {state.errors?.city && (
+                {state.errors?.city ? (
                     <p className="text-error">{state.errors.city[0]}</p>
-                )}
+                ) : null}
             </FormGroup>
 
             {/* Times */}
@@ -209,9 +216,9 @@ const BranchForm: React.FC<BranchFormProps> = ({
                     type="time"
                     defaultValue={state?.values?.openingTime ?? initialData.openingTime ?? ''}
                 />
-                {state.errors?.openingTime && (
+                {state.errors?.openingTime ? (
                     <p className="text-error">{state.errors.openingTime[0]}</p>
-                )}
+                ) : null}
             </FormGroup>
 
             <FormGroup>
@@ -221,19 +228,19 @@ const BranchForm: React.FC<BranchFormProps> = ({
                     type="time"
                     defaultValue={state?.values?.closingTime ?? initialData.closingTime ?? ''}
                 />
-                {state.errors?.closingTime && (
+                {state.errors?.closingTime ? (
                     <p className="text-error">{state.errors.closingTime[0]}</p>
-                )}
+                ) : null}
             </FormGroup>
 
             {/* Success message */}
-            {state.success && (
+            {state.success ? (
                 <div className='text-center'>
                     <p className='text-success font-bold text-lg'>
                         {mode === "add" ? "Branch Added Successfully" : "Branch Updated Successfully"}
                     </p>
                 </div>
-            )}
+            ) : <></>}
 
             <FormGroup>
                 <Button>{mode === 'add' ? 'Submit' : 'Update'}</Button>

@@ -22,11 +22,17 @@ const LoginForm = () =>
 
     const handleTypeChange = () =>
     {
-        fieldType === 'password' ? setFieldType('text') : setFieldType('password')
+        setFieldType(fieldType === 'password' ? 'text' : 'password')
     }
 
     return (
-        <Form title='Login' action={formAction} className='!min-w-75'>
+        <Form title='Login' onSubmit={(e: React.FormEvent<HTMLFormElement>) =>
+        {
+            e.preventDefault(); // prevent page reload
+
+            const formData = new FormData(e.currentTarget);
+            formAction(formData); // call your useActionState handler
+        }} className='!min-w-75'>
             <FormGroup>
                 <Label htmlFor='username'>Username</Label>
                 <Input name='username' placeholder='Enter Username' />

@@ -18,7 +18,13 @@ const ForgotPasswordForm = () =>
     const [state, formAction] = useActionState(handleForgotPasswordAction, initialState)
 
     return (
-        <Form title='Forgot Password' action={formAction}>
+        <Form title='Forgot Password' onSubmit={(e: React.FormEvent<HTMLFormElement>) =>
+        {
+            e.preventDefault(); // prevent page reload
+
+            const formData = new FormData(e.currentTarget);
+            formAction(formData); // call your useActionState handler
+        }}>
             <div className='flex flex-col'>
                 <Label htmlFor='username'>Username</Label>
                 <Input name='username' placeholder='Enter Username' autoFocus />
@@ -29,9 +35,9 @@ const ForgotPasswordForm = () =>
                 }
             </div>
             {
-                state.success &&
-                <div className='text-success'>
-                    Form Submitted Successfully</div>
+                state.success ?
+                    <div className='text-success'>
+                        Form Submitted Successfully</div> : <></>
             }
             <div className='flex justify-evenly items-center w-full mt-5'>
                 <SubmitButton />

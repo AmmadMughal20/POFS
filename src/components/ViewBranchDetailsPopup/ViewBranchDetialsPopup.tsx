@@ -1,9 +1,10 @@
 import React from 'react'
 import Button from '../ui/Button/Button'
 import Card from '../ui/Card/Card'
+import { Branch } from '@/schemas/BranchSchema'
 
 type VB = {
-    selectedBranch: any,
+    selectedBranch: Branch,
     onClose: () => void
 }
 const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>

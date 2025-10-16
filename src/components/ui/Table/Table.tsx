@@ -12,20 +12,35 @@ interface StyleConfig
     bgColor?: string;
     textColor?: string;
     fontWeight?: string;
-    align?: Align;
+    textAlign?: Align;
 }
 
-export interface Column
+
+export interface DataColumn<T, K extends keyof T = keyof T>
 {
-    key: string;
+    key: K; // must be a key of T
     label: string;
     sortable?: boolean;
     align?: Align;
     width?: string | number;
     headerStyle?: StyleConfig;
     bodyStyle?: StyleConfig;
-    render?: (value: any, row: Record<string, any>, rowIndex: number) => React.ReactNode;
+    render?: (value: T[K], row: T, rowIndex: number) => React.ReactNode;
 }
+
+export interface CustomColumn<T>
+{
+    key: string; // can be anything not in keyof T
+    label: string;
+    align?: Align;
+    sortable?: boolean;
+    width?: string | number;
+    headerStyle?: StyleConfig;
+    bodyStyle?: StyleConfig;
+    render: (row: T, rowIndex: number) => React.ReactNode; // only row is passed
+}
+
+export type Column<T> = DataColumn<T> | CustomColumn<T>;
 
 interface TableConfig
 {
@@ -36,15 +51,25 @@ interface TableConfig
     alternateRowColors?: boolean;
 }
 
-interface ITable
+interface TableProps<T>
 {
-    columns: Column[];
-    data: Record<string, any>[];
+    columns: Column<T>[];
+    data: T[];
     className?: string;
     config?: TableConfig;
 }
 
-const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} }) =>
+function isDataColumn<T>(col: Column<T>): col is DataColumn<T>
+{
+    return typeof col.render === 'function' && col.render.length === 3;
+}
+
+function Table<T extends Record<string, unknown>>({
+    data,
+    columns,
+    className = '',
+    config = {},
+}: TableProps<T>)
 {
     const {
         enableSearch = true,
@@ -54,14 +79,14 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
         alternateRowColors = true,
     } = config;
 
-    const [search, setSearch] = useState('');
-    const [sortKey, setSortKey] = useState<string | null>(null);
+    const [search, setSearch] = useState<string>('');
+    const [sortKey, setSortKey] = useState<keyof T | null>(null);
     const [sortAsc, setSortAsc] = useState(true);
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
 
-    // handle sort click
-    const handleSort = (col: Column) =>
+    // Sorting handler
+    const handleSort = (col: Column<T>) =>
     {
         if (!col.sortable) return;
         if (sortKey === col.key) setSortAsc(!sortAsc);
@@ -72,15 +97,20 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
         }
     };
 
-    // filtering
+    // Filter data
     const filteredData = useMemo(() =>
     {
+        const searchLower = search.toLowerCase();
         return data.filter((row) =>
-            Object.values(row).join(' ').toLowerCase().includes(search.toLowerCase())
+            Object.values(row)
+                .map((v) => (v == null ? '' : String(v)))
+                .join(' ')
+                .toLowerCase()
+                .includes(searchLower)
         );
     }, [data, search]);
 
-    // sorting
+    // Sort data
     const sortedData = useMemo(() =>
     {
         if (!sortKey) return filteredData;
@@ -89,13 +119,19 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
 
         return [...filteredData].sort((a, b) =>
         {
-            if (a[sortKey] < b[sortKey]) return sortAsc ? -1 : 1;
-            if (a[sortKey] > b[sortKey]) return sortAsc ? 1 : -1;
+            const aValue = a[sortKey];
+            const bValue = b[sortKey];
+
+            if (aValue == null) return 1;
+            if (bValue == null) return -1;
+
+            if (aValue < bValue) return sortAsc ? -1 : 1;
+            if (aValue > bValue) return sortAsc ? 1 : -1;
             return 0;
         });
     }, [filteredData, sortKey, sortAsc, columns]);
 
-    // pagination
+    // Pagination
     const paginatedData = useMemo(() =>
     {
         if (!enablePagination) return sortedData;
@@ -104,6 +140,21 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
     }, [sortedData, page, rowsPerPage, enablePagination]);
 
     const totalPages = Math.ceil(sortedData.length / rowsPerPage);
+
+    function renderCell(value: unknown): React.ReactNode
+    {
+        if (value === null || value === undefined) return null;
+        if (typeof value === 'boolean') return null; // ignore booleans
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint')
+        {
+            return value;
+        }
+        if (React.isValidElement(value)) return value; // already a React node
+        if (Array.isArray(value)) return value.map((v, i) => <React.Fragment key={i}>{renderCell(v)}</React.Fragment>);
+        // fallback for objects
+        return JSON.stringify(value);
+    }
+
 
     return (
         <div className={`space-y-3 ${className}`}>
@@ -131,29 +182,26 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
                         <tr>
                             {columns.map((col) => (
                                 <th
-                                    key={col.key}
+                                    key={String(col.key)}
                                     onClick={() => handleSort(col)}
                                     className={`
-  px-4 py-3 select-none cursor-${col.sortable ? 'pointer' : 'default'}
-  uppercase text-xs border-b border-gray-200
-  ${col.headerStyle?.bgColor ?? 'bg-gray-100'}
-  ${col.headerStyle?.textColor ?? 'text-gray-800'}
-  ${col.headerStyle?.fontWeight ?? 'font-semibold'}
-  ${col.headerStyle?.align === Align.CENTER
+                    px-4 py-3 select-none cursor-${col.sortable ? 'pointer' : 'default'}
+                    uppercase text-xs border-b border-gray-200
+                    ${col.headerStyle?.bgColor ?? 'bg-gray-100'}
+                    ${col.headerStyle?.textColor ?? 'text-gray-800'}
+                    ${col.headerStyle?.fontWeight ?? 'font-semibold'}
+                    ${col.headerStyle?.textAlign === Align.CENTER
                                             ? 'text-center'
-                                            : col.headerStyle?.align === Align.RIGHT
+                                            : col.headerStyle?.textAlign === Align.RIGHT
                                                 ? 'text-right'
-                                                : 'text-left'
-                                        }
-`}
+                                                : 'text-left'}
+                  `}
                                     style={{ width: col.width || `${100 / columns.length}%` }}
                                 >
                                     <div className="flex items-center justify-between">
                                         <span>{col.label}</span>
                                         {col.sortable && sortKey === col.key && (
-                                            <span className="ml-1 text-gray-500">
-                                                {sortAsc ? '▲' : '▼'}
-                                            </span>
+                                            <span className="ml-1 text-gray-500">{sortAsc ? '▲' : '▼'}</span>
                                         )}
                                     </div>
                                 </th>
@@ -166,37 +214,35 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
                             paginatedData.map((row, idx) => (
                                 <tr
                                     key={idx}
-                                    className={`${alternateRowColors && idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'
-                                        } hover:bg-gray-100 transition`}
+                                    className={`${alternateRowColors && idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 transition`}
                                 >
                                     {columns.map((col) => (
                                         <td
-                                            key={col.key}
+                                            key={String(col.key)}
                                             className={`
-  px-4 py-3 border-b border-gray-100
-  ${col.headerStyle?.textColor ?? 'text-gray-700'}
-  ${col.headerStyle?.fontWeight ?? 'font-normal'}
-  ${col.headerStyle?.align === Align.CENTER
+                        px-4 py-3 border-b border-gray-100
+                        ${col.bodyStyle?.textColor ?? 'text-gray-700'}
+                        ${col.bodyStyle?.fontWeight ?? 'font-normal'}
+                        ${col.bodyStyle?.textAlign === Align.CENTER
                                                     ? 'text-center'
-                                                    : col.headerStyle?.align === Align.RIGHT
+                                                    : col.bodyStyle?.textAlign === Align.RIGHT
                                                         ? 'text-right'
-                                                        : 'text-left'
-                                                }
-`}
+                                                        : 'text-left'}
+                      `}
                                         >
                                             {col.render
-                                                ? col.render(row[col.key], row, idx)
-                                                : row[col.key] ?? '-'}
+                                                ? isDataColumn(col)
+                                                    ? col.render(row[col.key as keyof T], row, idx)
+                                                    : col.render(row, idx)
+                                                : renderCell(col.key in row ? row[col.key as keyof T] : undefined)
+                                            }
                                         </td>
                                     ))}
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td
-                                    colSpan={columns.length}
-                                    className="text-center py-6 text-gray-500"
-                                >
+                                <td colSpan={columns.length} className="text-center py-6 text-gray-500">
                                     No data available
                                 </td>
                             </tr>
@@ -206,7 +252,7 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
             </div>
 
             {/* Pagination */}
-            {enablePagination && (
+            {enablePagination && totalPages > 1 && (
                 <div className="flex items-center justify-between text-sm text-gray-700">
                     <div className="flex items-center space-x-2">
                         <span>Rows per page:</span>
@@ -228,24 +274,20 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
                     </div>
 
                     <div className="space-x-2 flex items-center">
-                        {totalPages > 1 && (
-                            <>
-                                <button
-                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                    className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
-                                >
-                                    Prev
-                                </button>
-                                <button
-                                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                    disabled={page === totalPages}
-                                    className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
-                                >
-                                    Next
-                                </button>
-                            </>
-                        )}
+                        <button
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+                        >
+                            Prev
+                        </button>
+                        <button
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+                        >
+                            Next
+                        </button>
                         <span>
                             Page {page} of {totalPages}
                         </span>
@@ -254,6 +296,6 @@ const Table: React.FC<ITable> = ({ data, columns, className = '', config = {} })
             )}
         </div>
     );
-};
+}
 
 export default Table;

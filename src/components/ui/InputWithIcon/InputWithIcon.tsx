@@ -11,7 +11,7 @@ interface IInputWithIcon
     placeholder?: string
     value?: string | number,
     onChange?: ChangeEventHandler<HTMLInputElement>
-    className?: '',
+    className?: string,
     onTypeChange?: () => void
     icon: React.ReactNode,
     iconPosition: 'left' | "right"

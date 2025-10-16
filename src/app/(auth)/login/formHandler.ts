@@ -1,7 +1,14 @@
 'use server'
 import { LoginSchema } from "./schema"
 
-export async function handleLoginAction(prevState: any, formData: FormData)
+
+export interface LoginState
+{
+    errors?: Record<string, string[]>;
+    success?: boolean;
+}
+
+export async function handleLoginAction(prevState: LoginState, formData: FormData)
 {
     await new Promise((resolve) => setTimeout(resolve, 2000))
 

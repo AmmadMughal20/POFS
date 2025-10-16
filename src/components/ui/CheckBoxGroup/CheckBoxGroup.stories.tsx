@@ -13,10 +13,6 @@ const meta = {
     tags: ['autodocs'],
     // More on argTypes: https://storybook.js.org/docs/api/argtypes
     argTypes: {
-        mode: {
-            control: { type: 'radio' },
-            options: ['single', 'multiple'],
-        },
         direction: {
             control: { type: 'radio' },
             options: ['vertical', 'horizontal'],
@@ -32,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Normal: Story = {
     args: {
+        title: 'Fruits',
         name: 'fruits',
-        mode: 'multiple',
         direction: 'vertical',
         children: [
             <CheckBoxInput key='apple' title='Apple' value='apple' name='fruits' />,
@@ -46,8 +42,8 @@ export const Normal: Story = {
 
 export const SingleSelect: Story = {
     args: {
+        title: 'Fruits',
         name: 'fruits',
-        mode: 'single',
         direction: 'vertical',
         children: [
             <CheckBoxInput key='apple' title='Apple' value='apple' name='fruits' />,
@@ -59,8 +55,8 @@ export const SingleSelect: Story = {
 
 export const HorizontalSelect: Story = {
     args: {
+        title: 'Fruits',
         name: 'fruits',
-        mode: 'single',
         direction: 'horizontal',
         children: [
             <CheckBoxInput key='apple' title='Apple' value='apple' name='fruits' />,

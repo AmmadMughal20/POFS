@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
     args: {
         name: 'Select',
-        children: [<Option />, <Option key={1} value={1} title='Option 1' />, <Option key={2} value={2} title='Option 2' />],
+        children: [<Option key={1} />, <Option key={2} value={1} title='Option 1' />, <Option key={3} value={2} title='Option 2' />],
     },
 };
 
@@ -35,7 +35,7 @@ export const Small: Story = {
     args: {
         name: 'Small Select',
         className: 'small',
-        children: [<Option />, <Option key={1} value={1} title='Option 1' />, <Option key={2} value={2} title='Option 2' />],
+        children: [<Option key={1} />, <Option key={2} value={1} title='Option 1' />, <Option key={3} value={2} title='Option 2' />],
     },
 };
 
@@ -43,7 +43,7 @@ export const Medium: Story = {
     args: {
         name: 'Medium Select',
         className: 'medium',
-        children: [<Option />, <Option key={1} value={1} title='Option 1' />, <Option key={2} value={2} title='Option 2' />],
+        children: [<Option key={1} />, <Option key={2} value={1} title='Option 1' />, <Option key={3} value={2} title='Option 2' />],
     },
 };
 
@@ -51,7 +51,7 @@ export const Large: Story = {
     args: {
         name: 'Large Select',
         className: 'large',
-        children: [<Option />, <Option key={1} value={1} title='Option 1' />, <Option key={2} value={2} title='Option 2' />],
+        children: [<Option key={1} />, <Option key={2} value={1} title='Option 1' />, <Option key={3} value={2} title='Option 2' />],
     },
 };
 
@@ -59,6 +59,6 @@ export const Disabled: Story = {
     args: {
         name: 'Disabled',
         disabled: true,
-        children: [<Option />, <Option key={1} value={1} />, <Option key={2} value={2} />],
+        children: [<Option key={1} />, <Option key={2} value={1} />, <Option key={3} value={2} />],
     },
 };

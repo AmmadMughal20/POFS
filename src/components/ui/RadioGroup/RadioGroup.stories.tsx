@@ -30,8 +30,8 @@ export const Normal: Story = {
         name: "normal",
         direction: 'vertical',
         children: [
-            <RadioInput name='normal' value='Option1' title='Option1' id={1} />,
-            <RadioInput name='normal' value='Option2' title='Option2' id={2} />,
+            <RadioInput name='normal' value='Option1' title='Option1' id={1} key={1} />,
+            <RadioInput name='normal' value='Option2' title='Option2' id={2} key={2} />,
         ],
     },
 };
@@ -42,8 +42,8 @@ export const Horizontal: Story = {
         name: "Horizontal",
         direction: 'horizontal',
         children: [
-            <RadioInput name='Horizontal' value='Option1' title='Option1' id={1} />,
-            <RadioInput name='Horizontal' value='Option2' title='Option2' id={2} />,
+            <RadioInput name='Horizontal' value='Option1' title='Option1' id={1} key={1} />,
+            <RadioInput name='Horizontal' value='Option2' title='Option2' id={2} key={2} />,
         ],
     },
 };

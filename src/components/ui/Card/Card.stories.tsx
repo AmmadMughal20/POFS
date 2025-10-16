@@ -27,9 +27,9 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
     args: {
         className: 'max-w-100',
-        children: [<h3>Card Title</h3>,
-        <p className='py-5'>This is description.This is description.This is description.This is description.This is description.This is description.This is description.</p>
-            , <Button type='reset'>Sample</Button>
+        children: [<h3 key={1}>Card Title</h3>,
+        <p className='py-5' key={2}>This is description.This is description.This is description.This is description.This is description.This is description.This is description.</p>
+            , <Button type='reset' key={3}>Sample</Button>
         ]
     },
 };

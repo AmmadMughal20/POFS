@@ -32,11 +32,11 @@ export const Simple: Story = {
     args: {
         title: 'Simple Form',
         children: [
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2' key={1}>
                 <Label htmlFor='sample'>Sample Label</Label>
                 <Input name='sample' autoFocus />
             </div>,
-            <div className='flex justify-center items-center gap-2'>
+            <div className='flex justify-center items-center gap-2' key={2}>
                 <Button onClick={() => { return '' }} type='reset'>Submit</Button>
                 <Button onClick={() => { return '' }} type='reset' variant='secondary'>Cancel</Button>
             </div>

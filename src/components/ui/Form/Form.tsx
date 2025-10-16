@@ -1,14 +1,14 @@
 import React from 'react'
-import Button from '../Button/Button'
 
 interface IForm
 {
     title: string,
-    action?: any
+    action?: string;
     onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
     children?: React.ReactElement[]
     className?: string
 }
+
 const Form: React.FC<IForm> = ({ title, children, action, onSubmit, className = '' }) =>
 {
     return (

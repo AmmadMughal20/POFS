@@ -1,12 +1,20 @@
 'use server'
-import { BranchSchema } from "@/schemas/BranchSchema"
+import { BranchSchema, Branch } from "@/schemas/BranchSchema"
 import { revalidatePath } from 'next/cache'
 import fs from 'fs'
 import path from 'path'
 
 const BRANCHES_PATH = path.join(process.cwd(), 'src', 'data', 'branches.json')
 
-async function saveBranches(updatedBranches: any)
+export interface BranchesState
+{
+    errors?: Record<string, string[]>;
+    success?: boolean;
+    message?: string;
+    values?: Partial<Branch>
+}
+
+async function saveBranches(updatedBranches: Branch[])
 {
     await fs.promises.writeFile(
         BRANCHES_PATH,
@@ -16,23 +24,23 @@ async function saveBranches(updatedBranches: any)
 }
 
 
-export async function getBranches()
+export async function getBranches(): Promise<Branch[]>
 {
     const data = JSON.parse(await fs.promises.readFile(BRANCHES_PATH, 'utf-8'))
 
     await new Promise(res => setTimeout(res, 200))
 
-    return data.branches.map((branch: any) => ({
+    return data.branches.map((branch: Branch) => ({
         ...branch,
         branchId: branch.id,
     }))
 }
 
-export async function handleBranchAddAction(prevState: any, formData: FormData)
+export async function handleBranchAddAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
     await new Promise((resolve) => setTimeout(resolve, 200))
 
-    const newBranch = {
+    const newBranch: Branch = {
         id: formData.get('branchId')?.toString() || crypto.randomUUID(),
         city: formData.get('city')?.toString() || '',
         area: formData.get('area')?.toString() || '',
@@ -53,7 +61,7 @@ export async function handleBranchAddAction(prevState: any, formData: FormData)
     }
 
     const data = JSON.parse(await fs.promises.readFile(BRANCHES_PATH, 'utf-8'))
-    const updated = [...data.branches, newBranch]
+    const updated: Branch[] = [...data.branches, newBranch]
 
     await saveBranches(updated)
     revalidatePath('/branch-management')
@@ -61,13 +69,13 @@ export async function handleBranchAddAction(prevState: any, formData: FormData)
     return { success: true, message: 'Branch added successfully' }
 }
 
-export async function handleBranchEditAction(prevState: any, formData: FormData)
+export async function handleBranchEditAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
     await new Promise((resolve) => setTimeout(resolve, 200))
 
     const branchId = formData.get('branchId')?.toString() || ''
 
-    const updatedBranch = {
+    const updatedBranch: Branch = {
         id: branchId,
         city: formData.get('city')?.toString() || '',
         area: formData.get('area')?.toString() || '',
@@ -87,7 +95,7 @@ export async function handleBranchEditAction(prevState: any, formData: FormData)
     }
 
     const data = JSON.parse(await fs.promises.readFile(BRANCHES_PATH, 'utf-8'))
-    const updated = data.branches.map((b: any) =>
+    const updated: Branch[] = data.branches.map((b: Branch) =>
         b.id === branchId ? updatedBranch : b
     )
 
@@ -98,14 +106,14 @@ export async function handleBranchEditAction(prevState: any, formData: FormData)
 }
 
 
-export async function handleBranchDeleteAction(prevState: any, formData: FormData)
+export async function handleBranchDeleteAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
     const branchId = formData.get('branchId') as string
 
     try
     {
         const data = JSON.parse(await fs.promises.readFile(BRANCHES_PATH, 'utf-8'))
-        const updated = data.branches.filter((b: any) => b.id !== branchId)
+        const updated: Branch[] = data.branches.filter((b: Branch) => b.id !== branchId)
 
         await saveBranches(updated)
         revalidatePath('/branch-management')

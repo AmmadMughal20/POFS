@@ -1,7 +1,13 @@
 'use server'
 import { ForgotPasswordSchema } from "./schema"
 
-export async function handleForgotPasswordAction(prevState: any, formData: FormData)
+export interface ForgotPasswordState
+{
+    errors?: Record<string, string[]>;
+    success?: boolean;
+}
+
+export async function handleForgotPasswordAction(prevState: ForgotPasswordState, formData: FormData)
 {
     await new Promise((resolve) => setTimeout(resolve, 2000))
 

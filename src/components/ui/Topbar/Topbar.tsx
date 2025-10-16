@@ -1,8 +1,8 @@
 "use client"
+import { BellDot, Menu, Moon, X } from 'lucide-react'
+import Image from 'next/image'
 import React, { useState } from 'react'
 import Searchbar from '../Searchbar/Searchbar'
-import Image from 'next/image'
-import { ArrowDown, ArrowDown01, BellDot, BowArrow, LucideMenu, Menu, Moon, X } from 'lucide-react'
 
 interface ITopbar
 {
