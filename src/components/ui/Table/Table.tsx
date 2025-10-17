@@ -64,7 +64,7 @@ function isDataColumn<T>(col: Column<T>): col is DataColumn<T>
     return typeof col.render === 'function' && col.render.length === 3;
 }
 
-function Table<T extends Record<string, unknown>>({
+function Table<T extends object>({
     data,
     columns,
     className = '',
@@ -89,11 +89,14 @@ function Table<T extends Record<string, unknown>>({
     const handleSort = (col: Column<T>) =>
     {
         if (!col.sortable) return;
-        if (sortKey === col.key) setSortAsc(!sortAsc);
-        else
-        {
-            setSortKey(col.key);
-            setSortAsc(true);
+        if (isDataColumn(col))
+        { // only DataColumn has keyof T keys
+            if (sortKey === col.key) setSortAsc(!sortAsc);
+            else
+            {
+                setSortKey(col.key);
+                setSortAsc(true);
+            }
         }
     };
 
@@ -102,7 +105,7 @@ function Table<T extends Record<string, unknown>>({
     {
         const searchLower = search.toLowerCase();
         return data.filter((row) =>
-            Object.values(row)
+            Object.values(row as { [key: string]: unknown })
                 .map((v) => (v == null ? '' : String(v)))
                 .join(' ')
                 .toLowerCase()

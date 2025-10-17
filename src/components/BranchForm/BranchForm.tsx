@@ -1,5 +1,5 @@
 'use client'
-import React, { useActionState, useState } from 'react'
+import React, { startTransition, useActionState, useState } from 'react'
 import Form from '../ui/Form/Form'
 import FormGroup from '../ui/FormGroup/FormGroup'
 import Input from '../ui/Input/Input'
@@ -8,6 +8,8 @@ import Button from '../ui/Button/Button'
 import citiesList from "@/data/pakistan-cities-250.json"
 import areasList from "@/data/areanames.json"
 import { BranchesState } from '@/server/BranchFormHandlers'
+import RadioGroup from '../ui/RadioGroup/RadioGroup'
+import RadioInput from '../ui/RadioInput/RadioInput'
 
 interface BranchFormProps
 {
@@ -18,8 +20,9 @@ interface BranchFormProps
         area: string;
         address: string;
         city: string;
-        openingTime: string;
-        closingTime: string;
+        openingTime: Date;
+        closingTime: Date;
+        status: 'ACTIVE' | 'DISABLED'
     }>;
     onSubmitAction: (prevState: BranchesState, formData: FormData) => Promise<BranchesState>;
 }
@@ -112,7 +115,10 @@ const BranchForm: React.FC<BranchFormProps> = ({
             e.preventDefault(); // prevent page reload
 
             const formData = new FormData(e.currentTarget);
-            formAction(formData); // call your useActionState handler
+            startTransition(() =>
+            {
+                formAction(formData); // call your useActionState handler
+            })
         }}>
             {/* Branch ID */}
             <FormGroup>
@@ -214,7 +220,13 @@ const BranchForm: React.FC<BranchFormProps> = ({
                 <Input
                     name='openingTime'
                     type="time"
-                    defaultValue={state?.values?.openingTime ?? initialData.openingTime ?? ''}
+                    defaultValue={
+                        state?.values?.openingTime
+                            ? new Date(state.values.openingTime).toISOString().substring(11, 16)
+                            : initialData.openingTime
+                                ? new Date(initialData.openingTime).toISOString().substring(11, 16)
+                                : ''
+                    }
                 />
                 {state.errors?.openingTime ? (
                     <p className="text-error">{state.errors.openingTime[0]}</p>
@@ -226,10 +238,30 @@ const BranchForm: React.FC<BranchFormProps> = ({
                 <Input
                     name='closingTime'
                     type="time"
-                    defaultValue={state?.values?.closingTime ?? initialData.closingTime ?? ''}
+                    defaultValue={
+                        state?.values?.closingTime
+                            ? new Date(state.values.closingTime).toISOString().substring(11, 16)
+                            : initialData.closingTime
+                                ? new Date(initialData.closingTime).toISOString().substring(11, 16)
+                                : ''
+                    }
                 />
                 {state.errors?.closingTime ? (
                     <p className="text-error">{state.errors.closingTime[0]}</p>
+                ) : null}
+            </FormGroup>
+
+            <FormGroup>
+                <RadioGroup title='Status' name='status' >
+                    <RadioInput name='status' key='ACTIVE' value='ACTIVE' title='ACTIVE' defaultChecked={
+                        (state?.values?.status ?? initialData.status) === 'ACTIVE'
+                    } />
+                    <RadioInput name='status' key="DISABLED" value='DISABLED' title='DISABLED' defaultChecked={
+                        (state?.values?.status ?? initialData.status) === 'DISABLED'
+                    } />
+                </RadioGroup>
+                {state.errors?.status ? (
+                    <p className="text-error">{state.errors.status[0]}</p>
                 ) : null}
             </FormGroup>
 

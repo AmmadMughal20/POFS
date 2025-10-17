@@ -3,8 +3,7 @@ import BranchesPageClient from '../../../components/BranchClientComponent';
 
 export default async function Page()
 {
-    const branches = await getBranches(); // Server-side data fetching
-
+    const branches = await getBranches(0, 5); // Server-side data fetching
 
 
     return <BranchesPageClient initialBranches={branches} />;

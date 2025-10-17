@@ -33,10 +33,13 @@ const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
                     <div className="text-gray-900">{selectedBranch.phoneNo ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Opening Time:</div>
-                    <div className="text-gray-900">{selectedBranch.openingTime ?? "-"}</div>
+                    <div className="text-gray-900">{selectedBranch.openingTime.toString().substring(16, 21) ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Closing Time:</div>
-                    <div className="text-gray-900">{selectedBranch.closingTime ?? "-"}</div>
+                    <div className="text-gray-900">{selectedBranch.closingTime.toString().substring(16, 21) ?? "-"}</div>
+
+                    <div className="font-medium text-gray-600">Status:</div>
+                    <div className="text-gray-900">{selectedBranch.status ?? "-"}</div>
                 </div>
 
                 <div className="mt-6 flex justify-center">

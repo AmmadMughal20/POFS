@@ -49,12 +49,13 @@ CREATE TABLE "User" (
 CREATE TABLE "Branch" (
     "id" TEXT NOT NULL,
     "address" VARCHAR(200) NOT NULL,
+    "phoneNo" VARCHAR(15) NOT NULL DEFAULT '03213443764',
     "city" VARCHAR(70) NOT NULL,
     "area" VARCHAR(100) NOT NULL,
     "status" "BranchStatus" NOT NULL DEFAULT 'ACTIVE',
     "openingTime" TIME NOT NULL,
     "closingTime" TIME NOT NULL,
-    "branchManager" INTEGER NOT NULL,
+    "branchManager" INTEGER,
 
     CONSTRAINT "Branch_pkey" PRIMARY KEY ("id")
 );

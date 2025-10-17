@@ -29,6 +29,7 @@ async function main()
         data: {
             id: 'BR001',
             address: '123 Main St',
+            phoneNo: '03214884763',
             city: 'Lahore',
             area: 'Gulberg',
             status: 'ACTIVE',
