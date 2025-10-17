@@ -8,14 +8,18 @@ const areasToCompare = areaCodeList.map(area => (area.name))
 type City = (typeof citiesToCompare)[number]
 type Area = (typeof areasToCompare)[number]
 
-export type Branch = {
+export interface Branch
+{
     id: string
     phoneNo: string
     address: string
     area: Area,
     city: City,
-    openingTime: string
-    closingTime: string
+    openingTime: Date
+    closingTime: Date
+    status: 'ACTIVE' | 'DISABLED'
+    branchManager?: number | null
+
 }
 
 export const BranchSchema = z.object({
@@ -25,29 +29,9 @@ export const BranchSchema = z.object({
     area: z.literal(areasToCompare, 'Enter proper area name'),
     city: z.literal(citiesToCompare, 'Enter Pakistani city name'),
     openingTime: z
-        .string()
-        .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Opening time must be in HH:mm format"),
+        .date(),
 
     closingTime: z
-        .string()
-        .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Closing time must be in HH:mm format"),
+        .date(),
 
-}).superRefine((data, ctx) =>
-{
-    const { openingTime, closingTime } = data;
-    if (!openingTime || !closingTime) return;
-
-    const [openH, openM] = openingTime.split(":").map(Number);
-    const [closeH, closeM] = closingTime.split(":").map(Number);
-    const openMinutes = openH * 60 + openM;
-    const closeMinutes = closeH * 60 + closeM;
-
-    if (closeMinutes <= openMinutes)
-    {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["closingTime"],
-            message: "Closing time must be after opening time",
-        });
-    }
 });
