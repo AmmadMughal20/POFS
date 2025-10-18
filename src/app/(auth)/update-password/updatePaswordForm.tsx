@@ -9,6 +9,7 @@ import React, { useActionState, useEffect, useTransition } from 'react';
 import SubmitButton from '../login/SubmitButton';
 import { handleUpdatePasswordAction } from './formHandler';
 import { redirect, useRouter } from 'next/navigation';
+import PasswordInput from '@/components/ui/PasswordInput/PasswordInput';
 
 const UpdatePaswordForm = ({ email }: { email: string }) =>
 {
@@ -45,18 +46,18 @@ const UpdatePaswordForm = ({ email }: { email: string }) =>
             }
         }}>
             <p className="text-gray-700">Update your password</p>
-            <div className='flex flex-col'>
+            <FormGroup>
                 <Label htmlFor='new-password'>New Password</Label>
-                <Input name='new-password' type="text" placeholder='Enter new password' autoFocus required />
+                <PasswordInput name='new-password' placeholder='Enter Password' />
                 {
                     state.errors?.new_password && (
                         <p className="text-error">{state.errors.new_password[0]}</p>
                     )
                 }
-            </div>
+            </FormGroup>
             <FormGroup>
                 <Label htmlFor='confirm-password'>Confirm Password</Label>
-                <Input name='confirm-password' type="text" placeholder='Re-Enter new password' required />
+                <PasswordInput name='confirm-password' placeholder='Re-Enter Password' />
                 {
                     state.errors?.confirm_password && (
                         <p className="text-error">{state.errors.confirm_password[0]}</p>
