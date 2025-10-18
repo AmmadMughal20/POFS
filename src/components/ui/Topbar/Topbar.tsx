@@ -3,6 +3,8 @@ import { BellDot, Menu, Moon, X } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import Searchbar from '../Searchbar/Searchbar'
+import Button from '../Button/Button'
+import { signOut } from 'next-auth/react'
 
 interface ITopbar
 {
@@ -51,6 +53,9 @@ const Topbar: React.FC<ITopbar> = ({ collapsed }) =>
                 <button className="p-2 rounded-lg hover:bg-primary hover:text-white transition">
                     <Moon size={22} />
                 </button>
+                <Button onClick={() => signOut()}>
+                    Logout
+                </Button>
             </div>
 
             {/* Mobile Menu Overlay (optional placeholder) */}

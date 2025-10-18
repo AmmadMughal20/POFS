@@ -1,19 +1,20 @@
 'use client'
 
 import { useState } from 'react';
-import BranchForm from '@/components/BranchForm/BranchForm';
+import BranchForm from '@/components/Branch/BranchForm/BranchForm';
 import Button from '@/components/ui/Button/Button';
 import Page from '@/components/ui/Page/Page';
 import Popup from '@/components/ui/Popup/Popup';
 import RowActions from '@/components/ui/RowActions/RowActions';
 import Table, { Align, Column } from '@/components/ui/Table/Table';
-import ViewBranchDetialsPopup from '@/components/ViewBranchDetailsPopup/ViewBranchDetialsPopup';
+import ViewBranchDetialsPopup from '@/components/Branch/ViewBranchDetailsPopup/ViewBranchDetialsPopup';
 import { handleBranchAddAction, handleBranchDeleteAction, handleBranchEditAction } from '@/server/BranchFormHandlers';
-import { Plus } from 'lucide-react';
+import { Grid, List, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Branch } from '@/schemas/BranchSchema';
+import BranchCard from '../BranchCard/BranchCard';
 
-export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
+// export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
 const config = {
     enableSearch: true,
@@ -43,6 +44,7 @@ export default function BranchesPageClient({ initialBranches }: Props)
     const [branchAddPopup, setBranchAddPopup] = useState(false);
     const [branchEditPopup, setBranchEditPopup] = useState(false);
     const [viewBranchDetails, setViewBranchDetails] = useState(false);
+    const [displayType, setDisplayType] = useState<'list' | 'grid'>('list')
     const router = useRouter()
 
     if (branches.length === 0)
@@ -143,14 +145,46 @@ export default function BranchesPageClient({ initialBranches }: Props)
 
     return (
         <Page>
-            <div className='flex gap-5 items-center'>
-                <h5>Branches</h5>
-                <Button className='!rounded-full !p-0' onClick={() => setBranchAddPopup(true)}>
-                    <Plus />
-                </Button>
+            <div className='flex justify-between items-center'>
+                <div className='flex gap-5 items-center'>
+                    <h5>Branches</h5>
+                    <Button className='!rounded-full !p-0' onClick={() => setBranchAddPopup(true)}>
+                        <Plus />
+                    </Button>
+                </div>
+                <div className='flex gap-2'>
+                    <div className={`p-1 rounded cursor-pointer ${displayType == 'list' && 'bg-accent'}`} onClick={() => setDisplayType('list')}>
+                        <List />
+                    </div>
+                    <div className={`p-1 rounded cursor-pointer ${displayType == 'grid' && 'bg-accent'}`} onClick={() => setDisplayType('grid')}>
+                        <Grid />
+                    </div>
+                </div>
             </div>
-
-            <Table<Branch> columns={columnsWithActions} data={branchesToDisplay} config={config} />
+            {
+                displayType == "list" &&
+                <Table<Branch> columns={columnsWithActions} data={branchesToDisplay} config={config} />
+            }
+            {
+                displayType == "grid" &&
+                <div className='grid grid-cols-4 mt-3'>
+                    {
+                        branches.map(branch => (
+                            <BranchCard
+                                key={branch.id}
+                                id={branch.id}
+                                phoneNo={branch.phoneNo}
+                                area={branch.area}
+                                address={branch.address}
+                                city={branch.city}
+                                openingTime={branch.openingTime}
+                                closingTime={branch.closingTime}
+                                status={branch.status}
+                            />
+                        ))
+                    }
+                </div>
+            }
 
             <Popup isOpen={branchAddPopup} onClose={() => { setBranchAddPopup(false); router.refresh(); }}>
                 <BranchForm mode='add' onSubmitAction={handleBranchAddAction} />

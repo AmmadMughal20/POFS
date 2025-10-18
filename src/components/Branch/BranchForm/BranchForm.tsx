@@ -1,15 +1,15 @@
 'use client'
 import React, { startTransition, useActionState, useState } from 'react'
-import Form from '../ui/Form/Form'
-import FormGroup from '../ui/FormGroup/FormGroup'
-import Input from '../ui/Input/Input'
-import Label from '../ui/Label/Label'
-import Button from '../ui/Button/Button'
+import Form from '../../ui/Form/Form'
+import FormGroup from '../../ui/FormGroup/FormGroup'
+import Input from '../../ui/Input/Input'
+import Label from '../../ui/Label/Label'
+import Button from '../../ui/Button/Button'
 import citiesList from "@/data/pakistan-cities-250.json"
 import areasList from "@/data/areanames.json"
 import { BranchesState } from '@/server/BranchFormHandlers'
-import RadioGroup from '../ui/RadioGroup/RadioGroup'
-import RadioInput from '../ui/RadioInput/RadioInput'
+import RadioGroup from '../../ui/RadioGroup/RadioGroup'
+import RadioInput from '../../ui/RadioInput/RadioInput'
 
 interface BranchFormProps
 {
