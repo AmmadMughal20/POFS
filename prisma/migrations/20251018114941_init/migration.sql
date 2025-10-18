@@ -11,6 +11,8 @@ CREATE TYPE "OrderMode" AS ENUM ('ONLINE', 'OFFLINE');
 CREATE TABLE "Permission" (
     "id" SERIAL NOT NULL,
     "title" VARCHAR(100) NOT NULL,
+    "code" VARCHAR(100) NOT NULL,
+    "description" VARCHAR(255),
 
     CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
 );

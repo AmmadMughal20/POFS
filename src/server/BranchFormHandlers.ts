@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma"
 import { Branch, BranchSchema } from "@/schemas/BranchSchema"
 import { revalidatePath } from 'next/cache'
+import { getUserSession, hasPermission } from "@/server/getUserSession";
 
 export interface BranchesState
 {
@@ -13,6 +14,11 @@ export interface BranchesState
 
 export async function getBranches(skip: number, take: number): Promise<Branch[]>
 {
+    const { permissions } = await getUserSession();
+    if (!hasPermission(permissions, "branch:view"))
+    {
+        throw new Error("Forbidden: You don’t have permission to view branches.");
+    }
 
     const branches: Branch[] = await prisma.branch.findMany({ skip: skip, take: take })
 
@@ -24,6 +30,12 @@ export async function getBranches(skip: number, take: number): Promise<Branch[]>
 
 export async function handleBranchAddAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
+    const { permissions } = await getUserSession();
+    if (!hasPermission(permissions, "branch:create"))
+    {
+        throw new Error("Forbidden: You don’t have permission to create branches.");
+    }
+
     const newBranch: Branch = {
         id: formData.get('branchId')?.toString() || crypto.randomUUID(),
         city: formData.get('city')?.toString() || '',
@@ -54,6 +66,12 @@ export async function handleBranchAddAction(prevState: BranchesState, formData: 
 
 export async function handleBranchEditAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
+    const { permissions } = await getUserSession();
+    if (!hasPermission(permissions, "branch:update"))
+    {
+        throw new Error("Forbidden: You don’t have permission to edit branches.");
+    }
+
     const branchId = formData.get('branchId')?.toString() || ''
 
     const updatedBranchData = {
@@ -84,6 +102,12 @@ export async function handleBranchEditAction(prevState: BranchesState, formData:
 
 export async function handleBranchDeleteAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
+    const { permissions } = await getUserSession();
+    if (!hasPermission(permissions, "branch:delete"))
+    {
+        throw new Error("Forbidden: You don’t have permission to delete branches.");
+    }
+
     const branchId = formData.get('branchId') as string
 
     try

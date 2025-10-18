@@ -1,17 +1,18 @@
 'use client'
 
-import { useState } from 'react';
 import BranchForm from '@/components/Branch/BranchForm/BranchForm';
+import ViewBranchDetialsPopup from '@/components/Branch/ViewBranchDetailsPopup/ViewBranchDetialsPopup';
 import Button from '@/components/ui/Button/Button';
 import Page from '@/components/ui/Page/Page';
 import Popup from '@/components/ui/Popup/Popup';
 import RowActions from '@/components/ui/RowActions/RowActions';
 import Table, { Align, Column } from '@/components/ui/Table/Table';
-import ViewBranchDetialsPopup from '@/components/Branch/ViewBranchDetailsPopup/ViewBranchDetialsPopup';
+import { Branch } from '@/schemas/BranchSchema';
 import { handleBranchAddAction, handleBranchDeleteAction, handleBranchEditAction } from '@/server/BranchFormHandlers';
+import { hasPermission } from '@/server/getUserSession';
 import { Grid, List, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Branch } from '@/schemas/BranchSchema';
+import { useState } from 'react';
 import BranchCard from '../BranchCard/BranchCard';
 
 // export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
@@ -28,10 +29,12 @@ const config = {
 interface Props
 {
     initialBranches: Branch[];
+    permissions: string[];
 }
 
-export default function BranchesPageClient({ initialBranches }: Props)
+export default function BranchesPageClient({ initialBranches, permissions }: Props)
 {
+
     const branches = initialBranches;
     const branchesToDisplay = branches.map(branch =>
     {
@@ -134,9 +137,9 @@ export default function BranchesPageClient({ initialBranches }: Props)
                         setBranchEditPopup(true);
                     }}
                     onDelete={() => handleDelete(row.id)}
-                    showView
-                    showEdit
-                    showDelete
+                    showView={hasPermission(permissions, "branch:view")}
+                    showEdit={hasPermission(permissions, "branch:update")}
+                    showDelete={hasPermission(permissions, "branch:delete")}
                 />
             )
             ,

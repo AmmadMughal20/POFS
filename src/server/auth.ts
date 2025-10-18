@@ -12,10 +12,27 @@ export async function authenticateUser(email: string, password: string)
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) return null;
 
+    const rolePermissions = await prisma.rolePermission.findMany({
+        where: { roleId: user.roleId },
+        select: { permId: true }
+    })
+
+    const permissionIds = rolePermissions.map((rp) => rp.permId)
+
+    const role = await prisma.role.findUnique({ where: { id: user.roleId } })
+
+    const permissions = await prisma.permission.findMany({
+        where: { id: { in: permissionIds } },
+        select: { title: true, id: true, code: true }
+    })
+
     return {
         id: user.id.toString(), // <-- convert to string
         name: user.name,
-        email: user.email
+        email: user.email,
+        roleId: user.roleId,
+        roleTitle: role?.title,
+        permissions: permissions.map(perm => perm.code)
     };
 }
 

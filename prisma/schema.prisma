@@ -29,9 +29,11 @@ enum OrderMode {
 }
 
 model Permission {
-  id        Int              @id @default(autoincrement())
-  title     String           @db.VarChar(100)
-  rolePerms RolePermission[]
+  id          Int              @id @default(autoincrement())
+  title       String           @db.VarChar(100)
+  code        String           @db.VarChar(100)
+  description String?           @db.VarChar(255)
+  rolePerms   RolePermission[]
 }
 
 model RolePermission {
@@ -78,14 +80,14 @@ model OTP {
 model Branch {
   id            String       @id
   address       String       @db.VarChar(200)
-  phoneNo       String       @db.VarChar(15) @default("03213443764") 
+  phoneNo       String       @default("03213443764") @db.VarChar(15)
   city          String       @db.VarChar(70)
   area          String       @db.VarChar(100)
   status        BranchStatus @default(ACTIVE)
   openingTime   DateTime     @db.Time // stores only time, not date
   closingTime   DateTime     @db.Time
-  branchManager Int?          @unique
-  BranchManager User?         @relation("UserBranch", fields: [branchManager], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  branchManager Int?         @unique
+  BranchManager User?        @relation("UserBranch", fields: [branchManager], references: [id], onDelete: NoAction, onUpdate: NoAction)
   stocks        Stock[]      @relation("BranchStock")
   salesMen      SalesMan[]   @relation("SalesManBranch")
 }
