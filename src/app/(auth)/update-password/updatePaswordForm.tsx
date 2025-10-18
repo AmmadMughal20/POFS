@@ -2,14 +2,13 @@
 import Button from '@/components/ui/Button/Button';
 import Form from '@/components/ui/Form/Form';
 import FormGroup from '@/components/ui/FormGroup/FormGroup';
-import Input from '@/components/ui/Input/Input';
 import Label from '@/components/ui/Label/Label';
+import PasswordInput from '@/components/ui/PasswordInput/PasswordInput';
 import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useActionState, useEffect, useTransition } from 'react';
 import SubmitButton from '../login/SubmitButton';
 import { handleUpdatePasswordAction } from './formHandler';
-import { redirect, useRouter } from 'next/navigation';
-import PasswordInput from '@/components/ui/PasswordInput/PasswordInput';
 
 const UpdatePaswordForm = ({ email }: { email: string }) =>
 {

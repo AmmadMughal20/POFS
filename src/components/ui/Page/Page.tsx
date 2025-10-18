@@ -3,14 +3,15 @@ import React from 'react'
 
 interface IPage
 {
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    className?: string
 }
 
-const Page: React.FC<IPage> = ({ children = "No Content" }) =>
+const Page: React.FC<IPage> = ({ children = "No Content", className }) =>
 {
     const { isSidebarCollapsed } = useSidebar()
     return (
-        <div className={`mt-17.5 mr-5 w-auto ${isSidebarCollapsed ? 'pl-25' : 'pl-38'} transition-all `}>
+        <div className={`mt-17.5 mr-5 w-auto ${isSidebarCollapsed ? 'pl-25' : 'pl-38'} transition-all ${className}`}>
             {children}
         </div>
     )

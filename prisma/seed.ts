@@ -18,9 +18,15 @@ async function main()
     // Create permissions
     const permissions = await prisma.permission.createMany({
         data: [
-            { title: 'View Reports' },
-            { title: 'Manage Users' },
-            { title: 'Manage Inventory' },
+            { title: 'View Dashboard', code: 'dashboard:view' },
+            { title: 'Create Branch', code: 'branch:create' },
+            { title: 'Update Branch', code: 'branch:update' },
+            { title: 'View Branch', code: 'branch:view' },
+            { title: 'Delete Branch', code: 'branch:delete' },
+            { title: 'Create User', code: 'user:create' },
+            { title: 'Update User', code: 'user:update' },
+            { title: 'View User', code: 'user:view' },
+            { title: 'Delete User', code: 'user:delete' },
         ],
     });
 
