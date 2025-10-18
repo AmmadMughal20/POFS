@@ -5,7 +5,7 @@ import FormGroup from '@/components/ui/FormGroup/FormGroup';
 import Input from '@/components/ui/Input/Input';
 import Label from '@/components/ui/Label/Label';
 import Link from 'next/link';
-import React, { startTransition, useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect, useTransition } from 'react';
 import SubmitButton from '../login/SubmitButton';
 import { handleUpdatePasswordAction } from './formHandler';
 import { redirect, useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ const UpdatePaswordForm = ({ email }: { email: string }) =>
         errors: {
         }
     }
+    const [isPending, startTransition] = useTransition()
     const router = useRouter()
     const [state, formAction] = useActionState(handleUpdatePasswordAction, initialState)
 
@@ -71,7 +72,7 @@ const UpdatePaswordForm = ({ email }: { email: string }) =>
             <div className='flex justify-evenly items-center w-full mt-5'>
                 <SubmitButton />
                 <Link href='/login'>
-                    <Button type='reset' variant='secondary'>
+                    <Button type='reset' variant='secondary' disabled={isPending}>
                         Cancel
                     </Button>
                 </Link>

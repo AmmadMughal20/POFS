@@ -4,7 +4,7 @@ import Form from '@/components/ui/Form/Form'
 import Input from '@/components/ui/Input/Input'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { startTransition, useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useTransition } from 'react'
 import SubmitButton from '../login/SubmitButton'
 import { handleOtpAction } from './formHandler'
 
@@ -14,7 +14,7 @@ const OtpVerificationForm = ({ email }: { email: string | null }) =>
         errors: {
         }
     }
-
+    const [isPending, startTransition] = useTransition()
     const [state, formAction] = useActionState(handleOtpAction, initialState)
     const router = useRouter()
 
@@ -63,7 +63,7 @@ const OtpVerificationForm = ({ email }: { email: string | null }) =>
             <div className='flex justify-evenly items-center w-full mt-5'>
                 <SubmitButton />
                 <Link href='/login'>
-                    <Button type='reset' variant='secondary'>
+                    <Button type='reset' variant='secondary' disabled={isPending}>
                         Cancel
                     </Button>
                 </Link>
