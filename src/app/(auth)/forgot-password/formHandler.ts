@@ -29,16 +29,18 @@ export async function handleForgotPasswordAction(prevState: ForgotPasswordState,
 
     const otpResult = await generateOTP(email);
 
-    (await cookies()).set('otp_email', email, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 5, // expires in 5 minutes
-        path: '/',      // accessible to the OTP route
-    })
+
 
     let otpCode;
     if ('otpGenerated' in otpResult)
     {
+        (await cookies()).set('otp_email', email, {
+            httpOnly: true,
+            secure: true,
+            maxAge: 60 * 5, // expires in 5 minutes
+            path: '/',      // accessible to the OTP route
+        })
+
         const { otpGenerated, value } = otpResult;
         if (otpGenerated)
         {

@@ -25,7 +25,6 @@ export async function generateOTP(email: string)
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user)
     {
-        console.log("User not found with this email")
         return { errors: { email: ["User not found with this email."] } };
     }
     const userId = user.id
