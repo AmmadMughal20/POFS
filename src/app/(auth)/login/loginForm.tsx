@@ -5,9 +5,10 @@ import Input from '@/components/ui/Input/Input'
 import Label from '@/components/ui/Label/Label'
 import PasswordInput from '@/components/ui/PasswordInput/PasswordInput'
 import Link from 'next/link'
-import { startTransition, useActionState } from 'react'
+import { startTransition, useActionState, useEffect } from 'react'
 import { handleLoginAction } from './formHandler'
 import SubmitButton from './SubmitButton'
+import { useRouter, redirect } from 'next/navigation'
 
 const LoginForm = () =>
 {
@@ -15,7 +16,17 @@ const LoginForm = () =>
         errors: {}
     }
 
+    const router = useRouter()
+
     const [state, formAction] = useActionState(handleLoginAction, initialState)
+
+    useEffect(() =>
+    {
+        if (state.success)
+        {
+            redirect('/')
+        }
+    }, [state.success, router])
 
     return (
         <Form title='Login' onSubmit={(e: React.FormEvent<HTMLFormElement>) =>

@@ -1,7 +1,5 @@
-'use client'
 import { signIn } from "next-auth/react";
 import { LoginSchema } from "./schema"
-
 
 export interface LoginState
 {
@@ -9,25 +7,36 @@ export interface LoginState
     success?: boolean;
 }
 
-export async function handleLoginAction(prevState: LoginState, formData: FormData)
+export async function handleLoginAction(
+    prevState: LoginState,
+    formData: FormData
+): Promise<LoginState>
 {
-    const email = formData.get('email')
-    const password = formData.get('password')
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-
-    const result = LoginSchema.safeParse({ email, password })
-
+    // Validate using Zod
+    const result = LoginSchema.safeParse({ email, password });
     if (!result.success)
     {
-        return { errors: result.error.flatten().fieldErrors }
+        return { errors: result.error.flatten().fieldErrors };
     }
 
     const signInResult = await signIn('credentials', {
-        email: email, // your authOptions expects `email`
-        password
-    })
+        email,
+        password,
+        redirect: false,
+    });
 
-    console.log(signInResult, 'printing signin result')
-    return { success: true }
+    if (signInResult?.error)
+    {
+        return {
+            errors: {
+                password: ['Invalid email or password!'],
+            },
+        };
+    }
 
+    // Success ✅
+    return { success: true };
 }
