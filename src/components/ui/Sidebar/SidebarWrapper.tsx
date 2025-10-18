@@ -8,6 +8,7 @@ import Button from '../Button/Button'
 import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMenuItem'
 import Topbar from '../Topbar/Topbar'
 import Sidebar from './Sidebar'
+import { useSession } from 'next-auth/react'
 
 export const sidebarMenuItems: ISidebarMenuItem[] = [
     {
@@ -50,6 +51,8 @@ interface ISidebarWrapper
 const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
 {
     const { isSidebarCollapsed, toggleSidebar } = useSidebar();
+    const { status } = useSession()
+    if (status != "authenticated") return
 
     return (
         <>

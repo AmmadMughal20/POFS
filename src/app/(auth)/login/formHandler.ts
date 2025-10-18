@@ -1,4 +1,5 @@
-'use server'
+'use client'
+import { signIn } from "next-auth/react";
 import { LoginSchema } from "./schema"
 
 
@@ -10,24 +11,23 @@ export interface LoginState
 
 export async function handleLoginAction(prevState: LoginState, formData: FormData)
 {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    const email = formData.get('email')
+    const password = formData.get('password')
 
-    const data = {
-        fruits: formData.getAll('fruits'),
-        role: formData.get('role'),
-        desc: formData.get('desc'),
-        username: formData.get('username'),
-        password: formData.get('password'),
-    }
 
-    console.log(data)
-
-    const result = LoginSchema.safeParse(data)
+    const result = LoginSchema.safeParse({ email, password })
 
     if (!result.success)
     {
         return { errors: result.error.flatten().fieldErrors }
     }
+
+    const signInResult = await signIn('credentials', {
+        email: email, // your authOptions expects `email`
+        password
+    })
+
+    console.log(signInResult, 'printing signin result')
     return { success: true }
 
 }

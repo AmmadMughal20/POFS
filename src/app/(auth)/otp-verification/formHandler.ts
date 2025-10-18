@@ -1,5 +1,7 @@
 'use server'
+import { verifyOTP } from "@/server/auth";
 import { OTPSchema } from "./schema"
+import { cookies } from "next/headers";
 
 export interface OTPState
 {
@@ -9,11 +11,16 @@ export interface OTPState
 
 export async function handleOtpAction(prevState: OTPState, formData: FormData)
 {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
+    const email = (await cookies()).get('otp_email')?.value
+    const otp = formData.get('otp')
     const data = {
-        username: formData.get('username'),
-        otp: formData.get('otp')
+        email,
+        otp
+    }
+
+    if (!email || !otp || typeof email !== 'string' || typeof otp != 'string')
+    {
+        return { errors: { email: ['Invalid email or OTP value.'] } };
     }
 
     const result = OTPSchema.safeParse(data)
@@ -22,6 +29,17 @@ export async function handleOtpAction(prevState: OTPState, formData: FormData)
     {
         return { errors: result.error.flatten().fieldErrors }
     }
-    return { success: true }
+
+    if (!email) return { errors: { email: ['Email is missing'] } }
+
+    const verificationResult = await verifyOTP(email, otp);
+
+    if (verificationResult)
+    {
+        return { success: true }
+    } else
+    {
+        return { errors: { otp: ['Invalid OTP'] } }
+    }
 
 }

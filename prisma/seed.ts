@@ -40,7 +40,7 @@ async function main()
                     email: 'manager@example.com',
                     name: 'Branch Manager',
                     phoneNo: '03001234567',
-                    password: 'securepassword',
+                    password: '$2a$10$7NwTOkD1JXEiSeOgWMuM5OAFEls0UqaJu/Q3Xq9vJ6TwLRQT/3rwe',
                     roleId: managerRole.id,
                     status: 'ACTIVE',
                 },
@@ -54,7 +54,7 @@ async function main()
             email: 'customer@example.com',
             name: 'John Doe',
             phoneNo: '03111234567',
-            password: 'password123',
+            password: '$2a$10$7NwTOkD1JXEiSeOgWMuM5OAFEls0UqaJu/Q3Xq9vJ6TwLRQT/3rwe',
             roleId: adminRole.id,
             status: 'ACTIVE',
             Customer: {

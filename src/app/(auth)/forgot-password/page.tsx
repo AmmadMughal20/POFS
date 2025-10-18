@@ -1,7 +1,7 @@
 import React from 'react'
 import ForgotPasswordForm from './forgotPasswordForm'
 
-const ForgotPasswordPage = () =>
+const ForgotPasswordPage = async () =>
 {
     return (
         <div className='flex flex-col items-center p-30 gap-0 w-full h-screen '>

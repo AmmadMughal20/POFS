@@ -14,8 +14,6 @@ export interface BranchesState
 export async function getBranches(skip: number, take: number): Promise<Branch[]>
 {
 
-    await new Promise(res => setTimeout(res, 200))
-
     const branches: Branch[] = await prisma.branch.findMany({ skip: skip, take: take })
 
     return branches.map((branch: Branch) => ({
@@ -56,8 +54,6 @@ export async function handleBranchAddAction(prevState: BranchesState, formData: 
 
 export async function handleBranchEditAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>
 {
-    await new Promise((resolve) => setTimeout(resolve, 200))
-
     const branchId = formData.get('branchId')?.toString() || ''
 
     const updatedBranchData = {

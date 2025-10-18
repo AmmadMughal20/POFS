@@ -63,6 +63,16 @@ model User {
   Branch    Branch?    @relation("UserBranch")
   Customer  Customer?
   SalesMan  SalesMan?  @relation("UserSalesMan")
+  otp       OTP[]
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  code      String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
 }
 
 model Branch {

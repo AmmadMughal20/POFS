@@ -1,5 +1,5 @@
 import { getBranches } from '@/server/BranchFormHandlers';
-import BranchesPageClient from '../../../components/BranchClientComponent';
+import BranchesPageClient from '../../../components/Branch/BranchClientComponent/BranchClientComponent';
 
 export default async function Page()
 {

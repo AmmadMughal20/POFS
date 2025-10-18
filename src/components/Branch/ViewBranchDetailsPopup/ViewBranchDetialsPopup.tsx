@@ -1,6 +1,6 @@
 import React from 'react'
-import Button from '../ui/Button/Button'
-import Card from '../ui/Card/Card'
+import Button from '../../ui/Button/Button'
+import Card from '../../ui/Card/Card'
 import { Branch } from '@/schemas/BranchSchema'
 
 type VB = {
