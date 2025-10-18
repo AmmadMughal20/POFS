@@ -48,7 +48,7 @@ const LoginForm = () =>
                     )
                 }
             </FormGroup>
-            <div className='flex flex-col'>
+            <FormGroup>
                 <Label htmlFor='password'>Password</Label>
                 <PasswordInput name='password' placeholder='Enter Password' />
                 {
@@ -56,7 +56,7 @@ const LoginForm = () =>
                         <p className="text-error">{state.errors.password[0]}</p>
                     )
                 }
-            </div>
+            </FormGroup>
             {
                 state.success ?
                     <div className='text-success'>
