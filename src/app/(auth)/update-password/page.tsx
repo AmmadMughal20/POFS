@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import UpdatePaswordForm from './updatePaswordForm'
+import Image from 'next/image'
+import logo from '@/assets/images/pofs_logo.svg'
 
 const page = async () =>
 {
@@ -11,8 +13,8 @@ const page = async () =>
         redirect('/login')
     }
     return (
-        <div className='flex flex-col items-center p-30 gap-0 w-full h-screen '>
-            <h2 className='text-4xl font-bold mb-10'>POFS</h2>
+        <div className='flex flex-col items-center p-10 gap-0 w-full h-screen '>
+            <Image src={logo} width={225} height={100} alt='pofs' className='' />
             <UpdatePaswordForm email={otp_email} />
         </div>
     )

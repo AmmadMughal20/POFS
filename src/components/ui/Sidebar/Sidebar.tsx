@@ -32,7 +32,7 @@ const Sidebar: React.FC<ISidebar> = ({ children, className = '', variant, isColl
 
     return (
         <div
-            className={`flex flex-col gap-2 h-screen shadow-md px-5 py-5 top-0 left-0 max-w-50 fixed z-45
+            className={`flex flex-col gap-2 h-screen shadow-md px-3 py-5 top-0 left-0 max-w-50 fixed z-45
       ${className} ${variant ? 'bg-primary' : ''}`}
         >
             {enhancedChildren}

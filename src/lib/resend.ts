@@ -1,6 +1,5 @@
 import { Resend } from 'resend';
 
-console.log('RESEND_API_KEY is:', process.env.RESEND_API_KEY); // Should print the actual key
 
 const apiKey = process.env.RESEND_API_KEY;
 

@@ -11,7 +11,7 @@ const Page: React.FC<IPage> = ({ children = "No Content", className }) =>
 {
     const { isSidebarCollapsed } = useSidebar()
     return (
-        <div className={`mt-17.5 mr-5 w-auto ${isSidebarCollapsed ? 'pl-25' : 'pl-38'} transition-all ${className}`}>
+        <div className={`mt-17.5 mr-5 w-auto ${isSidebarCollapsed ? 'pl-20' : 'pl-38'} transition-all ${className}`}>
             {children}
         </div>
     )
