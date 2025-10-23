@@ -35,7 +35,6 @@ const UpdatePaswordForm = ({ email }: { email: string }) =>
             if (email)
             {
                 const formData = new FormData(e.currentTarget);
-                console.log(formData)
                 formData.append("email", email)
                 startTransition(() =>
                 {

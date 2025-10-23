@@ -1,43 +1,79 @@
 "use client"
+import logo from '@/assets/images/pofs_logo.svg'
+import logoOrg from '@/assets/images/pos_logo_org.svg'
 import { useSidebar } from '@/context/SidebarContext'
-import { ArrowLeft, ArrowRight, Globe, Home, LogOut, Phone, Settings } from 'lucide-react'
+import { ArrowLeft, ArrowRight, GitGraph, Globe, LayoutDashboard, LockKeyhole, LogOut, PersonStanding, ShoppingCart, Star, User } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React from 'react'
 import Button from '../Button/Button'
 import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMenuItem'
 import Topbar from '../Topbar/Topbar'
 import Sidebar from './Sidebar'
-import { useSession } from 'next-auth/react'
 
 export const sidebarMenuItems: ISidebarMenuItem[] = [
     {
-        title: 'Home',
+        title: 'Dashboard',
         link: '/',
-        icon: <Home />,
-        selected: true,
+        icon: <LayoutDashboard />,
+        selected: false,
+        permission: 'dashboard:view'
     },
+    {
+        title: 'Permissions',
+        link: '/permissions',
+        icon: <LockKeyhole />,
+        selected: false,
+        permission: 'permission:view'
+    },
+    {
+        title: 'Roles',
+        link: '/roles',
+        icon: <PersonStanding />,
+        selected: false,
+        permission: 'role:view'
+    },
+    {
+        title: 'Users',
+        link: '/users',
+        icon: <User />,
+        selected: false,
+        permission: 'user:view'
+    },
+    {
+        title: 'Products',
+        link: '/products',
+        icon: <Star />,
+        selected: false,
+        permission: 'product:view'
+    },
+
     {
         title: 'Branches',
         link: '/branch-management',
         icon: <Globe />,
         selected: false,
+        permission: 'branch:view'
     },
     {
-        title: 'Contact',
-        link: '/',
-        icon: <Phone />,
+        title: 'Orders',
+        link: '/orders',
+        icon: <ShoppingCart />,
         selected: false,
+        permission: 'order:view'
     },
     {
-        title: 'Settings',
-        link: '/',
-        icon: <Settings />,
+        title: 'Stocks',
+        link: '/stocks',
+        icon: <GitGraph />,
         selected: false,
+        permission: 'stock:view'
     },
     {
         title: 'Logout',
-        link: '/',
+        link: '/logout',
         icon: <LogOut />,
         selected: false,
     }
@@ -52,7 +88,18 @@ const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
 {
     const { isSidebarCollapsed, toggleSidebar } = useSidebar();
     const { status } = useSession()
+    const pathName = usePathname()
+    const { data: session } = useSession();
+    const userPermissions = session?.user?.permissions || [];
+
     if (status != "authenticated") return
+
+    const sideMenuItemsWithSelected = sidebarMenuItems
+        .filter(item => !item.permission || userPermissions.includes(item.permission))
+        .map(item => ({
+            ...item,
+            selected: item.link === pathName,
+        }));
 
     return (
         <>
@@ -60,7 +107,7 @@ const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
             <Sidebar isCollapsed={isSidebarCollapsed} variant={variant} className={` ${isSidebarCollapsed ? 'bg-white' : 'bg-primary'} transition-colors`}>
                 <div className='flex flex-col items-center justify-between'>
                     <Link href="/">
-                        <Image src={"globe.svg"} width={1000} height={1000} className='max-w-7.5 max-h-7.5' alt="logo" />
+                        <Image src={isSidebarCollapsed ? logo : logoOrg} width={1000} height={1000} className={`${isSidebarCollapsed ? 'max-w-10 max-h-10' : "max-w-20 max-h-20"} transition-all`} alt="logo" />
                     </Link>
                 </div>
                 <hr className={`my-1 ${isSidebarCollapsed ? 'text-primary/50' : 'text-gray-300'}`} />
@@ -70,9 +117,9 @@ const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
                     </Button>
                 </div>
                 <hr className={`my-1 ${isSidebarCollapsed ? 'text-primary/50' : 'text-gray-300'}`} />
-                <div className={`h-100 overflow-scroll scrollbar-hide`}>
+                <div className={`h-100 overflow-scroll scrollbar-hide flex flex-col gap-2`}>
                     {
-                        sidebarMenuItems.map((item, index) => (
+                        sideMenuItemsWithSelected.map((item, index) => (
                             <SidebarMenuItem key={index} title={item.title} variant={isSidebarCollapsed ? undefined : variant} link={item.link} icon={item.icon} selected={item.selected} />
                         ))
                     }

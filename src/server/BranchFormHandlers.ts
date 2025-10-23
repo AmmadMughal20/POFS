@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { Branch, BranchSchema } from "@/schemas/BranchSchema"
 import { revalidatePath } from 'next/cache'
 import { getUserSession, hasPermission } from "@/server/getUserSession";
+import { Prisma } from "@prisma/client";
 
 export interface BranchesState
 {
@@ -12,20 +13,37 @@ export interface BranchesState
     values?: Partial<Branch>
 }
 
-export async function getBranches(skip: number, take: number): Promise<Branch[]>
+
+export async function getBranches(
+    skip?: number,
+    take?: number,
+    orderBy?: Prisma.BranchOrderByWithRelationInput,
+    filter?: Prisma.BranchWhereInput
+): Promise<{ items: Branch[]; total: number }>
 {
     const { permissions } = await getUserSession();
     if (!hasPermission(permissions, "branch:view"))
     {
-        throw new Error("Forbidden: You don’t have permission to view branches.");
+        throw new Error("Forbidden: You don’t have permission to view branches list.");
     }
 
-    const branches: Branch[] = await prisma.branch.findMany({ skip: skip, take: take })
+    const findManyArgs: Prisma.BranchFindManyArgs = {
+        skip,
+        take,
+        orderBy: orderBy ?? { id: 'asc' },
+        where: filter,
+    };
 
-    return branches.map((branch: Branch) => ({
-        ...branch,
-        branchId: branch.id,
-    }))
+    const countArgs: Prisma.BranchCountArgs = {
+        where: filter,
+    };
+
+    const [items, total] = await Promise.all([
+        prisma.branch.findMany(findManyArgs),
+        prisma.branch.count(countArgs),
+    ]);
+
+    return { items, total };
 }
 
 export async function handleBranchAddAction(prevState: BranchesState, formData: FormData): Promise<BranchesState>

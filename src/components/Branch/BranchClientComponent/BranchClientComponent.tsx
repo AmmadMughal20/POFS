@@ -14,6 +14,7 @@ import { Grid, List, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import BranchCard from '../BranchCard/BranchCard';
+import Card from '@/components/ui/Card/Card';
 
 // export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
@@ -30,11 +31,16 @@ interface Props
 {
     initialBranches: Branch[];
     permissions: string[];
+    initialTotal: number
 }
 
-export default function BranchesPageClient({ initialBranches, permissions }: Props)
+export default function BranchesPageClient({ initialBranches, permissions, initialTotal }: Props)
 {
 
+    const [data, setData] = useState<Branch[]>([])
+    const [page, setPage] = useState(1)
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [total, setTotal] = useState(initialTotal)
     const branches = initialBranches;
     const branchesToDisplay = branches.map(branch =>
     {
@@ -146,48 +152,77 @@ export default function BranchesPageClient({ initialBranches, permissions }: Pro
         },
     ];
 
+    const handleSearch = (searchTerm: string) =>
+    {
+        // await
+        console.log(searchTerm)
+        return undefined
+    }
+
     return (
         <Page>
             <div className='flex justify-between items-center'>
-                <div className='flex gap-5 items-center'>
-                    <h5>Branches</h5>
-                    <Button className='!rounded-full !p-0' onClick={() => setBranchAddPopup(true)}>
-                        <Plus />
-                    </Button>
-                </div>
-                <div className='flex gap-2'>
-                    <div className={`p-1 rounded cursor-pointer ${displayType == 'list' && 'bg-accent'}`} onClick={() => setDisplayType('list')}>
-                        <List />
+                <Card className='flex w-full items-center justify-between'>
+                    <div className='flex gap-5 items-center'>
+                        <h5>Branches</h5>
+                        {
+                            hasPermission(permissions, "branch:create") ?
+                                <Button className='!rounded-full !p-0' onClick={() => setBranchAddPopup(true)}>
+                                    <Plus />
+                                </Button> : <></>
+                        }
                     </div>
-                    <div className={`p-1 rounded cursor-pointer ${displayType == 'grid' && 'bg-accent'}`} onClick={() => setDisplayType('grid')}>
-                        <Grid />
+                    <div className='flex gap-2'>
+                        <div className={`p-1 rounded cursor-pointer ${displayType == 'list' && 'bg-accent'}`} onClick={() => setDisplayType('list')}>
+                            <List />
+                        </div>
+                        <div className={`p-1 rounded cursor-pointer ${displayType == 'grid' && 'bg-accent'}`} onClick={() => setDisplayType('grid')}>
+                            <Grid />
+                        </div>
                     </div>
-                </div>
+                </Card>
             </div>
-            {
-                displayType == "list" &&
-                <Table<Branch> columns={columnsWithActions} data={branchesToDisplay} config={config} />
-            }
-            {
-                displayType == "grid" &&
-                <div className='grid grid-cols-4 mt-3'>
-                    {
-                        branches.map(branch => (
-                            <BranchCard
-                                key={branch.id}
-                                id={branch.id}
-                                phoneNo={branch.phoneNo}
-                                area={branch.area}
-                                address={branch.address}
-                                city={branch.city}
-                                openingTime={branch.openingTime}
-                                closingTime={branch.closingTime}
-                                status={branch.status}
-                            />
-                        ))
-                    }
-                </div>
-            }
+            <div className='pt-3'>
+                {
+                    displayType == "list" &&
+                    <Table<Branch>
+                        columns={columnsWithActions}
+                        data={data}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        total={total}
+                        onPageChange={setPage}
+                        onRowsPerPageChange={setRowsPerPage}
+                        onSearch={handleSearch}
+                        config={{
+                            enableSearch: true,
+                            enablePagination: true,
+                            defaultRowsPerPage: rowsPerPage,
+                            rowsPerPageOptions: [5, 10, 15],
+                        }}
+                    />
+                }
+                {
+                    displayType == "grid" &&
+                    <div className='grid grid-cols-4 mt-3'>
+                        {
+                            branches.map(branch => (
+                                <BranchCard
+                                    key={branch.id}
+                                    id={branch.id}
+                                    phoneNo={branch.phoneNo}
+                                    area={branch.area}
+                                    address={branch.address}
+                                    city={branch.city}
+                                    openingTime={branch.openingTime}
+                                    closingTime={branch.closingTime}
+                                    status={branch.status}
+                                />
+                            ))
+                        }
+                    </div>
+                }
+            </div>
 
             <Popup isOpen={branchAddPopup} onClose={() => { setBranchAddPopup(false); router.refresh(); }}>
                 <BranchForm mode='add' onSubmitAction={handleBranchAddAction} />

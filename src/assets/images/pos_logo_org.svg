@@ -1,0 +1,51 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="180" fill="#ffffff" opacity="0.08"/>
+  
+  <!-- Main logo container with gradient -->
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Flexible/modular icon representing POS system -->
+  <g transform="translate(200, 140)">
+    <!-- Main card shape -->
+    <rect x="-60" y="-40" width="120" height="80" rx="8" fill="url(#mainGradient)"/>
+    
+    <!-- Card stripe -->
+    <rect x="-60" y="-25" width="120" height="15" fill="url(#accentGradient)"/>
+    
+    <!-- Chip representation -->
+    <rect x="-45" y="0" width="30" height="25" rx="3" fill="#fcd34d"/>
+    <rect x="-42" y="3" width="24" height="19" rx="2" fill="#78350f"/>
+    
+    <!-- Contactless waves -->
+    <path d="M 25 5 Q 35 10 25 15" stroke="#fde68a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M 32 5 Q 45 10 32 15" stroke="#fde68a" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 39 5 Q 55 10 39 15" stroke="#fde68a" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+  </g>
+  
+  <!-- POFS Text -->
+  <text x="200" y="260" font-family="Arial, sans-serif" font-size="72" font-weight="bold" text-anchor="middle" fill="#ffffff">
+    POFS
+  </text>
+  
+  <!-- Tagline -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#e2e8f0" letter-spacing="3">
+    FLEXIBLE POS SYSTEM
+  </text>
+  
+  <!-- Accent dots -->
+  <circle cx="90" cy="200" r="6" fill="#fbbf24" opacity="0.7"/>
+  <circle cx="110" cy="190" r="4" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="290" cy="190" r="4" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="310" cy="200" r="6" fill="#fbbf24" opacity="0.7"/>
+</svg>

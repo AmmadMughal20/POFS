@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 export enum Align
 {
@@ -53,10 +53,16 @@ interface TableConfig
 
 interface TableProps<T>
 {
-    columns: Column<T>[];
     data: T[];
-    className?: string;
+    columns: Column<T>[];
     config?: TableConfig;
+    page: number;
+    rowsPerPage: number;
+    total: number;
+    onPageChange: (page: number) => void;
+    onRowsPerPageChange: (rows: number) => void;
+    className?: string;
+    onSearch: (searchTerm: string) => void
 }
 
 function isDataColumn<T>(col: Column<T>): col is DataColumn<T>
@@ -69,21 +75,26 @@ function Table<T extends object>({
     columns,
     className = '',
     config = {},
+    onPageChange,
+    rowsPerPage,
+    onRowsPerPageChange,
+    total,
+    page,
+    onSearch
 }: TableProps<T>)
 {
     const {
         enableSearch = true,
         enablePagination = true,
-        defaultRowsPerPage = 5,
         rowsPerPageOptions = [5, 10, 20],
         alternateRowColors = true,
     } = config;
 
-    const [search, setSearch] = useState<string>('');
+    const search = '';
     const [sortKey, setSortKey] = useState<keyof T | null>(null);
     const [sortAsc, setSortAsc] = useState(true);
-    const [page, setPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
+    // const [page, setPage] = useState(1);
+    // const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
 
     // Sorting handler
     const handleSort = (col: Column<T>) =>
@@ -101,48 +112,48 @@ function Table<T extends object>({
     };
 
     // Filter data
-    const filteredData = useMemo(() =>
-    {
-        const searchLower = search.toLowerCase();
-        return data.filter((row) =>
-            Object.values(row as { [key: string]: unknown })
-                .map((v) => (v == null ? '' : String(v)))
-                .join(' ')
-                .toLowerCase()
-                .includes(searchLower)
-        );
-    }, [data, search]);
+    // const filteredData = useMemo(() =>
+    // {
+    //     const searchLower = search.toLowerCase();
+    //     return data.filter((row) =>
+    //         Object.values(row as { [key: string]: unknown })
+    //             .map((v) => (v == null ? '' : String(v)))
+    //             .join(' ')
+    //             .toLowerCase()
+    //             .includes(searchLower)
+    //     );
+    // }, [data, search]);
 
     // Sort data
-    const sortedData = useMemo(() =>
-    {
-        if (!sortKey) return filteredData;
-        const col = columns.find((c) => c.key === sortKey);
-        if (!col || !col.sortable) return filteredData;
+    // const sortedData = useMemo(() =>
+    // {
+    //     if (!sortKey) return filteredData;
+    //     const col = columns.find((c) => c.key === sortKey);
+    //     if (!col || !col.sortable) return filteredData;
 
-        return [...filteredData].sort((a, b) =>
-        {
-            const aValue = a[sortKey];
-            const bValue = b[sortKey];
+    //     return [...filteredData].sort((a, b) =>
+    //     {
+    //         const aValue = a[sortKey];
+    //         const bValue = b[sortKey];
 
-            if (aValue == null) return 1;
-            if (bValue == null) return -1;
+    //         if (aValue == null) return 1;
+    //         if (bValue == null) return -1;
 
-            if (aValue < bValue) return sortAsc ? -1 : 1;
-            if (aValue > bValue) return sortAsc ? 1 : -1;
-            return 0;
-        });
-    }, [filteredData, sortKey, sortAsc, columns]);
+    //         if (aValue < bValue) return sortAsc ? -1 : 1;
+    //         if (aValue > bValue) return sortAsc ? 1 : -1;
+    //         return 0;
+    //     });
+    // }, [filteredData, sortKey, sortAsc, columns]);
 
     // Pagination
-    const paginatedData = useMemo(() =>
-    {
-        if (!enablePagination) return sortedData;
-        const start = (page - 1) * rowsPerPage;
-        return sortedData.slice(start, start + rowsPerPage);
-    }, [sortedData, page, rowsPerPage, enablePagination]);
+    // const paginatedData = useMemo(() =>
+    // {
+    //     if (!enablePagination) return sortedData;
+    //     const start = (page - 1) * rowsPerPage;
+    //     return sortedData.slice(start, start + rowsPerPage);
+    // }, [sortedData, page, rowsPerPage, enablePagination]);
 
-    const totalPages = Math.ceil(sortedData.length / rowsPerPage);
+    const totalPages = Math.ceil(total / rowsPerPage);
 
     function renderCell(value: unknown): React.ReactNode
     {
@@ -158,28 +169,46 @@ function Table<T extends object>({
         return JSON.stringify(value);
     }
 
-
     return (
         <div className={`space-y-3 ${className}`}>
             {/* Search */}
-            {enableSearch && (
-                <div className="flex flex-row-reverse">
+            <div className="flex gap-5 flex-row-reverse">
+                {enableSearch && (
                     <input
                         type="text"
                         placeholder="Search..."
                         value={search}
                         onChange={(e) =>
                         {
-                            setSearch(e.target.value);
-                            setPage(1);
+                            onSearch(e.target.value);
+                            onPageChange(1);
                         }}
                         className="px-3 py-2 border border-gray-300 bg-white rounded-md text-sm w-full max-w-xs"
                     />
+                )}
+
+                <div className="flex items-center space-x-2">
+                    <span>Rows per page:</span>
+                    <select
+                        value={rowsPerPage}
+                        onChange={(e) =>
+                        {
+                            onRowsPerPageChange(Number(e.target.value));
+                            onPageChange(1)
+                        }}
+                        className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                    >
+                        {rowsPerPageOptions.map((opt) => (
+                            <option key={opt} value={opt}>
+                                {opt}
+                            </option>
+                        ))}
+                    </select>
                 </div>
-            )}
+            </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-2xl shadow-sm border border-gray-200">
+            <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-200">
                 <table className="min-w-full text-sm border-collapse">
                     <thead>
                         <tr>
@@ -193,7 +222,7 @@ function Table<T extends object>({
                     ${col.headerStyle?.bgColor ?? 'bg-gray-100'}
                     ${col.headerStyle?.textColor ?? 'text-gray-800'}
                     ${col.headerStyle?.fontWeight ?? 'font-semibold'}
-                    ${col.headerStyle?.textAlign === Align.CENTER
+                    ${col.headerStyle?.textAlign === Align.LEFT
                                             ? 'text-center'
                                             : col.headerStyle?.textAlign === Align.RIGHT
                                                 ? 'text-right'
@@ -201,7 +230,7 @@ function Table<T extends object>({
                   `}
                                     style={{ width: col.width || `${100 / columns.length}%` }}
                                 >
-                                    <div className="flex items-center justify-between">
+                                    <div>
                                         <span>{col.label}</span>
                                         {col.sortable && sortKey === col.key && (
                                             <span className="ml-1 text-gray-500">{sortAsc ? '▲' : '▼'}</span>
@@ -213,8 +242,8 @@ function Table<T extends object>({
                     </thead>
 
                     <tbody>
-                        {paginatedData.length > 0 ? (
-                            paginatedData.map((row, idx) => (
+                        {data.length > 0 ? (
+                            data.map((row, idx) => (
                                 <tr
                                     key={idx}
                                     className={`${alternateRowColors && idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 transition`}
@@ -256,36 +285,18 @@ function Table<T extends object>({
 
             {/* Pagination */}
             {enablePagination && totalPages > 1 && (
-                <div className="flex items-center justify-between text-sm text-gray-700">
-                    <div className="flex items-center space-x-2">
-                        <span>Rows per page:</span>
-                        <select
-                            value={rowsPerPage}
-                            onChange={(e) =>
-                            {
-                                setRowsPerPage(Number(e.target.value));
-                                setPage(1);
-                            }}
-                            className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-                        >
-                            {rowsPerPageOptions.map((opt) => (
-                                <option key={opt} value={opt}>
-                                    {opt}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                <div className="flex items-center justify-end text-sm text-gray-700">
 
                     <div className="space-x-2 flex items-center">
                         <button
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            onClick={() => onPageChange(Math.max(1, page - 1))}
                             disabled={page === 1}
                             className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
                         >
                             Prev
                         </button>
                         <button
-                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                             disabled={page === totalPages}
                             className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
                         >

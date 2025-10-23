@@ -9,7 +9,8 @@ export interface ISidebarMenuItem
     link: string | (() => void)
     icon: React.ReactElement<React.SVGProps<SVGSVGElement>> | string
     selected?: boolean,
-    variant?: 'primary'
+    variant?: 'primary',
+    permission?: string | undefined
 }
 
 const SidebarMenuItem: React.FC<ISidebarMenuItem> = ({

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import Searchbar from '../Searchbar/Searchbar'
 import Button from '../Button/Button'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 
 interface ITopbar
 {
@@ -13,9 +13,10 @@ interface ITopbar
 const Topbar: React.FC<ITopbar> = ({ collapsed }) =>
 {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { data: session } = useSession()
 
     return (
-        <header className={`p-5 flex w-screen gap-10 items-center transition-all justify-between ${mobileMenuOpen ? 'z-46' : '41'} fixed top-0 ${collapsed ? 'pl-25' : 'pl-38'}`}>
+        <header className={`p-5 flex w-screen gap-10 items-center transition-all justify-between ${mobileMenuOpen ? 'z-46' : '41'} fixed top-0 ${collapsed ? 'pl-20' : 'pl-38'}`}>
             <div className="flex items-center gap-4">
                 {/* Mobile Menu Button */}
                 <button
@@ -37,15 +38,18 @@ const Topbar: React.FC<ITopbar> = ({ collapsed }) =>
                 {/* User Info */}
                 <div className="flex items-center gap-3 ml-6">
                     <Image
-                        src="/file.svg"
+                        src={session?.user.image ?? "file.svg"}
                         width={40}
                         height={40}
                         alt="username"
                         className="w-10 h-10 rounded-full bg-amber-200 object-cover"
                     />
-                    <h6 className="hidden sm:flex sm:gap-2 text-sm md:text-base font-medium">
-                        <span className='hidden lg:block'>Welcome, </span><span className="font-semibold"> Username</span>
-                    </h6>
+                    <div className="hidden sm:block">
+                        <h6 className="hidden sm:flex sm:gap-2 text-sm md:text-base font-medium">
+                            <span className='hidden lg:block'>Welcome, </span><span className="font-semibold"> {session?.user.name}</span>
+                        </h6>
+                        <p className='text-right'>{session?.user.roleTitle}</p>
+                    </div>
                 </div>
                 <button className="p-2 rounded-lg hover:bg-primary hover:text-white transition">
                     <BellDot size={22} />
