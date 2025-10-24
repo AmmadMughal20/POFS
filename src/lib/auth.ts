@@ -52,20 +52,29 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials)
             {
-                if (!credentials) return null;
+                if (!credentials) throw new Error("Missing credentials");
+                try
+                {
 
-                const user = await authenticateUser(credentials.email, credentials.password);
-                if (!user) return null;
-
-                // ✅ Return minimal safe user object for JWT
-                return {
-                    id: user.id,
-                    name: user.name ?? undefined,
-                    email: user.email,
-                    roleId: String(user.roleId),
-                    roleTitle: user.roleTitle,
-                    permissions: user.permissions,
-                };
+                    const user = await authenticateUser(credentials.email, credentials.password);
+                    // ✅ Return minimal safe user object for JWT
+                    return {
+                        id: user.id,
+                        name: user.name ?? undefined,
+                        email: user.email,
+                        roleId: String(user.roleId),
+                        roleTitle: user.roleTitle,
+                        permissions: user.permissions,
+                    };
+                }
+                catch (error)
+                {
+                    if (error instanceof Error)
+                    {
+                        throw new Error(error.message);
+                    }
+                    throw new Error("Login failed due to an unknown error");
+                }
             },
         }),
     ],

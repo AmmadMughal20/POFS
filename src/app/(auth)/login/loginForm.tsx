@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { startTransition, useActionState, useEffect } from 'react'
 import { handleLoginAction } from './formHandler'
 import SubmitButton from './SubmitButton'
-import { useRouter, redirect } from 'next/navigation'
+import { useRouter, redirect, useSearchParams } from 'next/navigation'
 
 const LoginForm = () =>
 {
@@ -16,12 +16,16 @@ const LoginForm = () =>
         errors: {}
     }
 
+    const searchParams = useSearchParams();
+    const errorMessage = searchParams.get("error");
+
     const router = useRouter()
 
     const [state, formAction] = useActionState(handleLoginAction, initialState)
 
     useEffect(() =>
     {
+        console.log(state, 'printing state')
         if (state.success)
         {
             redirect('/')
@@ -63,6 +67,9 @@ const LoginForm = () =>
                         Form Submitted Successfully
                     </div> : <></>
             }
+
+            {errorMessage ? <p className="text-red-500 text-sm">{decodeURIComponent(errorMessage)}</p> : <></>}
+
             <SubmitButton title='Sign In' />
             <div className='mt-5 text-center'>
                 <Link href='/forgot-password'>Forgot password?</Link>

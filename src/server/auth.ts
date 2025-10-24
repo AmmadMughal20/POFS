@@ -1,16 +1,19 @@
 "use server";
 
 import { prisma } from "@/lib/prisma"; // example: your DB client
+import { UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import crypto from 'crypto'
 
 export async function authenticateUser(email: string, password: string)
 {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return null;
+    if (!user) throw new Error("Invalid email or passworda");
+
+    if (user.status !== UserStatus.ACTIVE) throw new Error("Account not verified or disabled");
 
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return null;
+    if (!isValid) throw new Error("Invalid email or passwords");
 
     const rolePermissions = await prisma.rolePermission.findMany({
         where: { roleId: user.roleId },
