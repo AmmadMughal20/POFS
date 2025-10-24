@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,6 +12,87 @@ enum BranchStatus {
   DISABLED
 }
 
+enum Province {
+  PUNJAB
+  SINDH
+  KPK
+  BALOCHISTAN
+  ISLAMABAD
+  GILGIT_BALTISTAN
+  AJK
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  EASYPAY
+  JAZZCASH
+}
+
+enum BusinessType {
+  FASHION_APPAREL
+  FOOTWEAR
+  COSMETICS_BEAUTY
+  ELECTRONICS_MOBILE
+  GROCERY_SUPERMARKET
+  PHARMACY
+  BOOKSTORE
+  GIFT_SHOP
+  ECOMMERCE_STORE
+  RESTAURANT
+  CAFE
+  BAKERY
+  FAST_FOOD
+  CATERING
+  JUICE_BAR
+  HOTEL_GUEST_HOUSE
+  HOME_COOKED_FOOD
+  SALON
+  SPA
+  GYM
+  WELLNESS_CENTER
+  SCHOOL
+  TUITION_CENTER
+  TRAINING_INSTITUTE
+  COACHING_CENTER
+  CLINIC
+  DENTAL_CLINIC
+  OPTICAL_STORE
+  PHYSIOTHERAPY_CENTER
+  TRAVEL_AGENCY
+  PHOTOGRAPHY_STUDIO
+  EVENT_MANAGEMENT
+  HOME_MAINTENANCE
+  LAUNDRY
+  DELIVERY_SERVICE
+  AUTO_WORKSHOP
+  TAILORING_SERVICE
+  GAMING_CAFE
+  ART_STUDIO
+  SPORTS_CLUB
+  PET_CARE
+}
+
+enum BusinessStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_VERIFICATION
+  SUSPENDED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
 enum UserStatus {
   ACTIVE
   DISABLED
@@ -29,11 +104,17 @@ enum OrderMode {
 }
 
 model Permission {
-  id          Int              @id @default(autoincrement())
-  title       String           @db.VarChar(100)
-  code        String           @db.VarChar(100)
-  description String?           @db.VarChar(255)
-  rolePerms   RolePermission[]
+  id            Int              @id @default(autoincrement())
+  title         String           @db.VarChar(100)
+  code          String           @db.VarChar(100)
+  description   String?          @db.VarChar(255)
+  rolePerms     RolePermission[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?            @relation("PermissionCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?            @relation("PermissionUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
 }
 
 model RolePermission {
@@ -46,30 +127,73 @@ model RolePermission {
 }
 
 model Role {
-  id        Int              @id @default(autoincrement())
-  title     String           @db.VarChar(100)
-  User      User[]
-  rolePerms RolePermission[]
+  id            Int              @id @default(autoincrement())
+  title         String           @db.VarChar(100)
+  User          User[]
+  rolePerms     RolePermission[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?            @relation("RoleCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?            @relation("RoleUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now())
-  email     String     @unique @db.VarChar(255)
-  name      String?    @db.VarChar(255)
-  phoneNo   String     @unique @db.VarChar(15)
-  password  String     @db.VarChar(255)
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+  email     String        @unique @db.VarChar(255)
+  name      String?       @db.VarChar(255)
+  phoneNo   String        @unique @db.VarChar(15)
+  password  String        @db.VarChar(255)
   roleId    Int
-  Role      Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  status    UserStatus @default(ACTIVE)
-  Branch    Branch?    @relation("UserBranch")
+  Role      Role          @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status    UserStatus    @default(ACTIVE)
   Customer  Customer?
-  SalesMan  SalesMan?  @relation("UserSalesMan")
+  SalesMan  SalesMan?     @relation("UserSalesMan")
+  Manager   Manager?      @relation("UserManager")
   otp       OTP[]
+  Business  Business?
+  AuditLogs ActivityLog[]
+  updatedAt DateTime      @updatedAt
+  isDeleted Boolean       @default(false)
+  deletedAt DateTime?
+
+  createdBy Int?
+  updatedBy Int?
+
+  createdByUser User? @relation("UserCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User? @relation("UserUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  createdUsers User[] @relation("UserCreatedBy")
+  updatedUsers User[] @relation("UserUpdatedBy")
+
+  createdPermissions Permission[] @relation("PermissionCreatedBy")
+  updatedPermissions Permission[] @relation("PermissionUpdatedBy")
+  createdRole        Role[]       @relation("RoleCreatedBy")
+  updatedRole        Role[]       @relation("RoleUpdatedBy")
+  createdBranch      Branch[]     @relation("BranchCreatedBy")
+  updatedBranch      Branch[]     @relation("BranchUpdatedBy")
+  createdBusiness    Business[]   @relation("BusinessCreatedBy")
+  updatedBusiness    Business[]   @relation("BusinessUpdatedBy")
+  createdProduct     Product[]    @relation("ProductCreatedBy")
+  updatedProduct     Product[]    @relation("ProductUpdatedBy")
+  createdExpense     Expense[]    @relation("ExpenseCreatedBy")
+  updatedExpense     Expense[]    @relation("ExpenseUpdatedBy")
+  createdOrder       Order[]      @relation("OrderCreatedBy")
+  updatedOrder       Order[]      @relation("OrderUpdatedBy")
+  createdPurchase    Purchase[]   @relation("PurchaseCreatedBy")
+  updatedPurchase    Purchase[]   @relation("PurchaseUpdatedBy")
+  createdCategory    Category[]   @relation("CategoryCreatedBy")
+  updatedCategory    Category[]   @relation("CategoryUpdatedBy")
+  createdSupplier    Supplier[]   @relation("SupplierCreatedBy")
+  updatedSupplier    Supplier[]   @relation("SupplierUpdatedBy")
+  createdDiscount    Discount[]   @relation("DiscountCreatedBy")
+  updatedDiscount    Discount[]   @relation("DiscountUpdatedBy")
 }
 
 model OTP {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   code      String
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
@@ -78,72 +202,151 @@ model OTP {
 }
 
 model Branch {
-  id            String       @id
-  address       String       @db.VarChar(200)
-  phoneNo       String       @default("03213443764") @db.VarChar(15)
-  city          String       @db.VarChar(70)
-  area          String       @db.VarChar(100)
-  status        BranchStatus @default(ACTIVE)
-  openingTime   DateTime     @db.Time // stores only time, not date
-  closingTime   DateTime     @db.Time
-  branchManager Int?         @unique
-  BranchManager User?        @relation("UserBranch", fields: [branchManager], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  stocks        Stock[]      @relation("BranchStock")
-  salesMen      SalesMan[]   @relation("SalesManBranch")
+  id          String       @id
+  address     String       @db.VarChar(200)
+  phoneNo     String       @default("03213443764") @db.VarChar(15)
+  city        String       @db.VarChar(70)
+  area        String       @db.VarChar(100)
+  status      BranchStatus @default(ACTIVE)
+  openingTime DateTime     @db.Time // stores only time, not date
+  closingTime DateTime     @db.Time
+  managerId   Int?         @unique
+  Manager     Manager?     @relation("BranchManager", fields: [managerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stocks      Stock[]      @relation("BranchStock")
+  salesMen    SalesMan[]   @relation("SalesManBranch")
+  businessId  String
+  Business    Business     @relation("BusinessBranch", fields: [businessId], references: [id])
+  Products    Product[]    @relation("BranchProduct")
+  Expenses    Expense[]
+  Purchases   Purchase[]
+  discounts   Discount[]   @relation("BranchDiscount")
+  Orders      Order[]
+  Payments    Payment[]
+  province    Province?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User? @relation("BranchCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User? @relation("BranchUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@unique([phoneNo, address])
+  @@index([businessId, managerId])
+}
+
+model Manager {
+  id         Int      @id
+  User       User     @relation("UserManager", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Branch     Branch[] @relation("BranchManager")
+  businessId String
+  Business   Business @relation("BusinessManager", fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
 }
 
 model SalesMan {
-  id       Int    @unique
-  branchId String
-  User     User   @relation("UserSalesMan", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Branch   Branch @relation("SalesManBranch", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         Int      @unique
+  User       User     @relation("UserSalesMan", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  branchId   String
+  Branch     Branch   @relation("SalesManBranch", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  businessId String
+  Business   Business @relation("BusinessSaleMan", fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId, branchId])
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  title       String      @db.VarChar(200)
-  description String      @db.VarChar(500)
-  sku         String      @db.VarChar(20)
-  rate        Float
-  stocks      Stock[]     @relation("ProductStock")
-  orderItems  OrderItem[] @relation("ProductOrderItem")
+  id            Int            @id @default(autoincrement())
+  title         String         @db.VarChar(200)
+  description   String         @db.VarChar(500)
+  sku           String         @db.VarChar(20)
+  rate          Decimal        @db.Decimal(10, 2)
+  stocks        Stock[]        @relation("ProductStock")
+  orderItems    OrderItem[]    @relation("ProductOrderItem")
+  branchId      String
+  Branch        Branch         @relation("BranchProduct", fields: [branchId], references: [id])
+  businessId    String
+  Business      Business       @relation("BusinessProduct", fields: [businessId], references: [id])
+  categoryId    Int
+  Category      Category       @relation(fields: [categoryId], references: [id])
+  supplierId    Int
+  Supplier      Supplier       @relation("SupplierProducts", fields: [supplierId], references: [id])
+  PurchaseItems PurchaseItem[]
+  discounts     Discount[]     @relation("ProductDiscount")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?          @relation("ProductCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?          @relation("ProductUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@unique([businessId, sku])
+  @@index([businessId, branchId, categoryId, supplierId])
 }
 
 model Stock {
   branchId   String
   productId  Int
-  Branch     Branch  @relation("BranchStock", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Product    Product @relation("ProductStock", fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Branch     Branch   @relation("BranchStock", fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Product    Product  @relation("ProductStock", fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   stockUnits Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@id([branchId, productId])
 }
 
 model Customer {
-  id      Int     @id
-  address String? @db.VarChar(200)
-  city    String  @db.VarChar(70)
-  area    String  @db.VarChar(100)
-  User    User    @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  orders  Order[]
+  id        Int      @id
+  address   String?  @db.VarChar(200)
+  city      String   @db.VarChar(70)
+  area      String   @db.VarChar(100)
+  User      User     @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  customerId  Int
-  Customer    Customer    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderMode   OrderMode   @default(OFFLINE)
-  totalAmount Float
-  orderItems  OrderItem[] @relation("OrderOrderItem")
+  id            Int         @id @default(autoincrement())
+  customerId    Int
+  Customer      Customer    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderMode     OrderMode   @default(OFFLINE)
+  totalAmount   Decimal     @db.Decimal(10, 2)
+  orderItems    OrderItem[] @relation("OrderOrderItem")
+  businessId    String
+  Business      Business    @relation("BusinessOrder", fields: [businessId], references: [id])
+  Payment       Payment?
+  branchId      String
+  Branch        Branch      @relation(fields: [branchId], references: [id])
+  status        OrderStatus @default(PENDING)
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?       @relation("OrderCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?       @relation("OrderUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([businessId, branchId])
 }
 
 model OrderItem {
   orderId   Int
   productId Int
   qty       Int
-  amount    Float
+  amount    Decimal @db.Decimal(10, 2)
   Order     Order   @relation("OrderOrderItem", fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Product   Product @relation("ProductOrderItem", fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -151,9 +354,207 @@ model OrderItem {
 }
 
 model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Business {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  type        BusinessType
+  description String?      @db.Text
+  ownerId     Int          @unique
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  email    String?   @unique
+  phone    String?
+  website  String?
+  address  String?
+  city     String?
+  province Province?
+  country  String?   @default("Pakistan")
+
+  logoUrl       String?
+  coverImageUrl String?
+
+  establishedYear Int?
+  isVerified      Boolean        @default(false)
+  status          BusinessStatus @default(ACTIVE)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?    @relation("BusinessCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?    @relation("BusinessUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  Branches Branch[]   @relation("BusinessBranch")
+  SalesMen SalesMan[] @relation("BusinessSaleMan")
+  Manager  Manager[]  @relation("BusinessManager")
+  Orders   Order[]    @relation("BusinessOrder")
+  Products Product[]  @relation("BusinessProduct")
+
+  Categories Category[]
+  Expenses   Expense[]
+
+  Suppliers Supplier[]
+  Purchases Purchase[]
+  Payments  Payment[]
+
+  Discounts Discount[]
+  isDeleted Boolean    @default(false)
+  deletedAt DateTime?
+
+  @@index([name])
+  @@index([city])
+  @@index([type])
+}
+
+model Payment {
+  id          Int           @id @default(autoincrement())
+  orderId     Int           @unique
+  Order       Order         @relation(fields: [orderId], references: [id])
+  amount      Decimal       @db.Decimal(10, 2)
+  method      PaymentMethod
+  referenceNo String?       @db.VarChar(100) // e.g., card txn id or bank ref
+  paidAt      DateTime      @default(now())
+
+  branchId String
+  Branch   Branch @relation(fields: [branchId], references: [id])
+
+  businessId String
+  Business   Business @relation(fields: [businessId], references: [id])
+
+  @@index([branchId, businessId, method])
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  Products      Product[]
+  businessId    String
+  Business      Business  @relation(fields: [businessId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?     @relation("CategoryCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?     @relation("CategoryUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+}
+
+model Expense {
+  id            Int      @id @default(autoincrement())
+  businessId    String
+  Business      Business @relation(fields: [businessId], references: [id])
+  branchId      String?
+  Branch        Branch?  @relation(fields: [branchId], references: [id])
+  title         String
+  amount        Decimal  @db.Decimal(10, 2)
+  date          DateTime @default(now())
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?    @relation("ExpenseCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?    @relation("ExpenseUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([businessId, branchId])
+}
+
+model Supplier {
+  id            Int        @id @default(autoincrement())
+  name          String
+  contactNo     String?
+  email         String?
+  address       String?
+  Products      Product[]  @relation("SupplierProducts")
+  businessId    String
+  Business      Business   @relation(fields: [businessId], references: [id])
+  Purchases     Purchase[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?      @relation("SupplierCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?      @relation("SupplierUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+}
+
+model Purchase {
+  id            Int            @id @default(autoincrement())
+  supplierId    Int?
+  Supplier      Supplier?      @relation(fields: [supplierId], references: [id])
+  businessId    String
+  Business      Business       @relation(fields: [businessId], references: [id])
+  branchId      String?
+  Branch        Branch?        @relation(fields: [branchId], references: [id])
+  totalAmount   Decimal        @db.Decimal(10, 2)
+  items         PurchaseItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?          @relation("PurchaseCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?          @relation("PurchaseUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([businessId, branchId, supplierId])
+}
+
+model PurchaseItem {
   id         Int      @id @default(autoincrement())
-  email      String
-  token      String   @unique
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  purchaseId Int
+  Purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  productId  Int
+  Product    Product  @relation(fields: [productId], references: [id])
+  qty        Int
+  costPrice  Decimal  @db.Decimal(10, 2)
+
+  @@index([purchaseId, productId])
+}
+
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  User        User     @relation(fields: [userId], references: [id])
+  action      String
+  entity      String
+  entityId    String?
+  timestamp   DateTime @default(now())
+  description String?
+
+  @@index([userId])
+}
+
+model Discount {
+  id            Int          @id @default(autoincrement())
+  code          String       @unique
+  title         String?
+  description   String?
+  type          DiscountType @default(PERCENTAGE)
+  value         Decimal      @db.Decimal(10, 2) // e.g. 10 for 10% or 500 for Rs. 500 off
+  validFrom     DateTime
+  validTo       DateTime
+  active        Boolean      @default(true)
+  minimumAmount Decimal?     @db.Decimal(10, 2) // minimum order total to apply discount
+  usageLimit    Int? // how many times it can be used overall
+
+  businessId String
+  Business   Business @relation(fields: [businessId], references: [id])
+
+  products Product[] @relation("ProductDiscount")
+  branches Branch[]  @relation("BranchDiscount")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  createdByUser User?    @relation("DiscountCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User?    @relation("DiscountUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
 }
