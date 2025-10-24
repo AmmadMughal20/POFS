@@ -37,7 +37,7 @@ interface Props
 export default function BranchesPageClient({ initialBranches, permissions, initialTotal }: Props)
 {
 
-    const [data, setData] = useState<Branch[]>([])
+    const [data, setData] = useState<Branch[]>(initialBranches)
     const [page, setPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [total, setTotal] = useState(initialTotal)

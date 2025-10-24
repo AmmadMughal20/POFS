@@ -7,6 +7,9 @@ const routePermissions: Record<string, string[]> = {
     '/dashboard': ['view_dashboard'],
     '/branch-management': ['branch:view'],
     '/branch-management/edit': ['edit_branch'],
+    '/users': ['user:view'],
+    '/roles': ['role:view'],
+    '/permissions': ['permission:view']
 };
 
 const authPathNames = [
@@ -70,6 +73,9 @@ export const config = {
         '/login',
         '/dashboard/:path*',
         '/branch-management:path*',
+        '/users:path*',
+        '/permissions:path*',
+        '/roles:path*',
         '/',
         '/forgot-password',
         '/otp-verification',

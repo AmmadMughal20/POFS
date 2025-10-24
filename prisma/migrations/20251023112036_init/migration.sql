@@ -131,6 +131,17 @@ CREATE TABLE "OrderItem" (
     CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("orderId","productId")
 );
 
+-- CreateTable
+CREATE TABLE "VerificationToken" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -142,6 +153,9 @@ CREATE UNIQUE INDEX "Branch_branchManager_key" ON "Branch"("branchManager");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SalesMan_id_key" ON "SalesMan"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "VerificationToken_token_key" ON "VerificationToken"("token");
 
 -- AddForeignKey
 ALTER TABLE "RolePermission" ADD CONSTRAINT "RolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;

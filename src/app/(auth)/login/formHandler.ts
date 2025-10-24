@@ -22,21 +22,41 @@ export async function handleLoginAction(
         return { errors: result.error.flatten().fieldErrors };
     }
 
-    const signInResult = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-    });
-
-    if (signInResult?.error)
+    try
     {
-        return {
-            errors: {
-                password: ['Invalid email or password!'],
-            },
-        };
-    }
+        const signInResult = await signIn("credentials", {
+            email,
+            password,
+            redirect: false, // prevent auto-redirect
+        });
 
-    // Success ✅
-    return { success: true };
+        // ✅ Check authentication result
+        if (signInResult?.error)
+        {
+            const errorMsg =
+                signInResult.error === "CredentialsSignin"
+                    ? "Invalid email or password!"
+                    : signInResult.error; // handles custom thrown messages
+
+            return {
+                errors: { password: [errorMsg] },
+            };
+        }
+
+        // ✅ If sign-in succeeded
+        if (signInResult?.ok)
+        {
+            return { success: true };
+        }
+
+        return {
+            errors: { general: ["Unexpected error occurred"] },
+        };
+    } catch (error)
+    {
+        // ✅ Type-safe error handling
+        const message =
+            error instanceof Error ? error.message : "Something went wrong during sign-in";
+        return { errors: { general: [message] } };
+    }
 }
