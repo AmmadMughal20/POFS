@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, GlobeIcon, Pencil, Trash2 } from 'lucide-react';
 
 interface RowActionsProps
 {
@@ -12,15 +12,19 @@ interface RowActionsProps
     /** Called when Delete button is clicked */
     onDelete?: () => void;
 
+    onAddChild?: () => void;
+
     /** Whether to show the buttons */
     showView?: boolean;
     showEdit?: boolean;
     showDelete?: boolean;
+    showAddChild?: boolean;
 
     /** Custom titles for tooltips */
     viewTitle?: string;
     editTitle?: string;
     deleteTitle?: string;
+    addTitle?: string;
 
     /** Custom className for wrapper */
     className?: string;
@@ -33,12 +37,15 @@ const RowActions: React.FC<RowActionsProps> = ({
     onView,
     onEdit,
     onDelete,
+    onAddChild,
     showView = true,
     showEdit = true,
     showDelete = true,
+    showAddChild = true,
     viewTitle = 'View Details',
     editTitle = 'Edit',
     deleteTitle = 'Delete',
+    addTitle = "Add",
     className = '',
 }) =>
 {
@@ -69,6 +76,15 @@ const RowActions: React.FC<RowActionsProps> = ({
                     title={deleteTitle}
                 >
                     <Trash2 size={16} />
+                </button>
+            )}
+            {showAddChild && (
+                <button
+                    onClick={onAddChild}
+                    className="p-1.5 rounded-md hover:bg-warning/30 text-warning transition-colors"
+                    title={addTitle}
+                >
+                    <GlobeIcon size={16} />
                 </button>
             )}
         </div>

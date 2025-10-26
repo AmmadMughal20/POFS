@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from 'next/cache'
 import { getUserSession, hasPermission } from "@/server/getUserSession";
-import { IRole, RoleSchema } from "@/schemas/RoleSchema";
+import { IRole, AddRoleSchema, EditRoleSchema } from "@/schemas/RoleSchema";
 import { IPermission } from "@/schemas/PermissionSchema";
 import { Prisma } from "@prisma/client";
 import { Tag } from "@/components/ui/TagInput/TagInput";
@@ -28,34 +28,38 @@ export async function getRoles(
         throw new Error("Forbidden: You don’t have permission to view roles list.");
     }
 
-    const findManyArgs: Prisma.RoleFindManyArgs = {
-        skip,
-        take,
-        orderBy: orderBy ?? { id: 'asc' },
-        where: filter,
+    type RoleWithPerms = Prisma.RoleGetPayload<{
         include: {
             rolePerms: {
                 include: {
-                    Permission: true,
-                },
-            },
-        },
-    };
-
-    const countArgs: Prisma.RoleCountArgs = {
-        where: filter,
-    };
+                    Permission: true;
+                };
+            };
+        };
+    }>;
 
     const [roles, total] = await Promise.all([
         prisma.role.findMany({
-            ...findManyArgs,
-        }) as Promise<(IRole & { rolePerms: { Permission: IPermission }[] })[]>,
-        prisma.role.count(countArgs),
+            skip,
+            take,
+            orderBy: orderBy ?? { id: 'asc' },
+            where: filter,
+            include: {
+                rolePerms: {
+                    include: {
+                        Permission: true,
+                    },
+                },
+            },
+        }),
+        prisma.role.count({ where: filter }),
     ]);
 
-    const items = roles.map(role => ({
+    const items: (IRole & { permissions: IPermission[] })[] = (roles as RoleWithPerms[]).map((role) => ({
         ...role,
-        permissions: role.rolePerms.map(rp => rp.Permission),
+        permissions: role.rolePerms
+            .map((rp) => rp.Permission)
+            .filter((p): p is IPermission => Boolean(p)),
     }));
 
     return { items, total };
@@ -70,11 +74,13 @@ export async function handleRoleAddAction(
     try
     {
         // 🧩 1️⃣ Check permission
-        const { permissions } = await getUserSession();
+        const { user, permissions } = await getUserSession();
         if (!hasPermission(permissions, "role:create"))
         {
             throw new Error("Forbidden: You don’t have permission to create roles.");
         }
+
+        const createdBy = user.id
 
         // 🧩 2️⃣ Extract data
         const title = formData.get('title')?.toString().trim() || '';
@@ -88,11 +94,11 @@ export async function handleRoleAddAction(
         {
             permissionsForm = formData.getAll('permissions') as unknown as Tag[];
         }
-        const newRole: IRole = { title };
+        const newRole: IRole = { title, createdBy };
 
 
         // 🧩 3️⃣ Validate with schema
-        const result = RoleSchema.safeParse(newRole);
+        const result = AddRoleSchema.safeParse(newRole);
         if (!result.success)
         {
             return {
@@ -107,6 +113,7 @@ export async function handleRoleAddAction(
         const createdRole = await prisma.role.create({
             data: {
                 title,
+                createdBy,
                 rolePerms: {
                     create: permissionsForm.map((perm) => ({
                         Permission: { connect: { id: Number(perm.id) } },
@@ -161,12 +168,12 @@ export async function handleRoleEditAction(
     try
     {
         // 🧩 1️⃣ Check permission
-        const { permissions } = await getUserSession();
+        const { user, permissions } = await getUserSession();
         if (!hasPermission(permissions, "role:update"))
         {
             throw new Error("Forbidden: You don’t have permission to update roles.");
         }
-
+        const updatedBy = user.id
         // 🧩 1️⃣ Extract role ID and title
         const roleIdStr = formData.get("id")?.toString() || "";
         const roleId = parseInt(roleIdStr, 10);
@@ -188,7 +195,7 @@ export async function handleRoleEditAction(
             .filter((id) => !isNaN(id));
 
         // 🧩 3️⃣ Validate role data
-        const result = RoleSchema.safeParse({ id: roleId, title });
+        const result = EditRoleSchema.safeParse({ id: roleId, title, updatedBy });
         if (!result.success)
         {
             return {
@@ -215,7 +222,7 @@ export async function handleRoleEditAction(
             // Update role title
             prisma.role.update({
                 where: { id: roleId },
-                data: { title },
+                data: { title, updatedBy },
             }),
         ];
 
@@ -236,6 +243,7 @@ export async function handleRoleEditAction(
             values: {
                 id: updatedRole?.id,
                 title: updatedRole?.title,
+                updatedBy
             },
         };
     } catch (error: unknown)

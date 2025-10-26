@@ -7,7 +7,7 @@ import Page from '@/components/ui/Page/Page';
 import Popup from '@/components/ui/Popup/Popup';
 import RowActions from '@/components/ui/RowActions/RowActions';
 import Table, { Align, Column } from '@/components/ui/Table/Table';
-import { Branch } from '@/schemas/BranchSchema';
+import { IBranch } from '@/schemas/BranchSchema';
 import { handleBranchAddAction, handleBranchDeleteAction, handleBranchEditAction } from '@/server/BranchFormHandlers';
 import { hasPermission } from '@/server/getUserSession';
 import { Grid, List, Plus } from 'lucide-react';
@@ -18,38 +18,24 @@ import Card from '@/components/ui/Card/Card';
 
 // export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
-const config = {
-    enableSearch: true,
-    enablePagination: true,
-    defaultRowsPerPage: 5,
-    rowsPerPageOptions: [5, 10, 15, 20],
-    alternateRowColors: true,
-};
-
 
 interface Props
 {
-    initialBranches: Branch[];
+    initialBranches: IBranch[];
     permissions: string[];
     initialTotal: number
+    businessId: string
 }
 
-export default function BranchesPageClient({ initialBranches, permissions, initialTotal }: Props)
+export default function BranchesPageClient({ initialBranches, permissions, initialTotal, businessId }: Props)
 {
 
-    const [data, setData] = useState<Branch[]>(initialBranches)
+    const data: IBranch[] = (initialBranches)
     const [page, setPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [total, setTotal] = useState(initialTotal)
+    const total = initialTotal
     const branches = initialBranches;
-    const branchesToDisplay = branches.map(branch =>
-    {
-        return {
-            ...branch,
-            openingTimeToDisplay: branch.openingTime.toString().substring(16, 21)
-        }
-    })
-    const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+    const [selectedBranch, setSelectedBranch] = useState<IBranch | null>(null);
     const [branchAddPopup, setBranchAddPopup] = useState(false);
     const [branchEditPopup, setBranchEditPopup] = useState(false);
     const [viewBranchDetails, setViewBranchDetails] = useState(false);
@@ -71,7 +57,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
                 </div>
 
                 <Popup isOpen={branchAddPopup} onClose={() => { setBranchAddPopup(false); router.refresh() }}>
-                    <BranchForm mode='add' onSubmitAction={handleBranchAddAction} />
+                    <BranchForm mode='add' onSubmitAction={handleBranchAddAction} businessId={businessId} />
                 </Popup>
             </Page>
         )
@@ -89,11 +75,11 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         }
     };
 
-    const branchCols: Column<Branch>[] = Object.keys(branches[0] as Branch)
+    const branchCols: Column<IBranch>[] = Object.keys(branches[0] as IBranch)
         .map((key) =>
         {
             return {
-                key: key as keyof Branch,
+                key: key as keyof IBranch,
                 label: key.toUpperCase(),
                 sortable: true,
                 align: Align.CENTER,
@@ -112,7 +98,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         col => col.key !== "openingTime" && col.key !== "closingTime"
     );
 
-    const columnsWithActions: Column<Branch>[] = [
+    const columnsWithActions: Column<IBranch>[] = [
         ...filteredBranchCols,
         {
             key: "openingTimeToDisplay",
@@ -132,7 +118,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
                 <RowActions
                     onView={() =>
                     {
-                        const branch = branches.find((b: Branch) => b.id === row.id);
+                        const branch = branches.find((b: IBranch) => b.id === row.id);
                         if (branch) setSelectedBranch(branch);
                         setViewBranchDetails(true);
                     }}
@@ -185,7 +171,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
             <div className='pt-3'>
                 {
                     displayType == "list" &&
-                    <Table<Branch>
+                    <Table<IBranch>
                         columns={columnsWithActions}
                         data={data}
                         page={page}
@@ -217,6 +203,8 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
                                     openingTime={branch.openingTime}
                                     closingTime={branch.closingTime}
                                     status={branch.status}
+                                    branchManager={branch.branchManager}
+                                    businessId={branch.businessId}
                                 />
                             ))
                         }
@@ -225,12 +213,12 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
             </div>
 
             <Popup isOpen={branchAddPopup} onClose={() => { setBranchAddPopup(false); router.refresh(); }}>
-                <BranchForm mode='add' onSubmitAction={handleBranchAddAction} />
+                <BranchForm mode='add' onSubmitAction={handleBranchAddAction} businessId={businessId} />
             </Popup>
 
             <Popup isOpen={branchEditPopup} onClose={() => { setBranchEditPopup(false); setSelectedBranch(null); router.refresh(); }}>
                 {selectedBranch && (
-                    <BranchForm mode='edit' initialData={selectedBranch} onSubmitAction={handleBranchEditAction} />
+                    <BranchForm mode='edit' initialData={selectedBranch} onSubmitAction={handleBranchEditAction} businessId={businessId} />
                 )}
             </Popup>
 

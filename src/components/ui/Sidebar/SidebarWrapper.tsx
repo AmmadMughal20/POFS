@@ -2,7 +2,7 @@
 import logo from '@/assets/images/pofs_logo.svg'
 import logoOrg from '@/assets/images/pos_logo_org.svg'
 import { useSidebar } from '@/context/SidebarContext'
-import { ArrowLeft, ArrowRight, GitGraph, Globe, LayoutDashboard, LockKeyhole, LogOut, PersonStanding, ShoppingCart, Star, User } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, GitGraph, Globe, LayoutDashboard, LockKeyhole, LogOut, PersonStanding, ShoppingCart, Star, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -41,6 +41,13 @@ export const sidebarMenuItems: ISidebarMenuItem[] = [
         icon: <User />,
         selected: false,
         permission: 'user:view'
+    },
+    {
+        title: 'Businesses',
+        link: '/businesses',
+        icon: <BriefcaseBusiness />,
+        selected: false,
+        permission: 'business:view'
     },
     {
         title: 'Products',

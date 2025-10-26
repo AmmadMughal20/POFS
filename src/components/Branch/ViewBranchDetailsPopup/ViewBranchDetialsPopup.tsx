@@ -1,10 +1,10 @@
 import React from 'react'
 import Button from '../../ui/Button/Button'
 import Card from '../../ui/Card/Card'
-import { Branch } from '@/schemas/BranchSchema'
+import { IBranch } from '@/schemas/BranchSchema'
 
 type VB = {
-    selectedBranch: Branch,
+    selectedBranch: IBranch,
     onClose: () => void
 }
 const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
@@ -31,6 +31,12 @@ const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
 
                     <div className="font-medium text-gray-600">Phone No:</div>
                     <div className="text-gray-900">{selectedBranch.phoneNo ?? "-"}</div>
+
+                    <div className="font-medium text-gray-600">Business:</div>
+                    <div className="text-gray-900">{selectedBranch.businessId ?? "-"}</div>
+
+                    <div className="font-medium text-gray-600">Branch Manager:</div>
+                    <div className="text-gray-900">{selectedBranch.branchManager ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Opening Time:</div>
                     <div className="text-gray-900">{selectedBranch.openingTime.toString().substring(16, 21) ?? "-"}</div>

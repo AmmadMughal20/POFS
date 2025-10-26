@@ -125,8 +125,6 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
         setTotal(perms.total)
     }
 
-
-
     const handleSearch = (searchTerm: string) =>
     {
         // await

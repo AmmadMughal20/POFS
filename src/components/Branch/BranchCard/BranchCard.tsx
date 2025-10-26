@@ -1,10 +1,10 @@
 import Card from '@/components/ui/Card/Card'
 import React from 'react'
 
-import { Branch } from '@/schemas/BranchSchema'
+import { IBranch } from '@/schemas/BranchSchema'
 import { CheckCircle, Pencil, XCircle } from 'lucide-react'
 import Button from '@/components/ui/Button/Button'
-const BranchCard: React.FC<Branch> = ({ id, address, phoneNo, status, area, city, openingTime, closingTime }) =>
+const BranchCard: React.FC<IBranch> = ({ id, address, phoneNo, status, area, city, openingTime, closingTime, branchManager, businessId }) =>
 {
     return (
         <Card className="p-4 space-y-3 rounded-xl shadow hover:shadow-lg transition bg-white">
@@ -30,6 +30,15 @@ const BranchCard: React.FC<Branch> = ({ id, address, phoneNo, status, area, city
                 </p>
                 <p className="text-gray-700 text-sm">
                     <span className="font-medium">Phone:</span> {phoneNo}
+                </p>
+            </div>
+
+            <div className="space-y-1">
+                <p className="text-gray-700 text-sm">
+                    <span className="font-medium">Business:</span> {businessId}
+                </p>
+                <p className="text-gray-700 text-sm">
+                    <span className="font-medium">Branch Manager:</span> {branchManager}
                 </p>
             </div>
 

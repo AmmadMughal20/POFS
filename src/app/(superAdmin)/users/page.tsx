@@ -9,7 +9,7 @@ const page = async () =>
 {
     const { items, total } = await getUsers(0, 50)
     const { permissions } = await getUserSession()
-    const { items: roles, total: totalRoles } = await getRoles()
+    const { items: roles } = await getRoles()
 
     return (
         <UserClientComponent initialUsers={items} permissions={permissions} initialTotal={total} roles={roles} />

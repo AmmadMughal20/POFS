@@ -9,6 +9,7 @@ interface IRadioGroup
   direction?: 'vertical' | 'horizontal'
   selectedValue?: string | number
   onChange?: (value: string | number) => void
+  className?: string
 }
 const RadioGroup: React.FC<IRadioGroup> = ({
   title,
@@ -16,12 +17,13 @@ const RadioGroup: React.FC<IRadioGroup> = ({
   children,
   direction = 'vertical',
   selectedValue,
+  className = "",
   onChange }) =>
 {
   return (
     <>
       <Label htmlFor={name}>{title}</Label>
-      <div className={`radio-group ${direction == 'vertical' ? 'flex flex-col' : 'flex flex-row'}`}>
+      <div className={`radio-group ${direction == 'vertical' ? 'flex flex-col' : 'flex flex-row'} ${className}`}>
         {children.map((child) =>
           React.cloneElement(child, {
             name,

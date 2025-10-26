@@ -1,22 +1,20 @@
 'use client'
 import { PermissionsState } from '@/server/PermissionFormHandlers'
-import React, { startTransition, useActionState } from 'react'
+import React, { useActionState, useEffect, useTransition } from 'react'
 import Button from '../../ui/Button/Button'
 import Form from '../../ui/Form/Form'
 import FormGroup from '../../ui/FormGroup/FormGroup'
 import Input from '../../ui/Input/Input'
 import Label from '../../ui/Label/Label'
+import { handlePermissionAddAction } from '@/server/PermissionFormHandlers'
+import { IPermission } from '@/schemas/PermissionSchema'
+
 
 interface PermissionFormProps
 {
     mode?: 'add' | 'edit';
-    initialData?: Partial<{
-        id?: number
-        title: string;
-        code: string;
-        description?: string | null;
-    }>;
-    onSubmitAction: (prevState: PermissionsState, formData: FormData) => Promise<PermissionsState>;
+    initialData?: Partial<IPermission>;
+    onSubmitAction: typeof handlePermissionAddAction
 }
 
 const PermissionForm: React.FC<PermissionFormProps> = ({
@@ -26,15 +24,25 @@ const PermissionForm: React.FC<PermissionFormProps> = ({
 }) =>
 {
 
-    const initialState = { errors: {} }
+    const initialState = {
+        success: false,
+        message: '',
+        errors: {},
+        values: initialData ?? {},
+    } as PermissionsState;
 
-    const [state, formAction] = useActionState(
-        async (prevState: PermissionsState, formData: FormData) =>
+    const [isPending, startTransition] = useTransition();
+
+    const [state, formAction] = useActionState(onSubmitAction, initialState);
+
+    useEffect(() =>
+    {
+        if (state.success && mode === 'add')
         {
-            return await onSubmitAction(prevState, formData);
-        },
-        initialState
-    );
+            const form = document.querySelector('form');
+            if (form) form.reset();
+        }
+    }, [state.success, mode]);
 
     return (
         <Form title={mode === 'add' ? 'Add Permission' : 'Edit Permission'} onSubmit={(e: React.FormEvent<HTMLFormElement>) =>
@@ -102,17 +110,40 @@ const PermissionForm: React.FC<PermissionFormProps> = ({
                 )}
             </FormGroup>
 
-            {/* Success message */}
+            {/* Error Message */}
+            {!state.success && state.message ? (
+                <div className="text-center mb-4">
+                    <p className="text-error font-medium">{state.message}</p>
+
+                    {/* Show any unknown field errors */}
+                    {Object.entries(state.errors || {}).map(([key, value]) =>
+                    {
+                        if (['title', 'code', 'description', 'id'].includes(key)) return null;
+                        return (
+                            <p key={key} className="text-error text-sm">
+                                {value?.[0]}
+                            </p>
+                        );
+                    })}
+                </div>
+            ) : <></>}
+
+            {/* Success Message */}
             {state.success ? (
-                <div className='text-center'>
-                    <p className='text-success font-bold text-lg'>
-                        {mode === "add" ? "Permission Added Successfully" : "Permission Updated Successfully"}
+                <div className="text-center mt-3">
+                    <p className="text-success font-bold text-lg">
+                        {state.message ??
+                            (mode === 'add'
+                                ? 'Permission added successfully.'
+                                : 'Permission updated successfully.')}
                     </p>
                 </div>
             ) : <></>}
 
             <FormGroup>
-                <Button>{mode === 'add' ? 'Submit' : 'Update'}</Button>
+                <Button disabled={isPending}>
+                    {isPending ? 'Processing...' : mode === 'add' ? 'Submit' : 'Update'}
+                </Button>
             </FormGroup>
         </Form>
     )
