@@ -1,5 +1,5 @@
 'use client'
-import React, { startTransition, useActionState, useState } from 'react'
+import React, { useTransition, useActionState, useState } from 'react'
 import Form from '../../ui/Form/Form'
 import FormGroup from '../../ui/FormGroup/FormGroup'
 import Input from '../../ui/Input/Input'
@@ -10,32 +10,28 @@ import areasList from "@/data/areanames.json"
 import { BranchesState } from '@/server/BranchFormHandlers'
 import RadioGroup from '../../ui/RadioGroup/RadioGroup'
 import RadioInput from '../../ui/RadioInput/RadioInput'
+import { IBranch } from '@/schemas/BranchSchema'
+import { Province } from '@prisma/client'
 
 interface BranchFormProps
 {
     mode?: 'add' | 'edit';
-    initialData?: Partial<{
-        branchId: string;
-        phoneNo: string;
-        area: string;
-        address: string;
-        city: string;
-        openingTime: Date;
-        closingTime: Date;
-        status: 'ACTIVE' | 'DISABLED'
-    }>;
+    initialData?: Partial<IBranch>;
     onSubmitAction: (prevState: BranchesState, formData: FormData) => Promise<BranchesState>;
+    businessId: string
 }
 
 const BranchForm: React.FC<BranchFormProps> = ({
     mode = 'add',
     initialData = {},
     onSubmitAction,
+    businessId
 }) =>
 {
 
     const citiesToSuggest = citiesList.map(city => city.name)
     const areasToSuggest = areasList.map(area => area.name)
+    const [isPending, startTransition] = useTransition()
 
     const initialState = { errors: {} }
 
@@ -120,6 +116,19 @@ const BranchForm: React.FC<BranchFormProps> = ({
                 formAction(formData); // call your useActionState handler
             })
         }}>
+
+            <FormGroup>
+                <Label htmlFor='businessId'>Business</Label>
+                <Input
+                    name='businessId'
+                    readOnly
+                    defaultValue={state?.values?.businessId ?? businessId ?? ''}
+                />
+                {state.errors?.businessId && (
+                    <p className="text-error">{state.errors.businessId[0]}</p>
+                )}
+            </FormGroup>
+
             {/* Branch ID */}
             <FormGroup>
                 <Label htmlFor='branchId'>Branch Id</Label>
@@ -127,7 +136,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
                     name='branchId'
                     placeholder='Enter unique branch Id e.g. GR-32'
                     readOnly={mode === 'edit'}
-                    defaultValue={state?.values?.id ?? initialData.branchId ?? ''}
+                    defaultValue={state?.values?.id ?? initialData.id ?? ''}
                 />
                 {state.errors?.id && (
                     <p className="text-error">{state.errors.id[0]}</p>
@@ -252,7 +261,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
             </FormGroup>
 
             <FormGroup>
-                <RadioGroup title='Status' name='status' >
+                <RadioGroup title='Status' name='status' direction='horizontal' >
                     <RadioInput name='status' key='ACTIVE' value='ACTIVE' title='ACTIVE' defaultChecked={
                         (state?.values?.status ?? initialData.status) === 'ACTIVE'
                     } />
@@ -265,17 +274,60 @@ const BranchForm: React.FC<BranchFormProps> = ({
                 ) : null}
             </FormGroup>
 
-            {/* Success message */}
+            <FormGroup>
+                <RadioGroup title='Province' name='province'>
+                    {Object.values(Province).map((prov) => (
+                        <RadioInput
+                            key={prov}
+                            name="province"
+                            value={prov}
+                            title={prov.replace('_', ' ')} // optional: makes labels like 'GILGIT BALTISTAN'
+                            defaultChecked={
+                                (state?.values?.province ?? initialData.province) === prov
+                            }
+                        />
+                    ))}
+                </RadioGroup>
+                {state.errors?.province ? (
+                    <p className="text-error">{state.errors.province[0]}</p>
+                ) : null}
+            </FormGroup>
+
+            {/* Error Message */}
+            {!state.success && state.message ? (
+                <div className="text-center mb-4">
+                    <p className="text-error font-medium">{state.message}</p>
+
+                    {/* Show any unknown field errors */}
+                    {Object.entries(state.errors || {}).map(([key, value]) =>
+                    {
+                        if (['branchId', 'phoneNo', 'area', 'address', 'city', 'openingTime', 'closingTime', 'status', 'province'].includes(key)) return null;
+                        return (
+                            <p key={key} className="text-error text-sm">
+                                {value?.[0]}
+                            </p>
+                        );
+                    })}
+                </div>
+            ) : <></>}
+
+            {/* Success Message */}
             {state.success ? (
-                <div className='text-center'>
-                    <p className='text-success font-bold text-lg'>
-                        {mode === "add" ? "Branch Added Successfully" : "Branch Updated Successfully"}
+                <div className="text-center mt-3">
+                    <p className="text-success font-bold text-lg">
+                        {state.message ??
+                            (mode === 'add'
+                                ? 'Branch added successfully.'
+                                : 'Branch updated successfully.')}
                     </p>
                 </div>
             ) : <></>}
 
+
             <FormGroup>
-                <Button>{mode === 'add' ? 'Submit' : 'Update'}</Button>
+                <Button disabled={isPending}>
+                    {isPending ? 'Processing...' : mode === 'add' ? 'Submit' : 'Update'}
+                </Button>
             </FormGroup>
         </Form>
     )

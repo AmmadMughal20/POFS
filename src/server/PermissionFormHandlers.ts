@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from 'next/cache'
 import { getUserSession, hasPermission } from "@/server/getUserSession";
-import { IPermission, PermissionSchema } from "@/schemas/PermissionSchema";
+import { AddPermissionSchema, IPermission, UpdatePermissionSchema } from "@/schemas/PermissionSchema";
 import { Prisma } from '@prisma/client';
 
 
@@ -52,7 +52,7 @@ export async function handlePermissionAddAction(prevState: PermissionsState, for
     try
     {
         // 🧩 1️⃣ Check permission
-        const { permissions } = await getUserSession();
+        const { user, permissions } = await getUserSession();
         if (!hasPermission(permissions, "branch:create"))
         {
             throw new Error("Forbidden: You don’t have permission to create branches.");
@@ -61,8 +61,8 @@ export async function handlePermissionAddAction(prevState: PermissionsState, for
         const title = formData.get('title')?.toString().trim() || '';
         const code = formData.get('code')?.toString().trim() || '';
         const description = formData.get('description')?.toString().trim() || '';
-
-        const result = PermissionSchema.safeParse({ title, code, description });
+        const createdBy = user.id;
+        const result = AddPermissionSchema.safeParse({ title, code, description, createdBy });
         if (!result.success)
         {
             return {
@@ -78,6 +78,8 @@ export async function handlePermissionAddAction(prevState: PermissionsState, for
                 title,
                 code,
                 description: description || null, // Prisma expects null, not empty string
+                createdBy,
+                createdAt: new Date()
             },
         });
 
@@ -90,35 +92,75 @@ export async function handlePermissionAddAction(prevState: PermissionsState, for
         };
     } catch (error: unknown)
     {
-        console.error('Error adding permission:', error);
+        console.error('❌ Error adding permission:', error)
 
-        let message = 'Something went wrong while adding the permission.';
-        if (error instanceof Error) message = error.message;
+        // 🧩 6️⃣ Handle Prisma-specific errors
+        if (error instanceof Prisma.PrismaClientKnownRequestError)
+        {
+            switch (error.code)
+            {
+                case 'P2002':
+                    // Unique constraint failed
+                    return {
+                        success: false,
+                        message: 'A permission with this code already exists.',
+                    }
+                case 'P2003':
+                    // Foreign key constraint
+                    return {
+                        success: false,
+                        message: 'Related data missing. Check if references are valid.',
+                    }
+                case 'P2025':
+                    // Record not found
+                    return {
+                        success: false,
+                        message: 'Record not found. Please check your input.',
+                    }
+                default:
+                    return {
+                        success: false,
+                        message: `Database error (${error.code}). Please try again later.`,
+                    }
+            }
+        }
+
+        // 🧩 7️⃣ Generic Error Handling
+        let message = 'Something went wrong while adding the permission.'
+        if (error instanceof Error)
+        {
+            message = error.message
+        } else if (typeof error === 'string')
+        {
+            message = error
+        }
 
         return {
             success: false,
             message,
-        };
+        }
     }
 }
 
 export async function handlePermissionEditAction(prevState: PermissionsState, formData: FormData): Promise<PermissionsState>
 {
-    const { permissions } = await getUserSession();
+    const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "branch:update"))
     {
         throw new Error("Forbidden: You don’t have permission to edit branches.");
     }
 
     const permId = formData.get('id')?.toString() || ''
+    const updatedBy = user.id
 
     const updatedPermData = {
         title: formData.get('title')?.toString() || '',
         code: formData.get('code')?.toString() || '',
         description: formData.get('description')?.toString() || '',
+        updatedBy
     }
 
-    const result = PermissionSchema.safeParse({ id: permId, ...updatedPermData })
+    const result = UpdatePermissionSchema.safeParse({ id: permId, ...updatedPermData })
     if (!result.success)
     {
         return {

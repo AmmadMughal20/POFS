@@ -1,5 +1,5 @@
 'use client'
-import React, { startTransition, useActionState } from 'react'
+import React, { useActionState, useTransition } from 'react'
 import Form from '../../ui/Form/Form'
 import FormGroup from '../../ui/FormGroup/FormGroup'
 import Input from '../../ui/Input/Input'
@@ -29,6 +29,7 @@ const UserForm: React.FC<UserFormProps> = ({
 {
 
     const initialState = { errors: {} }
+    const [isPending, startTransition] = useTransition();
 
     const [state, formAction] = useActionState(
         async (prevState: UsersState, formData: FormData) =>
@@ -133,26 +134,40 @@ const UserForm: React.FC<UserFormProps> = ({
                 </FormGroup> : <></>
             }
 
-            {/* Success message */}
+            {/* Error Message */}
+            {!state.success && state.message ? (
+                <div className="text-center mb-4">
+                    <p className="text-error font-medium">{state.message}</p>
+
+                    {/* Show any unknown field errors */}
+                    {Object.entries(state.errors || {}).map(([key, value]) =>
+                    {
+                        if (['name', 'email', 'phone', 'userId', 'roleId', 'status'].includes(key)) return null;
+                        return (
+                            <p key={key} className="text-error text-sm">
+                                {value?.[0]}
+                            </p>
+                        );
+                    })}
+                </div>
+            ) : <></>}
+
+            {/* Success Message */}
             {state.success ? (
-                <div className='text-center'>
-                    <p className='text-success font-bold text-lg'>
-                        {mode === "add" ? "User Added Successfully" : "User Updated Successfully"}
+                <div className="text-center mt-3">
+                    <p className="text-success font-bold text-lg">
+                        {state.message ??
+                            (mode === 'add'
+                                ? 'User added successfully.'
+                                : 'User updated successfully.')}
                     </p>
                 </div>
             ) : <></>}
-            {
-                state.success == false && state.message ? (
-                    <div className='text-center'>
-                        <p className='text-error font-bold text-lg'>
-                            {state.message}
-                        </p>
-                    </div>
-                ) : <></>
-            }
 
             <FormGroup>
-                <Button>{mode === 'add' ? 'Submit' : 'Update'}</Button>
+                <Button disabled={isPending}>
+                    {isPending ? 'Processing...' : mode === 'add' ? 'Submit' : 'Update'}
+                </Button>
             </FormGroup>
         </Form>
     )

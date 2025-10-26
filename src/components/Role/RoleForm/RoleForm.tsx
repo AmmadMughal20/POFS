@@ -1,6 +1,6 @@
 'use client'
 import { RolesState } from '@/server/RoleFormHandlers'
-import React, { startTransition, useActionState } from 'react'
+import React, { useActionState, useTransition } from 'react'
 import Button from '../../ui/Button/Button'
 import Form from '../../ui/Form/Form'
 import FormGroup from '../../ui/FormGroup/FormGroup'
@@ -31,6 +31,7 @@ const RoleForm: React.FC<RoleFormProps> = ({
 
     const initialState = { errors: {} }
 
+    const [isPending, startTransition] = useTransition()
     const [state, formAction] = useActionState(
         async (prevState: RolesState, formData: FormData) =>
         {
@@ -83,21 +84,47 @@ const RoleForm: React.FC<RoleFormProps> = ({
                     <p className="text-error">{state.errors.title[0]}</p>
                 )}
             </FormGroup>
-            {/* <FormGroup> */}
-            <TagInput suggestions={permissions} name='permissions' defaultTags={initialData.permissions ?? []} />
-            {/* </FormGroup> */}
+            <FormGroup>
+                <TagInput suggestions={permissions} name='permissions' defaultTags={initialData.permissions ?? []} />
+                {state.errors?.permissions && (
+                    <p className="text-error">{state.errors.permissions[0]}</p>
+                )}
+            </FormGroup>
 
-            {/* Success message */}
+            {/* Error Message */}
+            {!state.success && state.message ? (
+                <div className="text-center mb-4">
+                    <p className="text-error font-medium">{state.message}</p>
+
+                    {/* Show any unknown field errors */}
+                    {Object.entries(state.errors || {}).map(([key, value]) =>
+                    {
+                        if (['title'].includes(key)) return null;
+                        return (
+                            <p key={key} className="text-error text-sm">
+                                {value?.[0]}
+                            </p>
+                        );
+                    })}
+                </div>
+            ) : <></>}
+
+            {/* Success Message */}
             {state.success ? (
-                <div className='text-center'>
-                    <p className='text-success font-bold text-lg'>
-                        {mode === "add" ? "Role Added Successfully" : "Role Updated Successfully"}
+                <div className="text-center mt-3">
+                    <p className="text-success font-bold text-lg">
+                        {state.message ??
+                            (mode === 'add'
+                                ? 'Role added successfully.'
+                                : 'Role updated successfully.')}
                     </p>
                 </div>
             ) : <></>}
 
             <FormGroup>
-                <Button>{mode === 'add' ? 'Submit' : 'Update'}</Button>
+                <Button disabled={isPending}>
+                    {isPending ? 'Processing...' : mode === 'add' ? 'Submit' : 'Update'}
+                </Button>
             </FormGroup>
         </Form>
     )

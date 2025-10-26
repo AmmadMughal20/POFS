@@ -4,7 +4,7 @@ import { sendVerificationEmail } from '@/helpers/sendVerificationemail';
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from 'next/cache'
 import { getUserSession, hasPermission } from "@/server/getUserSession";
-import { IUser, UserSchema } from "@/schemas/UserSchema";
+import { IUser, AddUserSchema, EditUserSchema } from "@/schemas/UserSchema";
 import { Prisma, UserStatus } from '@prisma/client';
 import bcrypt from "bcrypt";
 
@@ -29,20 +29,21 @@ export async function getUsers(
         throw new Error("Forbidden: You don’t have permission to view users list.");
     }
 
-    const findManyArgs: Prisma.UserFindManyArgs = {
-        skip,
-        take,
-        orderBy: orderBy ?? { id: 'asc' },
-        where: filter,
-    };
-
-    const countArgs: Prisma.UserCountArgs = {
-        where: filter,
+    const baseFilter: Prisma.UserWhereInput = {
+        isDeleted: false,
+        ...(filter ?? {}), // merge any other filters passed in
     };
 
     const [items, total] = await Promise.all([
-        prisma.user.findMany(findManyArgs),
-        prisma.user.count(countArgs),
+        prisma.user.findMany({
+            skip,
+            take,
+            orderBy: orderBy ?? { id: 'asc' },
+            where: baseFilter,
+        }),
+        prisma.user.count({
+            where: baseFilter,
+        }),
     ]);
 
     return { items, total };
@@ -54,19 +55,21 @@ export async function handleUserAddAction(prevState: UsersState, formData: FormD
     try
     {
         // 🧩 1️⃣ Check permission
-        const { permissions } = await getUserSession();
+        const { user, permissions } = await getUserSession();
         if (!hasPermission(permissions, "user:create"))
         {
             throw new Error("Forbidden: You don’t have permission to create user.");
         }
-
+        const createdBy = user.id
+        const password = "Test@123"
         const email = formData.get("email")?.toString().trim() || ''
         const name = formData.get("name")?.toString().trim() || ''
         const phoneNo = formData.get("phoneNo")?.toString().trim() || ''
         const roleId = parseInt(formData.get("roleId")?.toString().trim() || '0')
         const status = "DISABLED"
 
-        const result = UserSchema.safeParse({ email, phoneNo, roleId, status, name });
+        const result = AddUserSchema.safeParse({ email, phoneNo, roleId, status, name, createdBy, password });
+        const encPass = await bcrypt.hash(password, await bcrypt.genSalt(10))
 
         if (!result.success)
         {
@@ -78,14 +81,16 @@ export async function handleUserAddAction(prevState: UsersState, formData: FormD
             };
         }
 
+
         const createdUser = await prisma.user.create({
             data: {
+                createdBy,
                 email,
                 name,
                 phoneNo,
                 roleId,
                 status,
-                password: await bcrypt.hash("Test@123", await bcrypt.genSalt(10))
+                password: encPass
             },
         });
 
@@ -127,11 +132,12 @@ export async function handleUserAddAction(prevState: UsersState, formData: FormD
 
 export async function handleUserEditAction(prevState: UsersState, formData: FormData): Promise<UsersState>
 {
-    const { permissions } = await getUserSession();
+    const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "user:update"))
     {
         throw new Error("Forbidden: You don’t have permission to update user.");
     }
+    const updatedBy = user.id
 
     const userId = formData.get('userId')?.toString() || ''
 
@@ -142,12 +148,12 @@ export async function handleUserEditAction(prevState: UsersState, formData: Form
         name: formData.get("name")?.toString().trim() || '',
         phoneNo: formData.get("phoneNo")?.toString().trim() || '',
         roleId: parseInt(formData.get("roleId")?.toString().trim() || '0'),
-        status: formData.get("status")?.toString().trim() as UserStatus
+        status: formData.get("status")?.toString().trim() as UserStatus,
+        updatedBy
     }
 
-    const result = UserSchema.safeParse({ id: userId, ...updatedUserData })
+    const result = EditUserSchema.safeParse({ id: parseInt(userId), ...updatedUserData })
 
-    console.log(result, 'printing result ')
     if (!result.success)
     {
         return {
@@ -164,11 +170,13 @@ export async function handleUserEditAction(prevState: UsersState, formData: Form
 
 export async function handleUserDeleteAction(prevState: UsersState, formData: FormData): Promise<UsersState>
 {
-    const { permissions } = await getUserSession();
+    const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "user:delete"))
     {
         throw new Error("Forbidden: You don’t have permission to delete users.");
     }
+
+    const updatedBy = user.id
 
     const userId = formData.get('userId') as string
 
@@ -177,7 +185,7 @@ export async function handleUserDeleteAction(prevState: UsersState, formData: Fo
         const isUserExist = await prisma.user.findFirst({ where: { id: parseInt(userId) } })
         if (!isUserExist) return { errors: { userId: ['User not found.'] } }
 
-        await prisma.user.delete({ where: { id: parseInt(userId) } })
+        await prisma.user.update({ where: { id: parseInt(userId) }, data: { isDeleted: true, deletedAt: new Date(), updatedBy } })
 
         revalidatePath('/users')
 

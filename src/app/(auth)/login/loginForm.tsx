@@ -25,7 +25,6 @@ const LoginForm = () =>
 
     useEffect(() =>
     {
-        console.log(state, 'printing state')
         if (state.success)
         {
             redirect('/')
