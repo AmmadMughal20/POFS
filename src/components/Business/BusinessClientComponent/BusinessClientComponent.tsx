@@ -17,6 +17,8 @@ import BusinessCard from '../BusinessCard/BusinessCard';
 import Card from '@/components/ui/Card/Card';
 import BranchForm from '@/components/Branch/BranchForm/BranchForm';
 import { handleBranchAddAction } from '@/server/BranchFormHandlers';
+import CategoryForm from '@/components/Category/CategoryForm/CategoryForm';
+import SupplierForm from '@/components/Supplier/SupplierForm/SupplierForm';
 
 interface Props
 {
@@ -39,6 +41,8 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
     const [viewBusinessDetails, setViewBusinessDetails] = useState(false);
     const [displayType, setDisplayType] = useState<'list' | 'grid'>('list')
     const router = useRouter()
+    const [showCategoryAddPopup, setShowCategoryAddPopup] = useState(false)
+    const [showSupplierAddPopup, setShowSupplierAddPopup] = useState(false)
 
     const [showAddBranchPopup, setShowAddBranchPopup] = useState(false)
 
@@ -121,9 +125,10 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
                     onAddChild={() =>
                     {
                         const business = businesses.find(b => b.id === row.id);
-                        if (business) setSelectedBusiness(business); setShowAddBranchPopup(true)
+                        if (business) { setSelectedBusiness(business); setShowAddBranchPopup(true); }
                     }}
                     showAddChild={hasPermission(permissions, 'branch:create')}
+                    addTitle="Add Branch"
                 />
             )
             ,
@@ -225,18 +230,37 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
                 )}
             </Popup>
 
-            <Popup isOpen={viewBusinessDetails} onClose={() => setViewBusinessDetails(false)}>
+            <Popup isOpen={viewBusinessDetails} onClose={() => { setViewBusinessDetails(false); setSelectedBusiness(null); }}>
                 {selectedBusiness && (
-                    <ViewBusinessDetialsPopup selectedBusiness={selectedBusiness} onClose={() => { setViewBusinessDetails(false); setSelectedBusiness(null); }} />
+                    <ViewBusinessDetialsPopup
+                        selectedBusiness={selectedBusiness}
+                        onClose={() => { setViewBusinessDetails(false); setSelectedBusiness(null); }}
+                        onAddCategory={() => setShowCategoryAddPopup(true)}
+                        onAddSupplier={() => setShowSupplierAddPopup(true)}
+                    />
                 )}
             </Popup>
 
-            <Popup isOpen={showAddBranchPopup} onClose={() => setShowAddBranchPopup(false)}>
+            <Popup isOpen={showAddBranchPopup} onClose={() => { setShowAddBranchPopup(false); setSelectedBusiness(null); }}>
                 {
                     selectedBusiness &&
                     <BranchForm mode='add' onSubmitAction={handleBranchAddAction} businessId={selectedBusiness.id} />
                 }
             </Popup>
-        </Page>
+
+            <Popup isOpen={showCategoryAddPopup} onClose={() => setShowCategoryAddPopup(false)}>
+                {
+                    selectedBusiness &&
+                    <CategoryForm businessId={selectedBusiness.id} />
+                }
+            </Popup>
+
+            <Popup isOpen={showSupplierAddPopup} onClose={() => setShowSupplierAddPopup(false)}>
+                {
+                    selectedBusiness &&
+                    <SupplierForm businessId={selectedBusiness.id} />
+                }
+            </Popup>
+        </Page >
     );
 }

@@ -30,7 +30,7 @@ const ViewUserDetialsPopup = ({ selectedUser, onClose }: VB) =>
                     <div className="text-gray-900">{selectedUser.email ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Role:</div>
-                    <div className="text-gray-900">{selectedUser.roleId ?? "-"}</div>
+                    <div className="text-gray-900">{selectedUser.Role?.title ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Status:</div>
                     <div className="text-gray-900">{selectedUser.status ?? "-"}</div>

@@ -4,15 +4,20 @@ import Button from '@/components/ui/Button/Button';
 import Card from '@/components/ui/Card/Card';
 import { IBusiness } from '@/schemas/BusinessSchema';
 import { CheckCircle, XCircle } from 'lucide-react';
+import Link from 'next/link';
 
 type ViewBusinessDetailsPopupProps = {
     selectedBusiness: IBusiness;
     onClose: () => void;
+    onAddCategory: () => void;
+    onAddSupplier: () => void;
 };
 
 const ViewBusinessDetailsPopup: React.FC<ViewBusinessDetailsPopupProps> = ({
     selectedBusiness,
     onClose,
+    onAddCategory,
+    onAddSupplier
 }) =>
 {
     return (
@@ -68,7 +73,7 @@ const ViewBusinessDetailsPopup: React.FC<ViewBusinessDetailsPopupProps> = ({
                 {/* Details Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-sm text-gray-700">
                     <Detail label="Business ID" value={selectedBusiness.id} />
-                    <Detail label="Owner ID" value={selectedBusiness.ownerId} />
+                    <Detail label="Owner Name" value={selectedBusiness.owner?.name} />
                     <Detail label="Email" value={selectedBusiness.email} />
                     <Detail label="Phone" value={selectedBusiness.phone} />
                     <Detail label="Website" value={selectedBusiness.website} />
@@ -77,8 +82,8 @@ const ViewBusinessDetailsPopup: React.FC<ViewBusinessDetailsPopupProps> = ({
                     <Detail label="Province" value={selectedBusiness.province} />
                     <Detail label="Country" value={selectedBusiness.country} />
                     <Detail label="Address" value={selectedBusiness.address} />
-                    <Detail label="Created By" value={selectedBusiness.createdBy} />
-                    <Detail label="Updated By" value={selectedBusiness.updatedBy} />
+                    <Detail label="Created By" value={selectedBusiness.createdByUser?.name} />
+                    <Detail label="Updated By" value={selectedBusiness.updatedByUser?.name} />
                     <Detail
                         label="Created At"
                         value={
@@ -111,14 +116,20 @@ const ViewBusinessDetailsPopup: React.FC<ViewBusinessDetailsPopupProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t flex justify-center">
-                <Button
-                    onClick={onClose}
-                    className="px-6 py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900"
-                >
-                    Close
+            <div className="p-4 border-t flex justify-center gap-2">
+                <Link href={`/businesses/branches/${selectedBusiness.id}`}>
+                    <Button>
+                        View Branches
+                    </Button>
+                </Link>
+                <Button onClick={onAddCategory}>
+                    Add Category
+                </Button>
+                <Button onClick={onAddSupplier}>
+                    Add Supplier
                 </Button>
             </div>
+
         </>
 
     );

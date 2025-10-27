@@ -15,6 +15,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import BranchCard from '../BranchCard/BranchCard';
 import Card from '@/components/ui/Card/Card';
+import ProductForm from '@/components/Product/ProductForm/ProductForm';
+import { ICategory } from '@/schemas/CategorySchema';
+import { handleProductAddAction } from '@/server/ProductFormHandlers';
+import { ISupplier } from '@/schemas/SupplierSchema';
+import ChangeBranchManagerPopup from '@/components/Manager/ChangeBranchManagerPopup';
 
 // export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
@@ -24,10 +29,12 @@ interface Props
     initialBranches: IBranch[];
     permissions: string[];
     initialTotal: number
-    businessId: string
+    businessId: string,
+    categories: ICategory[]
+    suppliers: ISupplier[]
 }
 
-export default function BranchesPageClient({ initialBranches, permissions, initialTotal, businessId }: Props)
+export default function BranchesPageClient({ initialBranches, permissions, initialTotal, businessId, categories, suppliers }: Props)
 {
 
     const data: IBranch[] = (initialBranches)
@@ -40,6 +47,8 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
     const [branchEditPopup, setBranchEditPopup] = useState(false);
     const [viewBranchDetails, setViewBranchDetails] = useState(false);
     const [displayType, setDisplayType] = useState<'list' | 'grid'>('list')
+    const [showAddProductPopup, setShowAddProductPopup] = useState(false)
+    const [showBranchManagerChangePopup, setShowBranchManagerPopup] = useState(false)
     const router = useRouter()
 
     if (branches.length === 0)
@@ -75,31 +84,45 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         }
     };
 
-    const branchCols: Column<IBranch>[] = Object.keys(branches[0] as IBranch)
-        .map((key) =>
-        {
-            return {
-                key: key as keyof IBranch,
-                label: key.toUpperCase(),
-                sortable: true,
-                align: Align.CENTER,
-                headerStyle: { textAlign: Align.CENTER },
-                bodyStyle: { textAlign: Align.CENTER },
-            };
-        })
-        .sort((a, b) =>
-        {
-            if (a.key === 'id') return -1;
-            if (b.key === 'id') return 1;
-            return a.key.localeCompare(b.key);
-        });
-
-    const filteredBranchCols = branchCols.filter(
-        col => col.key !== "openingTime" && col.key !== "closingTime"
-    );
+    const branchCols: Column<IBranch>[] = [{
+        key: "id",
+        label: "Id",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: "city",
+        label: "City",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: "area",
+        label: "Area",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: "phoneNo",
+        label: "Phone No",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: "status",
+        label: "Status",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    },]
 
     const columnsWithActions: Column<IBranch>[] = [
-        ...filteredBranchCols,
+        ...branchCols,
         {
             key: "openingTimeToDisplay",
             label: "OPENING TIME",
@@ -132,6 +155,13 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
                     showView={hasPermission(permissions, "branch:view")}
                     showEdit={hasPermission(permissions, "branch:update")}
                     showDelete={hasPermission(permissions, "branch:delete")}
+                    onAddChild={() =>
+                    {
+                        const branch = branches.find(b => b.id === row.id);
+                        if (branch) { setSelectedBranch(branch); setShowAddProductPopup(true); }
+                    }}
+                    showAddChild={hasPermission(permissions, 'product:create')}
+                    addTitle="Add Product"
                 />
             )
             ,
@@ -143,6 +173,26 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         // await
         console.log(searchTerm)
         return undefined
+    }
+
+    const handleViewOrders = (businessId: string, branchId: string) =>
+    {
+        router.push(`/businesses/branches/${businessId}/${branchId}/orders`)
+    }
+
+    const handleViewProducts = (businessId: string, branchId: string) =>
+    {
+        router.push(`/businesses/branches/${businessId}/${branchId}/products`)
+    }
+
+    const handleViewStocks = (businessId: string, branchId: string) =>
+    {
+        router.push(`/businesses/branches/${businessId}/${branchId}/stocks`)
+    }
+
+    const handleChangeManager = (businessId: string, branchId: string) =>
+    {
+        setShowBranchManagerPopup(true)
     }
 
     return (
@@ -224,8 +274,22 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
 
             <Popup isOpen={viewBranchDetails} onClose={() => setViewBranchDetails(false)}>
                 {selectedBranch && (
-                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} />
+                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} permissions={permissions} onViewOrders={handleViewOrders} onViewProducts={handleViewProducts} onViewStocks={handleViewStocks} handleChangeManager={handleChangeManager} />
                 )}
+            </Popup>
+
+            <Popup isOpen={showAddProductPopup} onClose={() => { setShowAddProductPopup(false); setSelectedBranch(null); }}>
+                {
+                    selectedBranch &&
+                    <ProductForm mode='add' onSubmitAction={handleProductAddAction} businessId={selectedBranch.businessId} branchId={selectedBranch.id} businessCategories={categories} businessSuppliers={suppliers} />
+                }
+            </Popup>
+
+            <Popup isOpen={showBranchManagerChangePopup} onClose={() => setShowBranchManagerPopup(false)}>
+                {
+                    selectedBranch &&
+                    <ChangeBranchManagerPopup selectedBranch={selectedBranch} />
+                }
             </Popup>
         </Page>
     );

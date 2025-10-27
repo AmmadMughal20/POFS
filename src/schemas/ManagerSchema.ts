@@ -6,8 +6,7 @@ export interface IManager
 {
     id: number
     User: IUser
-    branchId: string
-    Branch?: IBranch
+    Branches?: IBranch[]
     businessId: string
     Business?: IBusiness
 }

@@ -32,6 +32,11 @@ export async function getBusinesses(
         take,
         orderBy: orderBy ?? { id: 'asc' },
         where: filter,
+        include: {
+            owner: true,
+            createdByUser: true,
+            updatedByUser: true
+        }
     };
 
     const countArgs: Prisma.BusinessCountArgs = {
