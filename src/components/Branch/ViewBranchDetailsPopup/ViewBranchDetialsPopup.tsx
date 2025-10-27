@@ -2,13 +2,24 @@ import React from 'react'
 import Button from '../../ui/Button/Button'
 import Card from '../../ui/Card/Card'
 import { IBranch } from '@/schemas/BranchSchema'
+import { hasPermission } from '@/server/getUserSession'
+import { IPermission } from '@/schemas/PermissionSchema'
+import { PencilIcon } from 'lucide-react'
 
 type VB = {
     selectedBranch: IBranch,
-    onClose: () => void
+    onClose: () => void,
+    permissions: string[],
+    onViewProducts: (businessId: string, branchId: string) => void,
+    onViewStocks: (businessId: string, branchId: string) => void,
+    onViewOrders: (businessId: string, branchId: string) => void,
+    handleChangeManager: (businessId: string, branchId: string) => void
 }
-const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
+
+const ViewBranchDetialsPopup = ({ selectedBranch, onClose, permissions, onViewProducts, onViewOrders, onViewStocks, handleChangeManager }: VB) =>
 {
+
+
     return (
         <Card>
             <div className="p-4 sm:p-6 w-full max-w-md">
@@ -36,7 +47,15 @@ const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
                     <div className="text-gray-900">{selectedBranch.businessId ?? "-"}</div>
 
                     <div className="font-medium text-gray-600">Branch Manager:</div>
-                    <div className="text-gray-900">{selectedBranch.branchManager ?? "-"}</div>
+                    {
+                        selectedBranch.Manager?.User.name ?
+                            <div className='flex justify-between'>
+                                <div className="text-gray-900">{selectedBranch.Manager?.User.name ?? "-"}</div>
+                                <button onClick={() => handleChangeManager(selectedBranch.businessId, selectedBranch.id)}><PencilIcon /></button>
+                            </div>
+                            : <Button onClick={() => handleChangeManager(selectedBranch.businessId, selectedBranch.id)}> Add Manager</Button>
+                    }
+
 
                     <div className="font-medium text-gray-600">Opening Time:</div>
                     <div className="text-gray-900">{selectedBranch.openingTime.toString().substring(16, 21) ?? "-"}</div>
@@ -48,12 +67,10 @@ const ViewBranchDetialsPopup = ({ selectedBranch, onClose }: VB) =>
                     <div className="text-gray-900">{selectedBranch.status ?? "-"}</div>
                 </div>
 
-                <div className="mt-6 flex justify-center">
-                    <Button
-                        onClick={onClose}
-                    >
-                        Close
-                    </Button>
+                <div className="mt-6 flex justify-center gap-2">
+                    {hasPermission(permissions, 'product:view') ? <Button onClick={() => onViewProducts(selectedBranch.businessId, selectedBranch.id)}>View Products</Button> : <></>}
+                    {hasPermission(permissions, 'stock:view') ? <Button onClick={() => onViewStocks(selectedBranch.businessId, selectedBranch.id)}>View Stocks</Button> : <></>}
+                    {hasPermission(permissions, 'order:view') ? <Button onClick={() => onViewOrders(selectedBranch.businessId, selectedBranch.id)}>View Orders</Button> : <></>}
                 </div>
             </div>
         </Card>

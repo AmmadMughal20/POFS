@@ -4,7 +4,7 @@ import styles from './Select.module.css';
 interface ISelect
 {
     name: string,
-    children: React.ReactElement[],
+    children: React.ReactNode,
     className?: string,
     required?: boolean,
     autoFocus?: boolean,

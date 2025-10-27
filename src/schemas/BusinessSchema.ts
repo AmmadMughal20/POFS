@@ -4,6 +4,7 @@ import { IBranch } from "./BranchSchema"
 import { IManager } from "./ManagerSchema"
 import { IProduct } from "./ProductSchema"
 import z from 'zod';
+import { IUser } from "./UserSchema";
 
 export interface IBusiness extends IBaseEntity
 {
@@ -14,6 +15,7 @@ export interface IBusiness extends IBaseEntity
     Products?: IProduct[]
     Managers?: IManager[]
     ownerId: number
+    owner?: IUser,
     status: BusinessStatus
     description?: string | null
     email?: string | null
@@ -28,7 +30,9 @@ export interface IBusiness extends IBaseEntity
     establishedYear?: number | null
     isVerified: boolean
     createdBy?: number | null
+    createdByUser?: IUser
     updatedBy?: number | null
+    updatedByUser?: IUser
 }
 
 export const AddBusinessSchema = z.object({

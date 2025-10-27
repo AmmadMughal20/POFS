@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, GlobeIcon, Pencil, Trash2 } from 'lucide-react';
+import { Eye, GlobeIcon, Pencil, PlusSquareIcon, Trash2 } from 'lucide-react';
 
 interface RowActionsProps
 {
@@ -41,7 +41,7 @@ const RowActions: React.FC<RowActionsProps> = ({
     showView = true,
     showEdit = true,
     showDelete = true,
-    showAddChild = true,
+    showAddChild = false,
     viewTitle = 'View Details',
     editTitle = 'Edit',
     deleteTitle = 'Delete',
@@ -84,7 +84,7 @@ const RowActions: React.FC<RowActionsProps> = ({
                     className="p-1.5 rounded-md hover:bg-warning/30 text-warning transition-colors"
                     title={addTitle}
                 >
-                    <GlobeIcon size={16} />
+                    <PlusSquareIcon size={16} />
                 </button>
             )}
         </div>

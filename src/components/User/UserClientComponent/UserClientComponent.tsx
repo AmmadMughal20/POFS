@@ -112,16 +112,20 @@ export default function UsersPageClient({ initialUsers, permissions, initialTota
         align: Align.CENTER,
         sortable: true,
     },
-    {
-        key: 'roleId',
-        label: 'Role ',
-        align: Align.CENTER,
-        sortable: true,
-    },]
+    ]
 
 
     const columnsWithActions: Column<IUser>[] = [
         ...userCols,
+        {
+            key: 'roleId',
+            label: 'Role ',
+            align: Align.CENTER,
+            sortable: true,
+            render: (row: IUser) => (
+                <p>{row.Role?.title}</p>
+            )
+        },
         {
             key: 'actions', // ✅ now allowed
             label: 'ACTIONS',

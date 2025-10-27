@@ -32,6 +32,18 @@ export async function getBranches(
         take,
         orderBy: orderBy ?? { id: 'asc' },
         where: filter,
+        include: {
+            Manager: {
+                include: {
+                    User: true
+                }
+            },
+            salesMen: {
+                include: {
+                    User: true
+                }
+            }
+        }
     };
 
     const countArgs: Prisma.BranchCountArgs = {

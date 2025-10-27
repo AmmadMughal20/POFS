@@ -272,8 +272,8 @@ model Product {
   rate          Decimal        @db.Decimal(10, 2)
   stocks        Stock[]        @relation("ProductStock")
   orderItems    OrderItem[]    @relation("ProductOrderItem")
-  branchId      String
-  Branch        Branch         @relation("BranchProduct", fields: [branchId], references: [id])
+  branchId      String?
+  Branch        Branch?         @relation("BranchProduct", fields: [branchId], references: [id])
   businessId    String
   Business      Business       @relation("BusinessProduct", fields: [businessId], references: [id])
   categoryId    Int

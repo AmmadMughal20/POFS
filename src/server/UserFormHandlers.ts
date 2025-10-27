@@ -40,6 +40,9 @@ export async function getUsers(
             take,
             orderBy: orderBy ?? { id: 'asc' },
             where: baseFilter,
+            include: {
+                Role: true
+            }
         }),
         prisma.user.count({
             where: baseFilter,
