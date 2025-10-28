@@ -3,6 +3,7 @@ import { AddProductSchema, IProduct } from "@/schemas/ProductSchema";
 import { getUserSession, hasPermission } from "./getUserSession";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export interface ProductState
 {
@@ -10,6 +11,45 @@ export interface ProductState
     success?: boolean;
     message?: string;
     values?: Partial<IProduct>
+}
+
+
+export const getProducts = async (skip?: number, take?: number, orderBy?: Prisma.ProductOrderByWithRelationInput, filter?: Prisma.ProductWhereInput) =>
+{
+    const { permissions } = await getUserSession()
+    if (!hasPermission(permissions, 'product:view'))
+    {
+        throw new Error("Forbidden: You don’t have permission to view products list.")
+    }
+
+    const findManyArgs: Prisma.ProductFindManyArgs = {
+        skip,
+        take,
+        orderBy: orderBy ?? { id: 'asc' },
+        where: filter,
+        include: {
+            Branch: true,
+            Business: true,
+            Category: true,
+            Supplier: true,
+            stocks: true
+        }
+    }
+
+    const countArgs: Prisma.ProductCountArgs = {
+        where: filter,
+    };
+
+    const [items, total] = await Promise.all([
+        prisma.product.findMany(findManyArgs),
+        prisma.product.count(countArgs),
+    ]);
+
+    const itemsToSend = items.map((prod) => ({
+        ...prod,
+        rate: Number(prod.rate)
+    }))
+    return { items: itemsToSend, total };
 }
 
 export const handleProductAddAction = async (prevState: ProductState, formData: FormData): Promise<ProductState> =>

@@ -13,10 +13,11 @@ type VB = {
     onViewProducts: (businessId: string, branchId: string) => void,
     onViewStocks: (businessId: string, branchId: string) => void,
     onViewOrders: (businessId: string, branchId: string) => void,
+    onViewSalemen: (businessId: string, branchId: string) => void,
     handleChangeManager: (businessId: string, branchId: string) => void
 }
 
-const ViewBranchDetialsPopup = ({ selectedBranch, onClose, permissions, onViewProducts, onViewOrders, onViewStocks, handleChangeManager }: VB) =>
+const ViewBranchDetialsPopup = ({ selectedBranch, onClose, permissions, onViewProducts, onViewOrders, onViewSalemen, onViewStocks, handleChangeManager }: VB) =>
 {
 
 
@@ -71,6 +72,7 @@ const ViewBranchDetialsPopup = ({ selectedBranch, onClose, permissions, onViewPr
                     {hasPermission(permissions, 'product:view') ? <Button onClick={() => onViewProducts(selectedBranch.businessId, selectedBranch.id)}>View Products</Button> : <></>}
                     {hasPermission(permissions, 'stock:view') ? <Button onClick={() => onViewStocks(selectedBranch.businessId, selectedBranch.id)}>View Stocks</Button> : <></>}
                     {hasPermission(permissions, 'order:view') ? <Button onClick={() => onViewOrders(selectedBranch.businessId, selectedBranch.id)}>View Orders</Button> : <></>}
+                    {hasPermission(permissions, 'saleman:view') ? <Button onClick={() => onViewSalemen(selectedBranch.businessId, selectedBranch.id)}>View Salemen</Button> : <></>}
                 </div>
             </div>
         </Card>

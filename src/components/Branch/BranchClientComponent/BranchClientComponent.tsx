@@ -12,7 +12,7 @@ import { handleBranchAddAction, handleBranchDeleteAction, handleBranchEditAction
 import { hasPermission } from '@/server/getUserSession';
 import { Grid, List, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BranchCard from '../BranchCard/BranchCard';
 import Card from '@/components/ui/Card/Card';
 import ProductForm from '@/components/Product/ProductForm/ProductForm';
@@ -20,6 +20,10 @@ import { ICategory } from '@/schemas/CategorySchema';
 import { handleProductAddAction } from '@/server/ProductFormHandlers';
 import { ISupplier } from '@/schemas/SupplierSchema';
 import ChangeBranchManagerPopup from '@/components/Manager/ChangeBranchManagerPopup';
+import { IManager } from '@/schemas/ManagerSchema';
+import { ISalesMan } from '@/schemas/SaleManSchems';
+import { getManagersByBusiness } from '@/server/ManagerFormHandlers';
+import { getSalesmenByBranch } from '@/server/SalemanFormHandlers';
 
 // export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
 
@@ -49,7 +53,37 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
     const [displayType, setDisplayType] = useState<'list' | 'grid'>('list')
     const [showAddProductPopup, setShowAddProductPopup] = useState(false)
     const [showBranchManagerChangePopup, setShowBranchManagerPopup] = useState(false)
+    const [existingManagers, setExistingManagers] = useState<IManager[]>()
+    const [existingSalesmen, setExistingSalesmen] = useState<ISalesMan[]>()
     const router = useRouter()
+
+
+    useEffect(() =>
+    {
+        if (selectedBranch?.id)
+        {
+            const getExistingManagers = async () =>
+            {
+                const managers = await getManagersByBusiness(selectedBranch.businessId)
+                if (managers.length > 0)
+                {
+                    setExistingManagers(managers)
+                }
+            }
+
+            const getExistingSalemen = async () =>
+            {
+                const salesmen = await getSalesmenByBranch(selectedBranch.id)
+                if (salesmen.length > 0)
+                {
+                    setExistingSalesmen(salesmen)
+                }
+            }
+
+            getExistingManagers()
+            getExistingSalemen()
+        }
+    }, [selectedBranch?.id])
 
     if (branches.length === 0)
     {
@@ -190,10 +224,16 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         router.push(`/businesses/branches/${businessId}/${branchId}/stocks`)
     }
 
+    const handleViewSalemen = (businessId: string, branchId: string) =>
+    {
+        router.push(`/businesses/branches/${businessId}/${branchId}/salemen`)
+    }
+
     const handleChangeManager = (businessId: string, branchId: string) =>
     {
         setShowBranchManagerPopup(true)
     }
+
 
     return (
         <Page>
@@ -274,7 +314,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
 
             <Popup isOpen={viewBranchDetails} onClose={() => setViewBranchDetails(false)}>
                 {selectedBranch && (
-                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} permissions={permissions} onViewOrders={handleViewOrders} onViewProducts={handleViewProducts} onViewStocks={handleViewStocks} handleChangeManager={handleChangeManager} />
+                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} permissions={permissions} onViewOrders={handleViewOrders} onViewProducts={handleViewProducts} onViewStocks={handleViewStocks} handleChangeManager={handleChangeManager} onViewSalemen={handleViewSalemen} />
                 )}
             </Popup>
 
@@ -288,7 +328,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
             <Popup isOpen={showBranchManagerChangePopup} onClose={() => setShowBranchManagerPopup(false)}>
                 {
                     selectedBranch &&
-                    <ChangeBranchManagerPopup selectedBranch={selectedBranch} />
+                    <ChangeBranchManagerPopup selectedBranch={selectedBranch} existingManagers={existingManagers} existingSalesmen={existingSalesmen} />
                 }
             </Popup>
         </Page>

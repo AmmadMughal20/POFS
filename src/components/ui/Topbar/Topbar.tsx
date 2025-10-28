@@ -16,7 +16,7 @@ const Topbar: React.FC<ITopbar> = ({ collapsed }) =>
     const { data: session } = useSession()
 
     return (
-        <header className={`p-5 flex w-screen gap-10 items-center transition-all justify-between ${mobileMenuOpen ? 'z-46' : '41'} fixed top-0 ${collapsed ? 'pl-20' : 'pl-38'}`}>
+        <header className={`p-5 flex w-screen bg-white shadow gap-10 items-center transition-all justify-between ${mobileMenuOpen ? 'z-46' : '41'} fixed top-0 ${collapsed ? 'pl-20' : 'pl-38'}`}>
             <div className="flex items-center gap-4">
                 {/* Mobile Menu Button */}
                 <button

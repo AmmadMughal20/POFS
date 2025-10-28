@@ -6,12 +6,14 @@ import Button from '@/components/ui/Button/Button'
 import Input from '@/components/ui/Input/Input'
 import Card from '@/components/ui/Card/Card'
 import Label from '@/components/ui/Label/Label'
+import { IManager } from '@/schemas/ManagerSchema'
+import { ISalesMan } from '@/schemas/SaleManSchems'
 
 interface ChangeBranchManagerProps
 {
     selectedBranch: IBranch
-    existingManagers?: { id: number; name: string; email: string }[]
-    existingSalesmen?: { id: number; name: string; email: string }[]
+    existingManagers?: IManager[]
+    existingSalesmen?: ISalesMan[]
 }
 
 const ChangeBranchManagerPopup = ({
@@ -27,7 +29,7 @@ const ChangeBranchManagerPopup = ({
         name: '',
         email: '',
         phoneNo: '',
-        roleId: '0',
+        roleId: '6',
     })
     const [message, setMessage] = useState<string | null>(null)
 
@@ -50,7 +52,7 @@ const ChangeBranchManagerPopup = ({
                 form.append('name', formData.name)
                 form.append('email', formData.email)
                 form.append('phoneNo', formData.phoneNo)
-                form.append('roleId', formData.roleId)
+                form.append('roleId', '6')
             }
 
             const res = await createManagerAction({} as ManagerState, form)
@@ -86,7 +88,7 @@ const ChangeBranchManagerPopup = ({
                                 <optgroup label="Managers">
                                     {existingManagers.map((m) => (
                                         <option key={m.id} value={m.id}>
-                                            {m.name} ({m.email})
+                                            {m.User.name} ({m.User.email})
                                         </option>
                                     ))}
                                 </optgroup>
@@ -95,7 +97,7 @@ const ChangeBranchManagerPopup = ({
                                 <optgroup label="Salesmen">
                                     {existingSalesmen.map((s) => (
                                         <option key={s.id} value={s.id}>
-                                            {s.name} ({s.email})
+                                            {s.User.name} ({s.User.email})
                                         </option>
                                     ))}
                                 </optgroup>
@@ -104,7 +106,7 @@ const ChangeBranchManagerPopup = ({
                         </select>
                     </div>
                 ) : (
-                    <div className="space-y-3 mt-4">
+                    <div className="space-y-3 mt-4 flex flex-col">
                         <Label htmlFor='name'>Name</Label>
                         <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Enter name" />
 
@@ -118,18 +120,10 @@ const ChangeBranchManagerPopup = ({
                             onChange={handleInputChange}
                             placeholder="Enter phone number"
                         />
-
-                        <Label htmlFor='roleId'>Role ID</Label>
-                        <Input
-                            name="roleId"
-                            value={formData.roleId}
-                            onChange={handleInputChange}
-                            placeholder="Role ID for manager"
-                        />
                     </div>
                 )}
 
-                {message && <p className="mt-4 text-sm text-center text-gray-600">{message}</p>}
+                {message && <p className="mt-4 text-sm text-center text-blue-600">{message}</p>}
 
                 <div className="mt-6 flex justify-end gap-2">
                     <Button onClick={handleSubmit} disabled={isPending}>

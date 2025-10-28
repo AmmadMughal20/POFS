@@ -10,34 +10,26 @@ import Input from '../../ui/Input/Input'
 import Label from '../../ui/Label/Label'
 import RadioGroup from '../../ui/RadioGroup/RadioGroup'
 import RadioInput from '../../ui/RadioInput/RadioInput'
+import { IUser } from '@/schemas/UserSchema'
 
 interface BusinessFormProps
 {
     mode?: 'add' | 'edit';
     initialData?: Partial<IBusiness>;
     onSubmitAction: (prevState: BusinessesState, formData: FormData) => Promise<BusinessesState>;
+    ownersToSuggest: IUser[]
 }
 
 const BusinessForm: React.FC<BusinessFormProps> = ({
     mode = 'add',
     initialData = {},
     onSubmitAction,
+    ownersToSuggest
 }) =>
 {
 
-    const ownersToSuggest = [{
-        id: 39,
-        name: 'Ali'
-    }, {
-        id: 2,
-        name: 'Saad'
-    }, {
-        id: 3,
-        name: 'Riaz'
-    },]
 
     const typesToSuggest = Object.values(BusinessType);
-
 
     const [isPending, startTransition] = useTransition()
 
@@ -100,13 +92,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
         }
 
         const filtered = ownersToSuggest
-            .filter(user => user.name.toLowerCase().startsWith(value.toLowerCase()))
+            .filter(user => user.name?.toLowerCase().startsWith(value.toLowerCase()))
             .slice(0, 5);
 
         setOwnerSuggestions(filtered);
     };
 
-    const handleSelectOwner = (user: { id: number, name: string }) =>
+    const handleSelectOwner = (user: IUser) =>
     {
         setOwnerValue(user.id);
         setOwnerSuggestions([]);

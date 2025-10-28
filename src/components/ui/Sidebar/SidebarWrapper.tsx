@@ -13,78 +13,7 @@ import SidebarMenuItem, { ISidebarMenuItem } from '../SidebarMenuItem/SidebarMen
 import Topbar from '../Topbar/Topbar'
 import Sidebar from './Sidebar'
 
-export const sidebarMenuItems: ISidebarMenuItem[] = [
-    {
-        title: 'Dashboard',
-        link: '/',
-        icon: <LayoutDashboard />,
-        selected: false,
-        permission: 'dashboard:view'
-    },
-    {
-        title: 'Permissions',
-        link: '/permissions',
-        icon: <LockKeyhole />,
-        selected: false,
-        permission: 'permission:view'
-    },
-    {
-        title: 'Roles',
-        link: '/roles',
-        icon: <PersonStanding />,
-        selected: false,
-        permission: 'role:view'
-    },
-    {
-        title: 'Users',
-        link: '/users',
-        icon: <User />,
-        selected: false,
-        permission: 'user:view'
-    },
-    {
-        title: 'Businesses',
-        link: '/businesses',
-        icon: <BriefcaseBusiness />,
-        selected: false,
-        permission: 'business:view'
-    },
-    {
-        title: 'Products',
-        link: '/products',
-        icon: <Star />,
-        selected: false,
-        permission: 'product:view'
-    },
 
-    {
-        title: 'Branches',
-        link: '/branch-management',
-        icon: <Globe />,
-        selected: false,
-        permission: 'branch:view'
-    },
-    {
-        title: 'Orders',
-        link: '/orders',
-        icon: <ShoppingCart />,
-        selected: false,
-        permission: 'order:view'
-    },
-    {
-        title: 'Stocks',
-        link: '/stocks',
-        icon: <GitGraph />,
-        selected: false,
-        permission: 'stock:view'
-    },
-    {
-        title: 'Logout',
-        link: '/logout',
-        icon: <LogOut />,
-        selected: false,
-    }
-]
 
 interface ISidebarWrapper
 {
@@ -98,8 +27,111 @@ const SidebarWrapper: React.FC<ISidebarWrapper> = ({ variant }) =>
     const pathName = usePathname()
     const { data: session } = useSession();
     const userPermissions = session?.user?.permissions || [];
+    const userRoleId = session?.user.roleId
+    const userBusinessId = session?.user.businessId
+    const userBranchId = session?.user.branchId
 
+    const getDashboardUrl = (roleId?: string | undefined) =>
+    {
+        if (roleId)
+        {
+            switch (roleId)
+            {
+                case '4':
+                    return '/dashboard';
+                case '5':
+                    return `/admin/${userBusinessId}/dashboard`;
+                case "6":
+                    return `/branch-manager/${userBranchId}/dashboard`;
+                default:
+                    return '/dashboard'
+            }
+        } else
+        {
+            return "/dashboard"
+        }
+    }
     if (status != "authenticated") return
+
+    const sidebarMenuItems: ISidebarMenuItem[] = [
+        {
+            title: 'Dashboard',
+            link: getDashboardUrl(userRoleId),
+            icon: <LayoutDashboard />,
+            selected: false,
+            permission: 'dashboard:view'
+        },
+        {
+            title: 'Permissions',
+            link: '/permissions',
+            icon: <LockKeyhole />,
+            selected: false,
+            permission: 'permission:view'
+        },
+        {
+            title: 'Roles',
+            link: '/roles',
+            icon: <PersonStanding />,
+            selected: false,
+            permission: 'role:view'
+        },
+        {
+            title: 'Users',
+            link: '/users',
+            icon: <User />,
+            selected: false,
+            permission: 'user:view'
+        },
+        {
+            title: 'Businesses',
+            link: '/businesses',
+            icon: <BriefcaseBusiness />,
+            selected: false,
+            permission: 'business:view'
+        },
+        {
+            title: 'Categories',
+            link: '/categories',
+            icon: <Star />,
+            selected: false,
+            permission: 'category:view'
+        },
+        {
+            title: 'Products',
+            link: '/products',
+            icon: <Star />,
+            selected: false,
+            permission: 'product:view'
+        },
+
+        {
+            title: 'Branches',
+            link: '/branch-management',
+            icon: <Globe />,
+            selected: false,
+            permission: 'branch:view'
+        },
+        {
+            title: 'Orders',
+            link: '/orders',
+            icon: <ShoppingCart />,
+            selected: false,
+            permission: 'order:view'
+        },
+        {
+            title: 'Stocks',
+            link: '/stocks',
+            icon: <GitGraph />,
+            selected: false,
+            permission: 'stock:view'
+        },
+        {
+            title: 'Logout',
+            link: '/logout',
+            icon: <LogOut />,
+            selected: false,
+        }
+    ]
 
     const sideMenuItemsWithSelected = sidebarMenuItems
         .filter(item => !item.permission || userPermissions.includes(item.permission))

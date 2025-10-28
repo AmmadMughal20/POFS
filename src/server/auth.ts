@@ -7,7 +7,7 @@ import crypto from 'crypto'
 
 export async function authenticateUser(email: string, password: string)
 {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email }, include: { Business: true, Manager: { include: { Branch: true } }, SalesMan: true } });
     if (!user) throw new Error("Invalid email or passworda");
 
     if (user.status !== UserStatus.ACTIVE) throw new Error("Account not verified or disabled");
@@ -26,7 +26,7 @@ export async function authenticateUser(email: string, password: string)
 
     const permissions = await prisma.permission.findMany({
         where: { id: { in: permissionIds } },
-        select: { title: true, id: true, code: true }
+        select: { title: true, id: true, code: true },
     })
 
     return {
@@ -35,7 +35,9 @@ export async function authenticateUser(email: string, password: string)
         email: user.email,
         roleId: user.roleId,
         roleTitle: role?.title,
-        permissions: permissions.map(perm => perm.code)
+        permissions: permissions.map(perm => perm.code),
+        businessId: user.Business?.id,
+        branchId: user.Manager?.Branch[0].id || user.SalesMan?.branchId
     };
 }
 

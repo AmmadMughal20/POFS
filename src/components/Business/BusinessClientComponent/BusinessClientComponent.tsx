@@ -19,15 +19,17 @@ import BranchForm from '@/components/Branch/BranchForm/BranchForm';
 import { handleBranchAddAction } from '@/server/BranchFormHandlers';
 import CategoryForm from '@/components/Category/CategoryForm/CategoryForm';
 import SupplierForm from '@/components/Supplier/SupplierForm/SupplierForm';
+import { IUser } from '@/schemas/UserSchema';
 
 interface Props
 {
     initialBusinesses: IBusiness[];
     permissions: string[];
     initialTotal: number
+    ownersToSuggest: IUser[]
 }
 
-export default function BusinessClientComponent({ initialBusinesses, permissions, initialTotal }: Props)
+export default function BusinessClientComponent({ initialBusinesses, permissions, initialTotal, ownersToSuggest }: Props)
 {
 
     const [data, setData] = useState<IBusiness[]>(initialBusinesses)
@@ -61,7 +63,7 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
                 </div>
 
                 <Popup isOpen={businessAddPopup} onClose={() => { setBusinessAddPopup(false); router.refresh() }}>
-                    <BusinessForm mode='add' onSubmitAction={handleBusinessAddAction} />
+                    <BusinessForm mode='add' onSubmitAction={handleBusinessAddAction} ownersToSuggest={ownersToSuggest} />
                 </Popup>
             </Page>
         )
@@ -221,12 +223,12 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
             </div>
 
             <Popup isOpen={businessAddPopup} onClose={() => { setBusinessAddPopup(false); router.refresh(); }}>
-                <BusinessForm mode='add' onSubmitAction={handleBusinessAddAction} />
+                <BusinessForm mode='add' onSubmitAction={handleBusinessAddAction} ownersToSuggest={ownersToSuggest} />
             </Popup>
 
             <Popup isOpen={businessEditPopup} onClose={() => { setBusinessEditPopup(false); setSelectedBusiness(null); router.refresh(); }}>
                 {selectedBusiness && (
-                    <BusinessForm mode='edit' initialData={selectedBusiness} onSubmitAction={handleBusinessEditAction} />
+                    <BusinessForm mode='edit' initialData={selectedBusiness} onSubmitAction={handleBusinessEditAction} ownersToSuggest={ownersToSuggest} />
                 )}
             </Popup>
 
