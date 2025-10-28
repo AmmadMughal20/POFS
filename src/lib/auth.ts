@@ -14,6 +14,8 @@ declare module "next-auth" {
         email: string;
         roleId?: string;
         roleTitle?: string;
+        branchId?: string | null
+        businessId?: string | null
         permissions?: string[];
     }
     interface Session
@@ -24,6 +26,8 @@ declare module "next-auth" {
             email: string;
             roleId?: string;
             roleTitle?: string;
+            branchId?: string | null
+            businessId?: string | null
             permissions?: string[];
         } & DefaultSession['user'];
     }
@@ -37,6 +41,8 @@ declare module 'next-auth/jwt' {
         email: string;
         roleId?: string;
         roleTitle?: string;
+        branchId?: string | null
+        businessId?: string | null
         permissions?: string[];
     }
 }
@@ -65,6 +71,8 @@ export const authOptions: NextAuthOptions = {
                         roleId: String(user.roleId),
                         roleTitle: user.roleTitle,
                         permissions: user.permissions,
+                        branchId: user.branchId,
+                        businessId: user.businessId
                     };
                 }
                 catch (error)
@@ -96,6 +104,8 @@ export const authOptions: NextAuthOptions = {
                 token.roleId = user.roleId;
                 token.roleTitle = user.roleTitle;
                 token.permissions = user.permissions;
+                token.branchId = user.branchId;
+                token.businessId = user.businessId; // optional if admin
             }
             return token;
         },
@@ -108,6 +118,8 @@ export const authOptions: NextAuthOptions = {
                 session.user.email = token.email;
                 session.user.roleId = token.roleId;
                 session.user.roleTitle = token.roleTitle;
+                session.user.branchId = token.branchId;
+                session.user.businessId = token.businessId;
                 session.user.permissions = token.permissions;
             }
             return session;

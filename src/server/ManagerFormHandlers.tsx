@@ -53,6 +53,13 @@ export async function createManagerAction(prevState: ManagerState, formData: For
         const phoneNo = formData.get('phoneNo')?.toString() || ''
         const roleId = parseInt(formData.get('roleId')?.toString() || '0')
 
+        console.log(branchId)
+        console.log(businessId)
+        console.log(name)
+        console.log(email)
+        console.log(phoneNo)
+        console.log(roleId)
+
         // 🔹 1️⃣ Create user first (reuse existing user creation logic)
         const userFormData = new FormData()
         userFormData.append('name', name)
@@ -64,6 +71,7 @@ export async function createManagerAction(prevState: ManagerState, formData: For
 
         if (!userResult.success || !userResult.values)
         {
+            console.log(userResult, 'printing user creation error')
             throw new Error(userResult.message || 'Failed to create user for manager.')
         }
 

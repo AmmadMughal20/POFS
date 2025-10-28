@@ -49,7 +49,6 @@ export default function OrdersPageClient({ initialOrders, permissions, initialTo
     const [orderEditPopup, setOrderEditPopup] = useState(false);
     const [viewOrderDetails, setViewOrderDetails] = useState(false);
     const [displayType, setDisplayType] = useState<'list' | 'grid'>('list')
-    const [showAddProductPopup, setShowAddProductPopup] = useState(false)
     const router = useRouter()
 
     if (orders.length === 0)
@@ -165,21 +164,6 @@ export default function OrdersPageClient({ initialOrders, permissions, initialTo
         // await
         console.log(searchTerm)
         return undefined
-    }
-
-    const handleViewOrders = (businessId: string, orderId: string) =>
-    {
-        router.push(`/businesses/orders/${businessId}/${orderId}/orders`)
-    }
-
-    const handleViewProducts = (businessId: string, orderId: string) =>
-    {
-        router.push(`/businesses/orders/${businessId}/${orderId}/products`)
-    }
-
-    const handleViewStocks = (businessId: string, orderId: string) =>
-    {
-        router.push(`/businesses/orders/${businessId}/${orderId}/stocks`)
     }
 
     return (

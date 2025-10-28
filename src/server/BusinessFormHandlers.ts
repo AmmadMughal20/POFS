@@ -213,3 +213,17 @@ export async function handleBusinessDeleteAction(prevState: BusinessesState, for
         return { success: false, message: 'Failed to delete business' }
     }
 }
+
+
+export async function getBusiness(businessId: string): Promise<IBusiness | null>
+{
+    const { user, permissions } = await getUserSession();
+    if (!(user.roleId == 5))
+    {
+        throw new Error("Forbidden: You don’t have permission to view business.");
+    }
+
+    const business = await prisma.business.findFirst({ where: { id: businessId } })
+
+    return business;
+}

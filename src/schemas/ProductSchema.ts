@@ -18,7 +18,7 @@ export interface IProduct extends IBaseEntity
     rate: number
     stocks?: IStock[]
     orderItems?: IOrderItem[]
-    branchId: string
+    branchId?: string | null
     Branch?: IBranch
     businessId: string
     Business?: IBusiness

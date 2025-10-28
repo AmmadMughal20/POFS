@@ -174,3 +174,17 @@ export async function handleBranchDeleteAction(prevState: BranchesState, formDat
         return { success: false, message: 'Failed to delete branch' }
     }
 }
+
+
+export async function getBranch(branchId: string): Promise<IBranch | null>
+{
+    const { user, permissions } = await getUserSession();
+    if (!(user.roleId == 6))
+    {
+        throw new Error("Forbidden: You don’t have permission to view branch.");
+    }
+
+    const branch = await prisma.branch.findFirst({ where: { id: branchId } })
+
+    return branch;
+}

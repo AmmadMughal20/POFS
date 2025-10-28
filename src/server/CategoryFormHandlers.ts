@@ -82,7 +82,6 @@ export const handleCategoryAddAction = async (prevState: CategoryState, formData
 
     revalidatePath('/businesses')
 
-    return { success: true, message: 'Business added successfully' }
-
+    return { success: true, message: 'Category added successfully' }
 
 } 
