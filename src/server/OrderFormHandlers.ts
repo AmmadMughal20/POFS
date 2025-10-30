@@ -200,17 +200,25 @@ export async function handleOrderAddAction(
             success: true,
             message: "Order and items added successfully.",
         };
-    } catch (error: unknown)
+    } catch (error)
     {
-        console.error("Error adding order:", error);
-        let message = "Something went wrong while adding the order.";
-        if (error instanceof Error) message = error.message;
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
             success: false,
-            message,
+            message: 'An unexpected error occurred while adding the category.',
         };
     }
-}
+};
 
 
 export async function handleOrderEditAction(prevState: OrdersState, formData: FormData): Promise<OrdersState>
@@ -281,7 +289,7 @@ export async function handleOrderDeleteAction(orderId: number, businessId: strin
 {
     try
     {
-        const { user, permissions } = await getUserSession();
+        const { permissions } = await getUserSession();
         if (!hasPermission(permissions, "order:delete"))
         {
             throw new Error("Forbidden: You don’t have permission to delete orders.");

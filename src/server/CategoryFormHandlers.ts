@@ -48,40 +48,71 @@ export async function getCategoryes(
 
 export const handleCategoryAddAction = async (prevState: CategoryState, formData: FormData): Promise<CategoryState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "category:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create category.");
-    }
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "category:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create category.");
+        }
 
-    const createdBy = user.id
+        const createdBy = user.id
 
-    const newCategory: ICategory = {
-        name: formData.get('name')?.toString() || '',
-        businessId: formData.get("businessId")?.toString() || "",
-        createdBy
-    }
+        const newCategory: ICategory = {
+            name: formData.get('name')?.toString() || '',
+            businessId: formData.get("businessId")?.toString() || "",
+            createdBy
+        }
 
-    const result = AddCategorySchema.safeParse(newCategory)
+        const result = AddCategorySchema.safeParse(newCategory)
 
-    if (!result.success)
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newCategory
+            }
+        }
+
+        await prisma.category.create({
+            data: {
+                name: newCategory.name,
+                businessId: newCategory.businessId,
+                createdBy: newCategory.createdBy
+            }
+        })
+
+        revalidatePath('/businesses')
+
+        return { success: true, message: 'Category added successfully' }
+
+    } catch (error)
     {
+        // ✅ Type-safe Prisma error handling
+        if (error instanceof Prisma.PrismaClientKnownRequestError)
+        {
+            if (error.code === 'P2002')
+            {
+                return {
+                    success: false,
+                    message: 'A category with this name already exists.',
+                };
+            }
+        }
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newCategory
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.category.create({
-        data: {
-            name: newCategory.name,
-            businessId: newCategory.businessId,
-            createdBy: newCategory.createdBy
-        }
-    })
-
-    revalidatePath('/businesses')
-
-    return { success: true, message: 'Category added successfully' }
-
-} 
+};

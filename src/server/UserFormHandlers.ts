@@ -135,67 +135,109 @@ export async function handleUserAddAction(prevState: UsersState, formData: FormD
 
 export async function handleUserEditAction(prevState: UsersState, formData: FormData): Promise<UsersState>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "user:update"))
-    {
-        throw new Error("Forbidden: You don’t have permission to update user.");
-    }
-    const updatedBy = user.id
-
-    const userId = formData.get('userId')?.toString() || ''
-
-    if (!userId) throw Error('User Id isrequired')
-
-    const updatedUserData = {
-        email: formData.get("email")?.toString().trim() || '',
-        name: formData.get("name")?.toString().trim() || '',
-        phoneNo: formData.get("phoneNo")?.toString().trim() || '',
-        roleId: parseInt(formData.get("roleId")?.toString().trim() || '0'),
-        status: formData.get("status")?.toString().trim() as UserStatus,
-        updatedBy
-    }
-
-    const result = EditUserSchema.safeParse({ id: parseInt(userId), ...updatedUserData })
-
-    if (!result.success)
-    {
-        return {
-            errors: result.error.flatten().fieldErrors,
-            values: { id: parseInt(userId), ...updatedUserData }
-        }
-    }
-    await prisma.user.update({ where: { id: parseInt(userId) }, data: updatedUserData })
-
-    revalidatePath('/users')
-
-    return { success: true, message: 'User updated successfully' }
-}
-
-export async function handleUserDeleteAction(prevState: UsersState, formData: FormData): Promise<UsersState>
-{
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "user:delete"))
-    {
-        throw new Error("Forbidden: You don’t have permission to delete users.");
-    }
-
-    const updatedBy = user.id
-
-    const userId = formData.get('userId') as string
-
     try
     {
-        const isUserExist = await prisma.user.findFirst({ where: { id: parseInt(userId) } })
-        if (!isUserExist) return { errors: { userId: ['User not found.'] } }
 
-        await prisma.user.update({ where: { id: parseInt(userId) }, data: { isDeleted: true, deletedAt: new Date(), updatedBy } })
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "user:update"))
+        {
+            throw new Error("Forbidden: You don’t have permission to update user.");
+        }
+        const updatedBy = user.id
+
+        const userId = formData.get('userId')?.toString() || ''
+
+        if (!userId) throw Error('User Id isrequired')
+
+        const updatedUserData = {
+            email: formData.get("email")?.toString().trim() || '',
+            name: formData.get("name")?.toString().trim() || '',
+            phoneNo: formData.get("phoneNo")?.toString().trim() || '',
+            roleId: parseInt(formData.get("roleId")?.toString().trim() || '0'),
+            status: formData.get("status")?.toString().trim() as UserStatus,
+            updatedBy
+        }
+
+        const result = EditUserSchema.safeParse({ id: parseInt(userId), ...updatedUserData })
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: { id: parseInt(userId), ...updatedUserData }
+            }
+        }
+        await prisma.user.update({ where: { id: parseInt(userId) }, data: updatedUserData })
 
         revalidatePath('/users')
 
-        return { success: true, message: 'User deleted successfully' }
+        return { success: true, message: 'User updated successfully' }
     } catch (error)
     {
-        console.error('Error deleting user:', error)
-        return { success: false, message: 'Failed to delete user' }
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-}
+};
+
+export async function handleUserDeleteAction(prevState: UsersState, formData: FormData): Promise<UsersState>
+{
+    try
+    {
+
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "user:delete"))
+        {
+            throw new Error("Forbidden: You don’t have permission to delete users.");
+        }
+
+        const updatedBy = user.id
+
+        const userId = formData.get('userId') as string
+
+        try
+        {
+            const isUserExist = await prisma.user.findFirst({ where: { id: parseInt(userId) } })
+            if (!isUserExist) return { errors: { userId: ['User not found.'] } }
+
+            await prisma.user.update({ where: { id: parseInt(userId) }, data: { isDeleted: true, deletedAt: new Date(), updatedBy } })
+
+            revalidatePath('/users')
+
+            return { success: true, message: 'User deleted successfully' }
+        } catch (error)
+        {
+            console.error('Error deleting user:', error)
+            return { success: false, message: 'Failed to delete user' }
+        }
+    } catch (error)
+    {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};

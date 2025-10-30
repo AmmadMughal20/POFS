@@ -87,124 +87,186 @@ export const getExpenses = async (skip?: number, take?: number, orderBy?: Prisma
 
 export const handleExpenseAddAction = async (prevState: ExpenseState, formData: FormData): Promise<ExpenseState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "expense:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create expense.");
-    }
 
-    const createdBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "expense:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create expense.");
+        }
 
-    const newExpense: IExpense = {
-        title: formData.get('title')?.toString() || '',
-        notes: formData.get("notes")?.toString() || "",
-        amount: Number(formData.get("amount")?.toString() || ""),
-        date: new Date(formData.get("date")?.toString() || ""),
-        businessId: formData.get("businessId")?.toString() || "",
-        branchId: formData.get("branchId")?.toString() || "",
-        createdBy
-    }
+        const createdBy = user.id
 
-    const result = AddExpenseSchema.safeParse(newExpense)
+        const newExpense: IExpense = {
+            title: formData.get('title')?.toString() || '',
+            notes: formData.get("notes")?.toString() || "",
+            amount: Number(formData.get("amount")?.toString() || ""),
+            date: new Date(formData.get("date")?.toString() || ""),
+            businessId: formData.get("businessId")?.toString() || "",
+            branchId: formData.get("branchId")?.toString() || "",
+            createdBy
+        }
 
-    if (!result.success)
+        const result = AddExpenseSchema.safeParse(newExpense)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newExpense
+            }
+        }
+
+        await prisma.expense.create({
+            data: {
+                title: newExpense.title,
+                notes: newExpense.notes,
+                amount: newExpense.amount,
+                date: newExpense.date,
+                businessId: newExpense.businessId ? newExpense.businessId : '',
+                branchId: newExpense.branchId ? newExpense.branchId : '',
+                createdBy: newExpense.createdBy
+            }
+        })
+
+        revalidatePath(`/branch/${newExpense.branchId}/expenses`)
+
+        return { success: true, message: 'Expense added successfully' }
+    } catch (error)
     {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newExpense
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.expense.create({
-        data: {
-            title: newExpense.title,
-            notes: newExpense.notes,
-            amount: newExpense.amount,
-            date: newExpense.date,
-            businessId: newExpense.businessId ? newExpense.businessId : '',
-            branchId: newExpense.branchId ? newExpense.branchId : '',
-            createdBy: newExpense.createdBy
-        }
-    })
-
-    revalidatePath(`/branch/${newExpense.branchId}/expenses`)
-
-    return { success: true, message: 'Expense added successfully' }
-}
+};
 
 export const handleExpenseEditAction = async (prevState: ExpenseState, formData: FormData): Promise<ExpenseState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "expense:update"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to update expense.");
-    }
 
-    const updatedBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "expense:update"))
+        {
+            throw new Error("Forbidden: You don’t have permission to update expense.");
+        }
 
-    const updatedExpense: IExpense = {
-        id: Number(formData.get('id')?.toString() || ''),
-        title: formData.get('title')?.toString() || '',
-        notes: formData.get("notes")?.toString() || "",
-        amount: Number(formData.get("amount")?.toString() || ""),
-        date: new Date(formData.get("date")?.toString() || ""),
-        businessId: formData.get("businessId")?.toString() || "",
-        branchId: formData.get("branchId")?.toString() || "",
-        updatedBy
-    }
+        const updatedBy = user.id
 
-    const result = EditExpenseSchema.safeParse(updatedExpense)
+        const updatedExpense: IExpense = {
+            id: Number(formData.get('id')?.toString() || ''),
+            title: formData.get('title')?.toString() || '',
+            notes: formData.get("notes")?.toString() || "",
+            amount: Number(formData.get("amount")?.toString() || ""),
+            date: new Date(formData.get("date")?.toString() || ""),
+            businessId: formData.get("businessId")?.toString() || "",
+            branchId: formData.get("branchId")?.toString() || "",
+            updatedBy
+        }
 
-    if (!result.success)
+        const result = EditExpenseSchema.safeParse(updatedExpense)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: updatedExpense
+            }
+        }
+
+        await prisma.expense.update({
+            where: { id: updatedExpense.id },
+            data: {
+                title: updatedExpense.title,
+                notes: updatedExpense.notes,
+                amount: updatedExpense.amount,
+                date: updatedExpense.date,
+                businessId: updatedExpense.businessId ? updatedExpense.businessId : '',
+                branchId: updatedExpense.branchId ? updatedExpense.branchId : '',
+                createdBy: updatedExpense.createdBy
+            }
+        })
+
+        revalidatePath(`/branch/${updatedExpense.branchId}/expenses`)
+
+        return { success: true, message: 'Expense updated successfully' }
+    } catch (error)
     {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: updatedExpense
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.expense.update({
-        where: { id: updatedExpense.id },
-        data: {
-            title: updatedExpense.title,
-            notes: updatedExpense.notes,
-            amount: updatedExpense.amount,
-            date: updatedExpense.date,
-            businessId: updatedExpense.businessId ? updatedExpense.businessId : '',
-            branchId: updatedExpense.branchId ? updatedExpense.branchId : '',
-            createdBy: updatedExpense.createdBy
-        }
-    })
-
-    revalidatePath(`/branch/${updatedExpense.branchId}/expenses`)
-
-    return { success: true, message: 'Expense updated successfully' }
-}
+};
 
 export const handleExpenseDeleteAction = async (prevState: ExpenseState, formData: FormData): Promise<ExpenseState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "expense:delete"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to delete expense.");
-    }
 
-    const id = Number(formData.get('id')?.toString())
-    const branchId = formData.get('branchId')?.toString()
-
-    const expenseToDelete = await prisma.expense.findFirst({ where: { id } })
-    if (!expenseToDelete)
-    {
-        return {
-            errors: { general: ['Expense not found'] },
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "expense:delete"))
+        {
+            throw new Error("Forbidden: You don’t have permission to delete expense.");
         }
+
+        const id = Number(formData.get('id')?.toString())
+        const branchId = formData.get('branchId')?.toString()
+
+        const expenseToDelete = await prisma.expense.findFirst({ where: { id } })
+        if (!expenseToDelete)
+        {
+            return {
+                errors: { general: ['Expense not found'] },
+            }
+        }
+
+        await prisma.expense.delete({
+            where: { id },
+        })
+
+        revalidatePath(`/branch/${branchId}/expenses`)
+
+        return { success: true, message: 'Expense deleted successfully' }
+    } catch (error)
+    {
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.expense.delete({
-        where: { id },
-    })
-
-    revalidatePath(`/branch/${branchId}/expenses`)
-
-    return { success: true, message: 'Expense deleted successfully' }
-} 
+};

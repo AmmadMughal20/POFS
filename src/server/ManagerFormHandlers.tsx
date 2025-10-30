@@ -27,12 +27,32 @@ export async function getManagersByBusiness(businessId: string)
 
 export async function assignBranchManager(branchId: string, userId: number)
 {
-    await prisma.branch.update({
-        where: { id: branchId },
-        data: { managerId: userId },
-    })
-    return { success: true }
-}
+    try
+    {
+        await prisma.branch.update({
+            where: { id: branchId },
+            data: { managerId: userId },
+        })
+        return { success: true }
+    } catch (error)
+    {
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};
+
 
 
 export async function createManagerAction(prevState: ManagerState, formData: FormData): Promise<ManagerState>

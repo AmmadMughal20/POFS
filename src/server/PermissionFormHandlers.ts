@@ -144,60 +144,102 @@ export async function handlePermissionAddAction(prevState: PermissionsState, for
 
 export async function handlePermissionEditAction(prevState: PermissionsState, formData: FormData): Promise<PermissionsState>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "branch:update"))
-    {
-        throw new Error("Forbidden: You don’t have permission to edit branches.");
-    }
-
-    const permId = formData.get('id')?.toString() || ''
-    const updatedBy = user.id
-
-    const updatedPermData = {
-        title: formData.get('title')?.toString() || '',
-        code: formData.get('code')?.toString() || '',
-        description: formData.get('description')?.toString() || '',
-        updatedBy
-    }
-
-    const result = UpdatePermissionSchema.safeParse({ id: permId, ...updatedPermData })
-    if (!result.success)
-    {
-        return {
-            errors: result.error.flatten().fieldErrors,
-            values: { id: parseInt(permId), ...updatedPermData }
-        }
-    }
-    await prisma.permission.update({ where: { id: parseInt(permId) }, data: updatedPermData })
-
-    revalidatePath('/permissions')
-
-    return { success: true, message: 'Permission updated successfully' }
-}
-
-export async function handlePermissionDeleteAction(prevState: PermissionsState, formData: FormData): Promise<PermissionsState>
-{
-    const { permissions } = await getUserSession();
-    if (!hasPermission(permissions, "branch:delete"))
-    {
-        throw new Error("Forbidden: You don’t have permission to delete branches.");
-    }
-
-    const permId = formData.get('permId') as string
-
     try
     {
-        const isPermExist = await prisma.permission.findFirst({ where: { id: parseInt(permId) } })
-        if (!isPermExist) return { errors: { branchId: ['Permission not found.'] } }
 
-        await prisma.permission.delete({ where: { id: parseInt(permId) } })
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "branch:update"))
+        {
+            throw new Error("Forbidden: You don’t have permission to edit branches.");
+        }
+
+        const permId = formData.get('id')?.toString() || ''
+        const updatedBy = user.id
+
+        const updatedPermData = {
+            title: formData.get('title')?.toString() || '',
+            code: formData.get('code')?.toString() || '',
+            description: formData.get('description')?.toString() || '',
+            updatedBy
+        }
+
+        const result = UpdatePermissionSchema.safeParse({ id: permId, ...updatedPermData })
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: { id: parseInt(permId), ...updatedPermData }
+            }
+        }
+        await prisma.permission.update({ where: { id: parseInt(permId) }, data: updatedPermData })
 
         revalidatePath('/permissions')
 
-        return { success: true, message: 'Permission deleted successfully' }
+        return { success: true, message: 'Permission updated successfully' }
     } catch (error)
     {
-        console.error('Error deleting permission:', error)
-        return { success: false, message: 'Failed to delete permission' }
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-}
+};
+
+export async function handlePermissionDeleteAction(prevState: PermissionsState, formData: FormData): Promise<PermissionsState>
+{
+    try
+    {
+
+        const { permissions } = await getUserSession();
+        if (!hasPermission(permissions, "branch:delete"))
+        {
+            throw new Error("Forbidden: You don’t have permission to delete branches.");
+        }
+
+        const permId = formData.get('permId') as string
+
+        try
+        {
+            const isPermExist = await prisma.permission.findFirst({ where: { id: parseInt(permId) } })
+            if (!isPermExist) return { errors: { branchId: ['Permission not found.'] } }
+
+            await prisma.permission.delete({ where: { id: parseInt(permId) } })
+
+            revalidatePath('/permissions')
+
+            return { success: true, message: 'Permission deleted successfully' }
+        } catch (error)
+        {
+            console.error('Error deleting permission:', error)
+            return { success: false, message: 'Failed to delete permission' }
+        }
+    } catch (error)
+    {
+
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};

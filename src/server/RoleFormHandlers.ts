@@ -272,51 +272,72 @@ export async function handleRoleDeleteAction(
     formData: FormData
 ): Promise<RolesState>
 {
-    const { permissions } = await getUserSession();
-    if (!hasPermission(permissions, "role:delete"))
-    {
-        throw new Error("Forbidden: You don’t have permission to delete role.");
-    }
-
-    const roleIdStr = formData.get("roleId")?.toString() || "";
-    const roleId = parseInt(roleIdStr, 10);
-
     try
     {
-        // 🧩 1️⃣ Check if role exists
-        const existingRole = await prisma.role.findUnique({ where: { id: roleId } });
-        if (!existingRole)
+
+        const { permissions } = await getUserSession();
+        if (!hasPermission(permissions, "role:delete"))
         {
-            return { errors: { roleId: ["Role not found."] } };
+            throw new Error("Forbidden: You don’t have permission to delete role.");
         }
 
-        // 🧩 2️⃣ Delete related role-permission records and role atomically
-        await prisma.$transaction([
-            prisma.rolePermission.deleteMany({ where: { roleId } }),
-            prisma.role.delete({ where: { id: roleId } }),
-        ]);
+        const roleIdStr = formData.get("roleId")?.toString() || "";
+        const roleId = parseInt(roleIdStr, 10);
 
-        // 🧩 3️⃣ Revalidate roles page cache
-        revalidatePath("/roles");
+        try
+        {
+            // 🧩 1️⃣ Check if role exists
+            const existingRole = await prisma.role.findUnique({ where: { id: roleId } });
+            if (!existingRole)
+            {
+                return { errors: { roleId: ["Role not found."] } };
+            }
 
-        return { success: true, message: "Role deleted successfully" };
-    } catch (error: unknown)
+            // 🧩 2️⃣ Delete related role-permission records and role atomically
+            await prisma.$transaction([
+                prisma.rolePermission.deleteMany({ where: { roleId } }),
+                prisma.role.delete({ where: { id: roleId } }),
+            ]);
+
+            // 🧩 3️⃣ Revalidate roles page cache
+            revalidatePath("/roles");
+
+            return { success: true, message: "Role deleted successfully" };
+        } catch (error: unknown)
+        {
+            console.error('Error deleting role:', error);
+
+            let message = 'Something went wrong while deleting the role.';
+
+            if (error instanceof Error)
+            {
+                message = error.message;
+            } else if (typeof error === 'string')
+            {
+                message = error;
+            }
+
+            return {
+                success: false,
+                message,
+            };
+        }
+    } catch (error)
     {
-        console.error('Error deleting role:', error);
 
-        let message = 'Something went wrong while deleting the role.';
-
+        // ✅ Fallback for other errors
         if (error instanceof Error)
         {
-            message = error.message;
-        } else if (typeof error === 'string')
-        {
-            message = error;
+            return {
+                success: false,
+                message: error.message,
+            };
         }
 
+        // ✅ Handle truly unknown errors safely
         return {
             success: false,
-            message,
+            message: 'An unexpected error occurred while adding the category.',
         };
     }
-}
+};

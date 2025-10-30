@@ -48,41 +48,63 @@ export async function getSupplieres(
 
 export const handleSupplierAddAction = async (prevState: SupplierState, formData: FormData): Promise<SupplierState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "category:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create category.");
-    }
 
-    const createdBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "category:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create category.");
+        }
 
-    const newSupplier: ISupplier = {
-        name: formData.get('name')?.toString() || '',
-        businessId: formData.get("businessId")?.toString() || "",
-        createdBy
-    }
+        const createdBy = user.id
 
-    const result = AddSupplierSchema.safeParse(newSupplier)
+        const newSupplier: ISupplier = {
+            name: formData.get('name')?.toString() || '',
+            businessId: formData.get("businessId")?.toString() || "",
+            createdBy
+        }
 
-    if (!result.success)
+        const result = AddSupplierSchema.safeParse(newSupplier)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newSupplier
+            }
+        }
+
+        await prisma.supplier.create({
+            data: {
+                name: newSupplier.name,
+                businessId: newSupplier.businessId,
+                createdBy: newSupplier.createdBy
+            }
+        })
+
+        revalidatePath('/businesses')
+
+        return { success: true, message: 'Supplier added successfully' }
+
+
+    } catch (error)
     {
+
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newSupplier
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.supplier.create({
-        data: {
-            name: newSupplier.name,
-            businessId: newSupplier.businessId,
-            createdBy: newSupplier.createdBy
-        }
-    })
-
-    revalidatePath('/businesses')
-
-    return { success: true, message: 'Supplier added successfully' }
-
-
-} 
+};

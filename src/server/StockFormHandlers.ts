@@ -66,136 +66,199 @@ export const getStocks = async (skip?: number, take?: number, orderBy?: Prisma.S
 
 export const handleStockAddAction = async (prevState: StockState, formData: FormData): Promise<StockState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "stock:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create stock.");
-    }
 
-    const createdBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "stock:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create stock.");
+        }
 
-    const newStock: IStock = {
-        branchId: formData.get("branchId")?.toString() || "",
-        productId: Number(formData.get("productId")?.toString()),
-        stockUnits: Number(formData.get("stockUnits")?.toString()),
-        createdBy
-    }
+        const createdBy = user.id
 
-    const result = AddStockSchema.safeParse(newStock)
+        const newStock: IStock = {
+            branchId: formData.get("branchId")?.toString() || "",
+            productId: Number(formData.get("productId")?.toString()),
+            stockUnits: Number(formData.get("stockUnits")?.toString()),
+            createdBy
+        }
 
-    if (!result.success)
+        const result = AddStockSchema.safeParse(newStock)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newStock
+            }
+        }
+
+        await prisma.stock.create({
+            data: {
+                branchId: newStock.branchId,
+                productId: newStock.productId,
+                stockUnits: newStock.stockUnits,
+                // createdBy: newStock.createdBy
+            }
+        })
+
+        revalidatePath(`/branch/${newStock.branchId}/stocks`)
+
+        return { success: true, message: 'Stock added successfully' }
+    } catch (error)
     {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newStock
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.stock.create({
-        data: {
-            branchId: newStock.branchId,
-            productId: newStock.productId,
-            stockUnits: newStock.stockUnits,
-            // createdBy: newStock.createdBy
-        }
-    })
-
-    revalidatePath(`/branch/${newStock.branchId}/stocks`)
-
-    return { success: true, message: 'Stock added successfully' }
-}
+};
 
 export const handleStockEditAction = async (prevState: StockState, formData: FormData): Promise<StockState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "stock:update"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to update stock.");
-    }
 
-    const updatedBy = user.id
-
-    const updatedStock: IStock = {
-        branchId: formData.get("branchId")?.toString() || "",
-        productId: Number(formData.get("productId")?.toString()),
-        stockUnits: Number(formData.get("stockUnits")?.toString()),
-        updatedBy
-    }
-
-    const result = EditStockSchema.safeParse(updatedStock)
-
-    if (!result.success)
-    {
-        return {
-            errors: result.error.flatten().fieldErrors,
-            values: updatedStock
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "stock:update"))
+        {
+            throw new Error("Forbidden: You don’t have permission to update stock.");
         }
-    }
 
-    await prisma.stock.update({
-        where: {
-            branchId_productId: {
+        const updatedBy = user.id
+
+        const updatedStock: IStock = {
+            branchId: formData.get("branchId")?.toString() || "",
+            productId: Number(formData.get("productId")?.toString()),
+            stockUnits: Number(formData.get("stockUnits")?.toString()),
+            updatedBy
+        }
+
+        const result = EditStockSchema.safeParse(updatedStock)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: updatedStock
+            }
+        }
+
+        await prisma.stock.update({
+            where: {
+                branchId_productId: {
+                    branchId: updatedStock.branchId,
+                    productId: updatedStock.productId,
+                },
+            },
+            data: {
                 branchId: updatedStock.branchId,
                 productId: updatedStock.productId,
-            },
-        },
-        data: {
-            branchId: updatedStock.branchId,
-            productId: updatedStock.productId,
-            stockUnits: updatedStock.stockUnits,
-            // updatedBy: updatedStock.createdBy
+                stockUnits: updatedStock.stockUnits,
+                // updatedBy: updatedStock.createdBy
+            }
+        })
+
+        revalidatePath(`/branch/${updatedStock.branchId}/stocks`)
+
+        return { success: true, message: 'Stock added successfully' }
+    } catch (error)
+    {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
         }
-    })
 
-    revalidatePath(`/branch/${updatedStock.branchId}/stocks`)
-
-    return { success: true, message: 'Stock added successfully' }
-}
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};
 
 
 export const handleStockDeleteAction = async (prevState: StockState, formData: FormData): Promise<StockState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "stock:delete"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to delete stock.");
-    }
 
-    const updatedBy = user.id
-
-    const updatedStock: IStock = {
-        branchId: formData.get("branchId")?.toString() || "",
-        productId: Number(formData.get("productId")?.toString()),
-        stockUnits: 0,
-        updatedBy
-    }
-
-    const result = EditStockSchema.safeParse(updatedStock)
-
-    if (!result.success)
-    {
-        return {
-            errors: result.error.flatten().fieldErrors,
-            values: updatedStock
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "stock:delete"))
+        {
+            throw new Error("Forbidden: You don’t have permission to delete stock.");
         }
-    }
 
-    await prisma.stock.update({
-        where: {
-            branchId_productId: {
+        const updatedBy = user.id
+
+        const updatedStock: IStock = {
+            branchId: formData.get("branchId")?.toString() || "",
+            productId: Number(formData.get("productId")?.toString()),
+            stockUnits: 0,
+            updatedBy
+        }
+
+        const result = EditStockSchema.safeParse(updatedStock)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: updatedStock
+            }
+        }
+
+        await prisma.stock.update({
+            where: {
+                branchId_productId: {
+                    branchId: updatedStock.branchId,
+                    productId: updatedStock.productId,
+                },
+            },
+            data: {
                 branchId: updatedStock.branchId,
                 productId: updatedStock.productId,
-            },
-        },
-        data: {
-            branchId: updatedStock.branchId,
-            productId: updatedStock.productId,
-            stockUnits: updatedStock.stockUnits,
-            // updatedBy: updatedStock.createdBy
+                stockUnits: updatedStock.stockUnits,
+                // updatedBy: updatedStock.createdBy
+            }
+        })
+
+        revalidatePath(`/branch/${updatedStock.branchId}/stocks`)
+
+        return { success: true, message: 'Stock added successfully' }
+    } catch (error)
+    {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
         }
-    })
 
-    revalidatePath(`/branch/${updatedStock.branchId}/stocks`)
-
-    return { success: true, message: 'Stock added successfully' }
-} 
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};

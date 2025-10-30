@@ -60,138 +60,200 @@ export const getSalesmen = async (skip?: number, take?: number, orderBy?: Prisma
 
 export const handleSalesmanAddAction = async (prevState: SalesmanState, formData: FormData): Promise<SalesmanState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "salesman:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create salesman.");
-    }
 
-    const createdBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "salesman:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create salesman.");
+        }
 
-    const newSalesman: ISalesman = {
-        User: {
-            name: formData.get('name')?.toString(),
-            phoneNo: formData.get("phoneNo")?.toString(),
-            email: formData.get("email")?.toString(),
-        },
-        branchId: formData.get("branchId")?.toString() || "",
-        businessId: formData.get("businessId")?.toString() || "",
-        // createdBy
-    }
+        const createdBy = user.id
 
-    const result = AddSalesmanSchema.safeParse(newSalesman)
+        const newSalesman: ISalesman = {
+            User: {
+                name: formData.get('name')?.toString(),
+                phoneNo: formData.get("phoneNo")?.toString(),
+                email: formData.get("email")?.toString(),
+            },
+            branchId: formData.get("branchId")?.toString() || "",
+            businessId: formData.get("businessId")?.toString() || "",
+            // createdBy
+        }
 
-    if (!result.success)
+        const result = AddSalesmanSchema.safeParse(newSalesman)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newSalesman
+            }
+        }
+
+        const password = "Test@123"; // default password
+        const encPass = await bcrypt.hash(password, await bcrypt.genSalt(10));
+
+        const createdUser = await prisma.user.create({
+            data: {
+                name: newSalesman.User.name,
+                email: newSalesman.User.email ?? '',
+                phoneNo: newSalesman.User.phoneNo ?? '',
+                password: encPass,
+                status: "DISABLED",
+                createdBy,
+                roleId: 1, // if you have a default role for customers
+            },
+        });
+        await prisma.salesMan.create({
+            data: {
+                id: createdUser.id,
+                businessId: newSalesman.businessId ? newSalesman.businessId : '',
+                branchId: newSalesman.branchId ? newSalesman.branchId : '',
+            }
+        })
+
+        revalidatePath(`/branch/${newSalesman.branchId}/salesmen`)
+
+        return { success: true, message: 'Salesman added successfully' }
+    } catch (error)
     {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newSalesman
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    const password = "Test@123"; // default password
-    const encPass = await bcrypt.hash(password, await bcrypt.genSalt(10));
-
-    const createdUser = await prisma.user.create({
-        data: {
-            name: newSalesman.User.name,
-            email: newSalesman.User.email ?? '',
-            phoneNo: newSalesman.User.phoneNo ?? '',
-            password: encPass,
-            status: "DISABLED",
-            createdBy,
-            roleId: 1, // if you have a default role for customers
-        },
-    });
-    await prisma.salesMan.create({
-        data: {
-            id: createdUser.id,
-            businessId: newSalesman.businessId ? newSalesman.businessId : '',
-            branchId: newSalesman.branchId ? newSalesman.branchId : '',
-        }
-    })
-
-    revalidatePath(`/branch/${newSalesman.branchId}/salesmen`)
-
-    return { success: true, message: 'Salesman added successfully' }
-}
+};
 
 export const handleSalesmanEditAction = async (prevState: SalesmanState, formData: FormData): Promise<SalesmanState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "salesman:update"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to update salesman.");
-    }
-
-    const updatedBy = user.id
-
-    const updatedSalesman: ISalesman = {
-        User: {
-            id: Number(formData.get('id')?.toString()),
-            name: formData.get('name')?.toString(),
-            phoneNo: formData.get("phoneNo")?.toString(),
-            email: formData.get("email")?.toString(),
-        },
-        branchId: formData.get("branchId")?.toString() || "",
-        businessId: formData.get("businessId")?.toString() || "",
-        // updatedBy
-    }
-
-    const result = EditSalesmanSchema.safeParse(updatedSalesman)
-
-    if (!result.success)
-    {
-        return {
-            errors: result.error.flatten().fieldErrors,
-            values: updatedSalesman
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "salesman:update"))
+        {
+            throw new Error("Forbidden: You don’t have permission to update salesman.");
         }
-    }
 
-    if (updatedSalesman.User.id)
-    {
-        await prisma.user.update({
-            where: { id: updatedSalesman.User.id },
-            data: {
-                name: updatedSalesman.User.name,
-                phoneNo: updatedSalesman.User.phoneNo,
-                email: updatedSalesman.User.email,
+        const updatedBy = user.id
+
+        const updatedSalesman: ISalesman = {
+            User: {
+                id: Number(formData.get('id')?.toString()),
+                name: formData.get('name')?.toString(),
+                phoneNo: formData.get("phoneNo")?.toString(),
+                email: formData.get("email")?.toString(),
+            },
+            branchId: formData.get("branchId")?.toString() || "",
+            businessId: formData.get("businessId")?.toString() || "",
+            // updatedBy
+        }
+
+        const result = EditSalesmanSchema.safeParse(updatedSalesman)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: updatedSalesman
             }
-        })
+        }
+
+        if (updatedSalesman.User.id)
+        {
+            await prisma.user.update({
+                where: { id: updatedSalesman.User.id },
+                data: {
+                    name: updatedSalesman.User.name,
+                    phoneNo: updatedSalesman.User.phoneNo,
+                    email: updatedSalesman.User.email,
+                }
+            })
+        }
+
+        revalidatePath(`/branch/${updatedSalesman.branchId}/salesmen`)
+
+        return { success: true, message: 'Salesman updated successfully' }
+    } catch (error)
+    {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    revalidatePath(`/branch/${updatedSalesman.branchId}/salesmen`)
-
-    return { success: true, message: 'Salesman updated successfully' }
-}
+};
 
 export const handleSalesmanDeleteAction = async (prevState: SalesmanState, formData: FormData): Promise<SalesmanState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "salesman:delete"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to delete salesman.");
-    }
 
-    const id = Number(formData.get('id')?.toString())
-
-    const salesmanToDelete = await prisma.salesMan.findFirst({ where: { id } })
-    if (!salesmanToDelete)
-    {
-        return {
-            errors: { general: ['Salesman not found'] },
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "salesman:delete"))
+        {
+            throw new Error("Forbidden: You don’t have permission to delete salesman.");
         }
+
+        const id = Number(formData.get('id')?.toString())
+
+        const salesmanToDelete = await prisma.salesMan.findFirst({ where: { id } })
+        if (!salesmanToDelete)
+        {
+            return {
+                errors: { general: ['Salesman not found'] },
+            }
+        }
+
+        await prisma.salesMan.delete({
+            where: { id },
+        })
+
+        await prisma.user.delete({
+            where: { id },
+        })
+
+        revalidatePath(`/branch/${salesmanToDelete.branchId}/salesmans`)
+
+        return { success: true, message: 'Salesman deleted successfully' }
+    } catch (error)
+    {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.salesMan.delete({
-        where: { id },
-    })
-
-    await prisma.user.delete({
-        where: { id },
-    })
-
-    revalidatePath(`/branch/${salesmanToDelete.branchId}/salesmans`)
-
-    return { success: true, message: 'Salesman deleted successfully' }
-} 
+};
