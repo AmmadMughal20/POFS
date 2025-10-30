@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button/Button';
 import Page from '@/components/ui/Page/Page';
 import Popup from '@/components/ui/Popup/Popup';
 import RowActions from '@/components/ui/RowActions/RowActions';
-import Table, { Align, Column } from '@/components/ui/Table/Table';
+import Table, { Align, Column } from '@/components/ui/Table/Tableold';
 import { IUser } from '@/schemas/UserSchema';
 import { handleUserAddAction, handleUserDeleteAction, handleUserEditAction } from '@/server/UserFormHandlers';
 import { hasPermission } from '@/server/getUserSession';

@@ -1,13 +1,10 @@
 'use client';
 
 import { IProduct } from '@/schemas/ProductSchema';
-import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
-import Image from 'next/image';
 
 type ViewProductProps = {
     selectedProduct: IProduct;
-    onClose: () => void;
+    onClose?: () => void;
     permissions: string[];
 };
 
@@ -16,14 +13,14 @@ const ViewProductDetailsPopup = ({ selectedProduct, onClose, permissions }: View
     const totalStock = selectedProduct.stocks?.reduce((sum, s) => sum + s.stockUnits, 0) || 0;
 
     return (
-        <div >
+        <>
             {/* Header */}
-            <div className="flex justify-between items-center border-b px-6 py-4 bg-gray-50">
+            <div className="flex justify-between items-center border-b px-6 py-2 bg-gray-50 ">
                 <h4 className="text-xl font-semibold text-gray-800">Product Details</h4>
             </div>
 
             {/* Body */}
-            <div className="p-6 max-h-[80vh] overflow-y-auto space-y-8">
+            <div className="px-6 py-2 max-h-[75vh] overflow-y-auto space-y-4">
                 {/* Product Info Section */}
                 <section>
                     <h5 className="text-lg font-semibold text-gray-800 mb-3">Product Information</h5>
@@ -163,7 +160,7 @@ const ViewProductDetailsPopup = ({ selectedProduct, onClose, permissions }: View
                     </section>
                 )}
             </div>
-        </div>
+        </>
     );
 };
 

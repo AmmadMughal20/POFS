@@ -102,7 +102,7 @@ function redirectToDashboard(token: JWT, req: NextRequest)
             redirectUrl = `/admin/${businessId}/dashboard`;
             break;
         case '6': // Branch Manager
-            redirectUrl = `/branch-manager/${branchId}/dashboard`;
+            redirectUrl = `/branch/${branchId}/dashboard`;
             break;
         default:
             redirectUrl = '/dashboard';
@@ -122,7 +122,7 @@ export const config = {
         '/unauthorized',
         '/dashboard/:path*',
         '/admin/:path*',
-        '/branch-manager/:path*',
+        '/branch/:path*',
         '/branch-management/:path*',
         '/users/:path*',
         '/roles/:path*',

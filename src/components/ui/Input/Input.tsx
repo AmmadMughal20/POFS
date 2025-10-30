@@ -2,17 +2,17 @@ import { ChangeEventHandler } from 'react'
 
 interface IInput
 {
-    name: string
+    name?: string
     required?: boolean
     autoFocus?: boolean
-    type?: 'text' | 'number' | 'email' | 'password' | "time",
+    type?: 'text' | 'number' | 'email' | 'password' | "time" | "tel" | "date" | "hidden",
     placeholder?: string
     value?: string | number,
     onChange?: ChangeEventHandler<HTMLInputElement>
     className?: string,
     disabled?: boolean,
     readOnly?: boolean,
-    defaultValue?: string | number
+    defaultValue?: string | number,
 
 }
 const Input = ({ name, type = 'text', value, onChange, className = '', placeholder = 'Enter value', autoFocus = false, required = false, disabled = false, defaultValue, readOnly }: IInput) =>

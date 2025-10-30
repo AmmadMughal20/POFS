@@ -8,12 +8,13 @@ interface ISelect
     className?: string,
     required?: boolean,
     autoFocus?: boolean,
-    disabled?: boolean
+    disabled?: boolean,
+    defaultSelected?: string | number
 }
-const Select: React.FC<ISelect> = ({ name, children, className = '', required = true, autoFocus = false, disabled = false }: ISelect) =>
+const Select: React.FC<ISelect> = ({ name, children, className = '', required = true, autoFocus = false, disabled = false, defaultSelected = '' }: ISelect) =>
 {
     return (
-        <select className={`${styles.select} ${className}`} name={name} required={required} autoFocus={autoFocus} disabled={disabled}>
+        <select className={`${styles.select} ${className}`} name={name} required={required} autoFocus={autoFocus} disabled={disabled} defaultValue={defaultSelected}>
             {children}
         </select>
     )

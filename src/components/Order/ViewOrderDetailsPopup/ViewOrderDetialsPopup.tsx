@@ -1,11 +1,9 @@
 'use client'
 
-import { IOrder } from '@/schemas/OrderSchema'
 import { IOrderItem } from '@/schemas/OrderItem'
+import { IOrder } from '@/schemas/OrderSchema'
 import { getOrderItems } from '@/server/OrderItemsHandlers'
 import { useEffect, useState } from 'react'
-import Card from '../../ui/Card/Card'
-import Button from '../../ui/Button/Button'
 
 type ViewOrderProps = {
     selectedOrder: IOrder

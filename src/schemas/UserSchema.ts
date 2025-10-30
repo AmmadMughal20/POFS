@@ -5,7 +5,7 @@ import { IRole } from './RoleSchema'
 import { IPermission } from './PermissionSchema'
 import { IBusiness } from './BusinessSchema'
 import { IManager } from './ManagerSchema'
-import { ISalesMan } from './SaleManSchems'
+import { ISalesman } from './SalesmanSchema'
 import { ICustomer } from './CustomerSchema'
 import { IActivityLog } from './ActivityLogSchema'
 import { IBranch } from './BranchSchema'
@@ -28,7 +28,7 @@ export interface IUser extends IBaseEntity
     roleId: number
     Role?: IRole
     Customer?: ICustomer
-    SalesMan?: ISalesMan
+    SalesMan?: ISalesman
     Manager?: IManager
     Business?: IBusiness
     AuditLogs?: IActivityLog[]

@@ -19,7 +19,7 @@ export interface IProduct extends IBaseEntity
     stocks?: IStock[]
     orderItems?: IOrderItem[]
     branchId?: string | null
-    Branch?: IBranch
+    Branch?: IBranch | null
     businessId: string
     Business?: IBusiness
     categoryId: number

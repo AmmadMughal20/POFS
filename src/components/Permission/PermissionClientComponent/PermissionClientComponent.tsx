@@ -48,7 +48,6 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
 
                 <Popup isOpen={permissionAddPopup} onClose={() => { setPermissionAddPopup(false); router.refresh() }}>
                     <PermissionForm mode='add' onSubmitAction={handlePermissionAddAction} />
-                    <></>
                 </Popup>
             </Page>
         )
@@ -73,7 +72,7 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
             return a.key.localeCompare(b.key);
         });
 
-    const columnsWithActions: Column<IPermission>[] = [
+    const columnsWithActions: Column<IPermission, string>[] = [
         ...permCols,
         {
             key: 'actions', // ✅ now allowed
@@ -83,13 +82,13 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
                 <RowActions
                     onView={() =>
                     {
-                        const perm = initialPerms.find((b: IPermission) => b.id === row.id);
+                        const perm = data.find((b: IPermission) => b.id === row.id);
                         if (perm) setSelectedPermission(perm);
                         setViewPermissionDetails(true);
                     }}
                     onEdit={() =>
                     {
-                        const perm = initialPerms.find(b => b.id === row.id);
+                        const perm = data.find(b => b.id === row.id);
                         if (perm) setSelectedPermission(perm);
                         setPermissionEditPopup(true);
                     }}
@@ -159,7 +158,7 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
             <div className='pt-3'>
                 {
                     displayType == "list" &&
-                    <Table<IPermission>
+                    <Table<IPermission, string>
                         columns={columnsWithActions}
                         data={data}
                         page={page}
@@ -180,7 +179,7 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
                     displayType == "grid" &&
                     <div className='grid grid-cols-4 mt-3'>
                         {
-                            initialPerms.map(perm => (
+                            data.map(perm => (
                                 <div key={perm.id}>{perm.title}</div>
                                 // <BranchCard
                                 //     key={branch.id}

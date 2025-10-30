@@ -9,9 +9,7 @@ const page = async () =>
 {
     const { items, total } = await getBusinesses(0, 50)
     const { permissions } = await getUserSession()
-    const { items: ownersToSuggest, total: totalUsers } = await getUsers(undefined, undefined, undefined, { roleId: 5 })
-
-    console.log(ownersToSuggest, 'printing in page')
+    const { items: ownersToSuggest } = await getUsers(undefined, undefined, undefined, { roleId: 5 })
 
     return (
         <BusinessClientComponent initialBusinesses={items} permissions={permissions} initialTotal={total} ownersToSuggest={ownersToSuggest} />

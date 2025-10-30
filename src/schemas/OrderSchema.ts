@@ -16,7 +16,7 @@ export interface IOrder extends IBaseEntity
     Branch?: IBranch
     businessId: string
     Business?: IBusiness
-    totalAmount: Decimal | number;
+    totalAmount: number;
     orderMode: OrderMode,
     status: string
     orderItems?: IOrderItem[]
@@ -26,11 +26,11 @@ export interface IOrder extends IBaseEntity
 
 
 export const AddOrderSchema = z.object({
-    id: z.string('Order Id is required'),
-    address: z.string().min(1, 'Address is required'),
-    phoneNo: z.string().regex(/^((\+92)?(0092)?(92)?(0)?)(3)([0-9]{9})$/, "Enter Pakistani mobile no."),
+    // address: z.string().min(1, 'Address is required'),
+    // phoneNo: z.string().regex(/^((\+92)?(0092)?(92)?(0)?)(3)([0-9]{9})$/, "Enter Pakistani mobile no."),
     customerId: z.int('Customer is required'),
-    branchId: z.int('Branch is required'),
+    branchId: z.string('Branch is required'),
+    businessId: z.string('Business is required'),
     totalAmount: z.float64('Total amount is required'),
     orderMode: z.enum(OrderMode, 'Select Order mode'),
     status: z.enum(OrderStatus),
@@ -38,8 +38,7 @@ export const AddOrderSchema = z.object({
 });
 
 export const EditOrderSchema = z.object({
-    id: z.string('Order Id is required'),
-    address: z.string().min(1, 'Address is required'),
-    phoneNo: z.string().regex(/^((\+92)?(0092)?(92)?(0)?)(3)([0-9]{9})$/, "Enter Pakistani mobile no."),
+    id: z.number('Order Id is required'),
+    status: z.enum(OrderStatus),
     updatedBy: z.int('Updated by is required')
 });

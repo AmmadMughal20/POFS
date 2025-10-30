@@ -4,7 +4,7 @@ import citiesList from '@/data/pakistan-cities-250.json';
 import areaCodeList from '@/data/areanames.json';
 import { IBusiness } from './BusinessSchema';
 import { IManager } from './ManagerSchema';
-import { ISalesMan } from './SaleManSchems';
+import { ISalesman } from './SalesmanSchema';
 import { IStock } from './StockSchema';
 import { IProduct } from './ProductSchema';
 import { BranchStatus, Province } from '@prisma/client';
@@ -28,7 +28,7 @@ export interface IBranch
     branchManager?: number
     Manager?: IManager
     stocks?: IStock[]
-    salesMen?: ISalesMan[]
+    salesMen?: ISalesman[]
     businessId: string
     Business?: IBusiness
     Products?: IProduct[]

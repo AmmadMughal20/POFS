@@ -1,0 +1,210 @@
+'use server'
+import { prisma } from "@/lib/prisma";
+import { AddPurchaseSchema, EditPurchaseSchema, IPurchase } from "@/schemas/PurchaseSchema";
+import { Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { getUserSession, hasPermission } from "./getUserSession";
+
+export interface PurchaseState
+{
+    errors?: Record<string, string[]>;
+    success?: boolean;
+    message?: string;
+    values?: Partial<IPurchase>
+}
+
+
+export const getPurchases = async (skip?: number, take?: number, orderBy?: Prisma.PurchaseOrderByWithRelationInput, filter?: Prisma.PurchaseWhereInput & { search?: string }) =>
+{
+    const { permissions } = await getUserSession()
+    if (!hasPermission(permissions, 'purchase:view'))
+    {
+        throw new Error("Forbidden: You don’t have permission to view purchase list.")
+    }
+
+    const { search, date, ...restFilters } = filter ?? {};
+
+    const where: Prisma.PurchaseWhereInput = {
+        ...restFilters,
+    };
+
+    if (date)
+    {
+        const parsedDate = new Date(date.toString());
+        if (!isNaN(parsedDate.getTime()))
+        {
+            // Match records for the same day (ignoring time)
+            const startOfDay = new Date(parsedDate);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(parsedDate);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            where.date = {
+                gte: startOfDay,
+                lte: endOfDay,
+            };
+        }
+    }
+
+    if (search && search.trim() !== '')
+    {
+        where.OR = [
+            { title: { contains: search, mode: 'insensitive' } },
+            { createdByUser: { name: { contains: search, mode: 'insensitive' } } },
+            { notes: { contains: search, mode: 'insensitive' } },
+            { Branch: { area: { contains: search, mode: 'insensitive' } } },
+            { Business: { name: { contains: search, mode: 'insensitive' } } },
+        ];
+
+        if (!isNaN(Number(search)))
+        {
+            where.OR.push({ amount: { equals: Number(search) } });
+        }
+    }
+
+    const [items, total] = await Promise.all([
+        prisma.purchase.findMany({
+            skip,
+            take,
+            orderBy: orderBy ?? { id: 'asc' },
+            where,
+            include: {
+                Branch: true,
+                Business: true,
+                createdByUser: true,
+                updatedByUser: true
+            },
+        }),
+        prisma.purchase.count({ where }),
+    ]);
+
+    const itemsToSend = items.map((prod) => ({
+        ...prod,
+        amount: Number(prod.amount)
+    }))
+    return { items: itemsToSend, total };
+}
+
+export const handlePurchaseAddAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
+{
+    const { user, permissions } = await getUserSession();
+    if (!hasPermission(permissions, "purchase:create"))
+    {
+        throw new Error("Forbidden: You don’t have permission to create purchase.");
+    }
+
+    const createdBy = user.id
+
+    const newPurchase: IPurchase = {
+        title: formData.get('title')?.toString() || '',
+        notes: formData.get("notes")?.toString() || "",
+        amount: Number(formData.get("amount")?.toString() || ""),
+        date: new Date(formData.get("date")?.toString() || ""),
+        businessId: formData.get("businessId")?.toString() || "",
+        branchId: formData.get("branchId")?.toString() || "",
+        createdBy
+    }
+
+    const result = AddPurchaseSchema.safeParse(newPurchase)
+
+    if (!result.success)
+    {
+        return {
+            errors: result.error.flatten().fieldErrors,
+            values: newPurchase
+        }
+    }
+
+    await prisma.purchase.create({
+        data: {
+            title: newPurchase.title,
+            notes: newPurchase.notes,
+            amount: newPurchase.amount,
+            date: newPurchase.date,
+            businessId: newPurchase.businessId ? newPurchase.businessId : '',
+            branchId: newPurchase.branchId ? newPurchase.branchId : '',
+            createdBy: newPurchase.createdBy
+        }
+    })
+
+    revalidatePath(`/branch/${newPurchase.branchId}/purchases`)
+
+    return { success: true, message: 'Purchase added successfully' }
+}
+
+export const handlePurchaseEditAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
+{
+    const { user, permissions } = await getUserSession();
+    if (!hasPermission(permissions, "purchase:update"))
+    {
+        throw new Error("Forbidden: You don’t have permission to update purchase.");
+    }
+
+    const updatedBy = user.id
+
+    const updatedPurchase: IPurchase = {
+        id: Number(formData.get('id')?.toString() || ''),
+        title: formData.get('title')?.toString() || '',
+        notes: formData.get("notes")?.toString() || "",
+        amount: Number(formData.get("amount")?.toString() || ""),
+        date: new Date(formData.get("date")?.toString() || ""),
+        businessId: formData.get("businessId")?.toString() || "",
+        branchId: formData.get("branchId")?.toString() || "",
+        updatedBy
+    }
+
+    const result = EditPurchaseSchema.safeParse(updatedPurchase)
+
+    if (!result.success)
+    {
+        return {
+            errors: result.error.flatten().fieldErrors,
+            values: updatedPurchase
+        }
+    }
+
+    await prisma.purchase.update({
+        where: { id: updatedPurchase.id },
+        data: {
+            title: updatedPurchase.title,
+            notes: updatedPurchase.notes,
+            amount: updatedPurchase.amount,
+            date: updatedPurchase.date,
+            businessId: updatedPurchase.businessId ? updatedPurchase.businessId : '',
+            branchId: updatedPurchase.branchId ? updatedPurchase.branchId : '',
+            createdBy: updatedPurchase.createdBy
+        }
+    })
+
+    revalidatePath(`/branch/${updatedPurchase.branchId}/purchases`)
+
+    return { success: true, message: 'Purchase updated successfully' }
+}
+
+export const handlePurchaseDeleteAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
+{
+    const { user, permissions } = await getUserSession();
+    if (!hasPermission(permissions, "purchase:delete"))
+    {
+        throw new Error("Forbidden: You don’t have permission to delete purchase.");
+    }
+
+    const id = Number(formData.get('id')?.toString())
+    const branchId = formData.get('branchId')?.toString()
+
+    const purchaseToDelete = await prisma.purchase.findFirst({ where: { id } })
+    if (!purchaseToDelete)
+    {
+        return {
+            errors: { general: ['Purchase not found'] },
+        }
+    }
+
+    await prisma.purchase.delete({
+        where: { id },
+    })
+
+    revalidatePath(`/branch/${branchId}/purchases`)
+
+    return { success: true, message: 'Purchase deleted successfully' }
+} 
