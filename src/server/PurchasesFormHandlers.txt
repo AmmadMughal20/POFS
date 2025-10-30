@@ -86,7 +86,8 @@ export const getPurchases = async (skip?: number, take?: number, orderBy?: Prism
 }
 
 export const handlePurchaseAddAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
-{
+{ 
+    try {
     const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "purchase:create"))
     {
@@ -130,10 +131,28 @@ export const handlePurchaseAddAction = async (prevState: PurchaseState, formData
     revalidatePath(`/branch/${newPurchase.branchId}/purchases`)
 
     return { success: true, message: 'Purchase added successfully' }
-}
+} catch (error)
+    {
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};
 
 export const handlePurchaseEditAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
 {
+    try {
     const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "purchase:update"))
     {
@@ -179,10 +198,30 @@ export const handlePurchaseEditAction = async (prevState: PurchaseState, formDat
     revalidatePath(`/branch/${updatedPurchase.branchId}/purchases`)
 
     return { success: true, message: 'Purchase updated successfully' }
-}
+} catch (error)
+    {
+    
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};
 
 export const handlePurchaseDeleteAction = async (prevState: PurchaseState, formData: FormData): Promise<PurchaseState> =>
 {
+    try {
+        
     const { user, permissions } = await getUserSession();
     if (!hasPermission(permissions, "purchase:delete"))
     {
@@ -207,4 +246,23 @@ export const handlePurchaseDeleteAction = async (prevState: PurchaseState, formD
     revalidatePath(`/branch/${branchId}/purchases`)
 
     return { success: true, message: 'Purchase deleted successfully' }
-} 
+} catch (error)
+    {
+        
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
+        return {
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
+    }
+};

@@ -53,24 +53,35 @@ const PermissionClientComponent = ({ initialPerms, permissions, initialTotal }: 
         )
     }
 
-    const permCols: Column<IPermission>[] = Object.keys(initialPerms[0] as IPermission)
-        .map((key) =>
-        {
-            return {
-                key: key as keyof IPermission,
-                label: key.toUpperCase(),
-                sortable: true,
-                align: Align.CENTER,
-                headerStyle: { textAlign: Align.CENTER },
-                bodyStyle: { textAlign: Align.CENTER },
-            };
-        })
-        .sort((a, b) =>
-        {
-            if (a.key === 'id') return -1;
-            if (b.key === 'id') return 1;
-            return a.key.localeCompare(b.key);
-        });
+    const permCols: Column<IPermission>[] = [{
+        key: 'id',
+        label: "Id",
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: 'title',
+        label: 'Title',
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: 'code',
+        label: 'Code',
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }, {
+        key: 'description',
+        label: 'Description',
+        sortable: true,
+        align: Align.CENTER,
+        headerStyle: { textAlign: Align.CENTER },
+        bodyStyle: { textAlign: Align.CENTER },
+    }]
 
     const columnsWithActions: Column<IPermission, string>[] = [
         ...permCols,

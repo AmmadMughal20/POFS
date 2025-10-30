@@ -64,53 +64,74 @@ export const getProducts = async (skip?: number, take?: number, orderBy?: Prisma
 
 export const handleProductAddAction = async (prevState: ProductState, formData: FormData): Promise<ProductState> =>
 {
-    const { user, permissions } = await getUserSession();
-    if (!hasPermission(permissions, "category:create"))
+    try
     {
-        throw new Error("Forbidden: You don’t have permission to create category.");
-    }
 
-    const createdBy = user.id
+        const { user, permissions } = await getUserSession();
+        if (!hasPermission(permissions, "category:create"))
+        {
+            throw new Error("Forbidden: You don’t have permission to create category.");
+        }
 
-    const newProduct: IProduct = {
-        title: formData.get('title')?.toString() || '',
-        description: formData.get("description")?.toString() || "",
-        sku: formData.get("sku")?.toString() || "",
-        rate: parseFloat(formData.get("rate")?.toString() || ""),
-        categoryId: parseInt(formData.get("categoryId")?.toString() || ""),
-        supplierId: parseInt(formData.get("supplierId")?.toString() || ""),
-        businessId: formData.get("businessId")?.toString() || "",
-        branchId: formData.get("branchId")?.toString() || "",
-        createdBy
-    }
+        const createdBy = user.id
 
-    const result = AddProductSchema.safeParse(newProduct)
+        const newProduct: IProduct = {
+            title: formData.get('title')?.toString() || '',
+            description: formData.get("description")?.toString() || "",
+            sku: formData.get("sku")?.toString() || "",
+            rate: parseFloat(formData.get("rate")?.toString() || ""),
+            categoryId: parseInt(formData.get("categoryId")?.toString() || ""),
+            supplierId: parseInt(formData.get("supplierId")?.toString() || ""),
+            businessId: formData.get("businessId")?.toString() || "",
+            branchId: formData.get("branchId")?.toString() || "",
+            createdBy
+        }
 
-    if (!result.success)
+        const result = AddProductSchema.safeParse(newProduct)
+
+        if (!result.success)
+        {
+            return {
+                errors: result.error.flatten().fieldErrors,
+                values: newProduct
+            }
+        }
+
+        await prisma.product.create({
+            data: {
+                title: newProduct.title,
+                description: newProduct.description,
+                sku: newProduct.sku,
+                rate: newProduct.rate,
+                categoryId: newProduct.categoryId,
+                supplierId: newProduct.supplierId,
+                businessId: newProduct.businessId,
+                createdBy: newProduct.createdBy,
+                branchId: newProduct.branchId
+            }
+        })
+
+        revalidatePath(`/branch/${formData.get("branchId")}/products`)
+
+        return { success: true, message: 'Product added successfully' }
+
+
+    } catch (error)
     {
+
+        // ✅ Fallback for other errors
+        if (error instanceof Error)
+        {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // ✅ Handle truly unknown errors safely
         return {
-            errors: result.error.flatten().fieldErrors,
-            values: newProduct
-        }
+            success: false,
+            message: 'An unexpected error occurred while adding the category.',
+        };
     }
-
-    await prisma.product.create({
-        data: {
-            title: newProduct.title,
-            description: newProduct.description,
-            sku: newProduct.sku,
-            rate: newProduct.rate,
-            categoryId: newProduct.categoryId,
-            supplierId: newProduct.supplierId,
-            businessId: newProduct.businessId,
-            createdBy: newProduct.createdBy,
-            branchId: newProduct.branchId
-        }
-    })
-
-    revalidatePath(`/branch/${formData.get("branchId")}/products`)
-
-    return { success: true, message: 'Product added successfully' }
-
-
-} 
+};
