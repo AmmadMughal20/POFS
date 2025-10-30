@@ -7,13 +7,13 @@ import Input from '@/components/ui/Input/Input'
 import Card from '@/components/ui/Card/Card'
 import Label from '@/components/ui/Label/Label'
 import { IManager } from '@/schemas/ManagerSchema'
-import { ISalesMan } from '@/schemas/SaleManSchems'
+import { ISalesman } from '@/schemas/SalesmanSchema'
 
 interface ChangeBranchManagerProps
 {
     selectedBranch: IBranch
     existingManagers?: IManager[]
-    existingSalesmen?: ISalesMan[]
+    existingSalesmen?: ISalesman[]
 }
 
 const ChangeBranchManagerPopup = ({
@@ -96,7 +96,7 @@ const ChangeBranchManagerPopup = ({
                             {existingSalesmen.length > 0 && (
                                 <optgroup label="Salesmen">
                                     {existingSalesmen.map((s) => (
-                                        <option key={s.id} value={s.id}>
+                                        <option key={s.id} value={s.User.id}>
                                             {s.User.name} ({s.User.email})
                                         </option>
                                     ))}

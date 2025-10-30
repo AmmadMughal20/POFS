@@ -4,6 +4,7 @@ import { AddOrderSchema, EditOrderSchema, IOrder } from "@/schemas/OrderSchema";
 import { getUserSession, hasPermission } from "@/server/getUserSession";
 import { OrderMode, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from 'next/cache';
+import bcrypt from "bcrypt";
 
 export interface OrdersState
 {
@@ -18,7 +19,7 @@ export async function getOrders(
     skip?: number,
     take?: number,
     orderBy?: Prisma.OrderOrderByWithRelationInput,
-    filter?: Prisma.OrderWhereInput
+    filter?: Prisma.OrderWhereInput & { search?: string }
 ): Promise<{ items: IOrder[]; total: number }>
 {
     const { permissions } = await getUserSession();
@@ -27,47 +28,67 @@ export async function getOrders(
         throw new Error("Forbidden: You don’t have permission to view orders list.");
     }
 
-    const findManyArgs: Prisma.OrderFindManyArgs = {
-        skip,
-        take,
-        orderBy: orderBy ?? { id: 'asc' },
-        where: filter,
-        include: {
-            Branch: true,
-            Business: true,
-            Customer: {
-                include: {
-                    User: true
-                }
-            }
-        }
+    const { search, ...restFilters } = filter ?? {};
+
+    const where: Prisma.OrderWhereInput = {
+        ...restFilters,
     };
 
-    const countArgs: Prisma.OrderCountArgs = {
-        where: filter,
-    };
+    if (search && search.trim() !== '')
+    {
+        where.OR = [
+            // { status: { equals: search as OrderStatus } },
+            { Branch: { area: { contains: search, mode: 'insensitive' } } },
+            { Business: { name: { contains: search, mode: 'insensitive' } } },
+            { Customer: { User: { name: { contains: search, mode: 'insensitive' } } } },
+            { Customer: { User: { phoneNo: { contains: search, mode: 'insensitive' } } } },
+            { Customer: { User: { email: { contains: search, mode: 'insensitive' } } } },
+        ];
+    }
 
     const [items, total] = await Promise.all([
-        prisma.order.findMany(findManyArgs),
-        prisma.order.count(countArgs),
+        prisma.order.findMany({
+            skip,
+            take,
+            orderBy: orderBy ?? { id: 'asc' },
+            where,
+            include: {
+                Branch: true,
+                Business: true,
+                Customer: {
+                    include: { User: true },
+                },
+            },
+        }),
+        prisma.order.count({ where }),
     ]);
 
-    return { items, total };
+    const itemsToSend = items.map((item) => ({
+        ...item,
+        totalAmount: Number(item.totalAmount),
+    }));
+
+
+    return { items: itemsToSend, total };
 }
 
-export async function handleOrderAddAction(prevState: OrdersState, formData: FormData): Promise<OrdersState>
+
+export async function handleOrderAddAction(
+    prevState: OrdersState,
+    formData: FormData
+): Promise<OrdersState>
 {
     try
     {
-
         const { user, permissions } = await getUserSession();
         if (!hasPermission(permissions, "order:create"))
         {
             throw new Error("Forbidden: You don’t have permission to create orders.");
         }
 
-        const createdBy = user.id
+        const createdBy = user.id;
 
+        // Parse order items
         const orderItemsRaw = formData.get("orderItems")?.toString() || "[]";
         const parsedOrderItems = JSON.parse(orderItemsRaw) as {
             productId: number;
@@ -78,30 +99,74 @@ export async function handleOrderAddAction(prevState: OrdersState, formData: For
         const orderItems = parsedOrderItems.map((item) => ({
             productId: item.productId,
             qty: item.qty,
-            amount: new Prisma.Decimal(item.amount),
+            amount: Number(item.amount),
         }));
 
+        // Determine customerId
+        let customerId: number | undefined;
+        const customerIdFromForm = formData.get("customerId")?.toString();
+        const customerName = formData.get("customerName")?.toString()?.trim();
+
+        if (customerIdFromForm)
+        {
+            customerId = parseInt(customerIdFromForm);
+        } else if (customerName)
+        {
+            // Create new user and customer
+            const email = formData.get("customerEmail")?.toString()?.trim() || "";
+            const phone = formData.get("customerPhone")?.toString()?.trim() || "";
+            const password = "Test@123"; // default password
+            const encPass = await bcrypt.hash(password, await bcrypt.genSalt(10));
+
+            const createdUser = await prisma.user.create({
+                data: {
+                    name: customerName,
+                    email,
+                    phoneNo: phone,
+                    password: encPass,
+                    status: "DISABLED",
+                    createdBy,
+                    roleId: 1, // if you have a default role for customers
+                },
+            });
+
+            const createdCustomer = await prisma.customer.create({
+                data: {
+                    User: { connect: { id: createdUser.id } },
+                    address: formData.get("address")?.toString() || "",
+                    city: formData.get("city")?.toString() || "",
+                    area: formData.get("area")?.toString() || "",
+                },
+            });
+
+            customerId = createdCustomer.id;
+        }
+
+
+        // Build order object
         const newOrder: IOrder = {
-            customerId: parseInt(formData.get('customerId')?.toString() || ''),
-            branchId: formData.get('branchId')?.toString() || '',
-            businessId: formData.get('businessId')?.toString() || '',
-            totalAmount: new Prisma.Decimal(formData.get('totalAmount')?.toString() || '0'),
+            customerId: customerId!,
+            branchId: formData.get("branchId")?.toString() || "",
+            businessId: formData.get("businessId")?.toString() || "",
+            totalAmount: Number(formData.get("totalAmount")?.toString() || "0"),
             status: OrderStatus.PENDING,
             orderMode: OrderMode.OFFLINE,
             orderItems,
             createdBy,
-        }
+        };
 
-        const result = AddOrderSchema.safeParse(newOrder)
+        // Validate order
+        const result = AddOrderSchema.safeParse(newOrder);
 
         if (!result.success)
         {
             return {
                 errors: result.error.flatten().fieldErrors,
-                values: newOrder
-            }
+                values: newOrder,
+            };
         }
 
+        // Create order and order items in a transaction
         await prisma.$transaction(async (tx) =>
         {
             const createdOrder = await tx.order.create({
@@ -123,13 +188,13 @@ export async function handleOrderAddAction(prevState: OrdersState, formData: For
                         orderId: createdOrder.id,
                         productId: item.productId,
                         qty: item.qty,
-                        amount: item.amount,
+                        amount: Number(item.amount),
                     })),
                 });
             }
         });
 
-        revalidatePath(`/businesses/branches/${formData.get("businessId")}/orders`);
+        revalidatePath(`/branch/${formData.get("branchId")}/orders`);
 
         return {
             success: true,
@@ -137,24 +202,16 @@ export async function handleOrderAddAction(prevState: OrdersState, formData: For
         };
     } catch (error: unknown)
     {
-        console.error('Error adding order:', error);
-
-        let message = 'Something went wrong while adding the order.';
-
-        if (error instanceof Error)
-        {
-            message = error.message;
-        } else if (typeof error === 'string')
-        {
-            message = error;
-        }
-
+        console.error("Error adding order:", error);
+        let message = "Something went wrong while adding the order.";
+        if (error instanceof Error) message = error.message;
         return {
             success: false,
             message,
         };
     }
 }
+
 
 export async function handleOrderEditAction(prevState: OrdersState, formData: FormData): Promise<OrdersState>
 {
@@ -166,31 +223,14 @@ export async function handleOrderEditAction(prevState: OrdersState, formData: Fo
             throw new Error("Forbidden: You don’t have permission to update orders.");
         }
 
-        const orderId = parseInt(formData.get("id")?.toString() || "");
+        const orderId = parseInt(formData.get("orderId")?.toString() || "");
         if (isNaN(orderId)) throw new Error("Invalid order ID.");
 
         const updatedBy = user.id;
 
-        const orderItemsRaw = formData.get("orderItems")?.toString() || "[]";
-        const parsedOrderItems = JSON.parse(orderItemsRaw) as {
-            productId: number;
-            qty: number;
-            amount: number | string;
-        }[];
-
-        const orderItems = parsedOrderItems.map((item) => ({
-            productId: item.productId,
-            qty: item.qty,
-            amount: new Prisma.Decimal(item.amount),
-        }));
-
         const updatedOrder: Partial<IOrder> = {
-            customerId: parseInt(formData.get("customerId")?.toString() || ""),
-            branchId: formData.get("branchId")?.toString() || "",
-            businessId: formData.get("businessId")?.toString() || "",
-            totalAmount: new Prisma.Decimal(formData.get("totalAmount")?.toString() || "0"),
-            status: formData.get("status") as OrderStatus || OrderStatus.PENDING,
-            orderMode: (formData.get("orderMode") as OrderMode) || OrderMode.OFFLINE,
+            id: parseInt(formData.get("orderId")?.toString() || ""),
+            status: formData.get("status") as OrderStatus,
             updatedBy,
         };
 
@@ -203,36 +243,14 @@ export async function handleOrderEditAction(prevState: OrdersState, formData: Fo
             };
         }
 
-        await prisma.$transaction(async (tx) =>
-        {
-            // Update the order
-            await tx.order.update({
-                where: { id: orderId },
-                data: {
-                    customerId: updatedOrder.customerId,
-                    totalAmount: updatedOrder.totalAmount,
-                    branchId: updatedOrder.branchId,
-                    businessId: updatedOrder.businessId,
-                    status: updatedOrder.status as OrderStatus,
-                    orderMode: updatedOrder.orderMode as OrderMode,
-                    updatedBy,
-                },
-            });
-
-            // Replace all existing order items with new ones
-            await tx.orderItem.deleteMany({ where: { orderId } });
-
-            if (orderItems.length > 0)
-            {
-                await tx.orderItem.createMany({
-                    data: orderItems.map((item) => ({
-                        orderId,
-                        productId: item.productId,
-                        qty: item.qty,
-                        amount: item.amount,
-                    })),
-                });
-            }
+        console.log(updatedOrder.status)
+        // Update the order
+        await prisma.order.update({
+            where: { id: orderId },
+            data: {
+                status: updatedOrder.status as OrderStatus,
+                updatedBy,
+            },
         });
 
         revalidatePath(`/businesses/branches/${formData.get("businessId")}/orders`);

@@ -21,12 +21,9 @@ import { handleProductAddAction } from '@/server/ProductFormHandlers';
 import { ISupplier } from '@/schemas/SupplierSchema';
 import ChangeBranchManagerPopup from '@/components/Manager/ChangeBranchManagerPopup';
 import { IManager } from '@/schemas/ManagerSchema';
-import { ISalesMan } from '@/schemas/SaleManSchems';
+import { ISalesman } from '@/schemas/SalesmanSchema';
 import { getManagersByBusiness } from '@/server/ManagerFormHandlers';
-import { getSalesmenByBranch } from '@/server/SalemanFormHandlers';
-
-// export const dynamic = 'force-dynamic' // ✅ forces fresh fetch on refresh
-
+import { getSalesmen } from '@/server/SalesmanFormHandlers';
 
 interface Props
 {
@@ -54,9 +51,8 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
     const [showAddProductPopup, setShowAddProductPopup] = useState(false)
     const [showBranchManagerChangePopup, setShowBranchManagerPopup] = useState(false)
     const [existingManagers, setExistingManagers] = useState<IManager[]>()
-    const [existingSalesmen, setExistingSalesmen] = useState<ISalesMan[]>()
+    const [existingSalesmen, setExistingSalesmen] = useState<ISalesman[]>()
     const router = useRouter()
-
 
     useEffect(() =>
     {
@@ -71,9 +67,9 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
                 }
             }
 
-            const getExistingSalemen = async () =>
+            const getExistingSalesmen = async () =>
             {
-                const salesmen = await getSalesmenByBranch(selectedBranch.id)
+                const { items: salesmen } = await getSalesmen(undefined, undefined, undefined, { branchId: selectedBranch.id })
                 if (salesmen.length > 0)
                 {
                     setExistingSalesmen(salesmen)
@@ -81,7 +77,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
             }
 
             getExistingManagers()
-            getExistingSalemen()
+            getExistingSalesmen()
         }
     }, [selectedBranch?.id])
 
@@ -155,7 +151,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         bodyStyle: { textAlign: Align.CENTER },
     },]
 
-    const columnsWithActions: Column<IBranch>[] = [
+    const columnsWithActions: Column<IBranch, string>[] = [
         ...branchCols,
         {
             key: "openingTimeToDisplay",
@@ -224,9 +220,9 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
         router.push(`/businesses/branches/${businessId}/${branchId}/stocks`)
     }
 
-    const handleViewSalemen = (businessId: string, branchId: string) =>
+    const handleViewSalesmen = (businessId: string, branchId: string) =>
     {
-        router.push(`/businesses/branches/${businessId}/${branchId}/salemen`)
+        router.push(`/businesses/branches/${businessId}/${branchId}/salesmen`)
     }
 
     const handleChangeManager = (businessId: string, branchId: string) =>
@@ -261,7 +257,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
             <div className='pt-3'>
                 {
                     displayType == "list" &&
-                    <Table<IBranch>
+                    <Table<IBranch, string>
                         columns={columnsWithActions}
                         data={data}
                         page={page}
@@ -314,7 +310,7 @@ export default function BranchesPageClient({ initialBranches, permissions, initi
 
             <Popup isOpen={viewBranchDetails} onClose={() => setViewBranchDetails(false)}>
                 {selectedBranch && (
-                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} permissions={permissions} onViewOrders={handleViewOrders} onViewProducts={handleViewProducts} onViewStocks={handleViewStocks} handleChangeManager={handleChangeManager} onViewSalemen={handleViewSalemen} />
+                    <ViewBranchDetialsPopup selectedBranch={selectedBranch} onClose={() => { setViewBranchDetails(false); setSelectedBranch(null); }} permissions={permissions} onViewOrders={handleViewOrders} onViewProducts={handleViewProducts} onViewStocks={handleViewStocks} handleChangeManager={handleChangeManager} onViewSalesmen={handleViewSalesmen} />
                 )}
             </Popup>
 

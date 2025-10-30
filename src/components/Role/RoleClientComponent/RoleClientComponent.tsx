@@ -71,7 +71,7 @@ const RoleClientComponent = ({ initialRoles, permissions, initialTotal, allPerms
         bodyStyle: { textAlign: Align.CENTER },
     }]
 
-    const columnsWithActions: Column<IRole>[] = [
+    const columnsWithActions: Column<IRole, string>[] = [
         ...roleCols,
         {
             key: 'actions', // ✅ now allowed
@@ -157,7 +157,7 @@ const RoleClientComponent = ({ initialRoles, permissions, initialTotal, allPerms
             <div className='pt-3'>
                 {
                     displayType == "list" &&
-                    <Table<IRole>
+                    <Table<IRole, string>
                         columns={columnsWithActions}
                         data={data}
                         page={page}

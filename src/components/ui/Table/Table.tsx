@@ -1,4 +1,7 @@
+// src/components/ui/Table/Table.tsx
+'use client';
 import React, { useState } from 'react';
+import Pagination from './Pagination';
 
 export enum Align
 {
@@ -7,40 +10,17 @@ export enum Align
     RIGHT = 'right',
 }
 
-interface StyleConfig
+export interface Column<T, K extends keyof T | string = keyof T>
 {
-    bgColor?: string;
-    textColor?: string;
-    fontWeight?: string;
-    textAlign?: Align;
-}
-
-
-export interface DataColumn<T, K extends keyof T = keyof T>
-{
-    key: K; // must be a key of T
+    key: K;
     label: string;
     sortable?: boolean;
     align?: Align;
+    render?: (row: T, rowIndex: number) => React.ReactNode;
+    headerStyle?: React.CSSProperties;
+    bodyStyle?: React.CSSProperties;
     width?: string | number;
-    headerStyle?: StyleConfig;
-    bodyStyle?: StyleConfig;
-    render?: (value: T[K], row: T, rowIndex: number) => React.ReactNode;
 }
-
-export interface CustomColumn<T>
-{
-    key: string; // can be anything not in keyof T
-    label: string;
-    align?: Align;
-    sortable?: boolean;
-    width?: string | number;
-    headerStyle?: StyleConfig;
-    bodyStyle?: StyleConfig;
-    render: (row: T, rowIndex: number) => React.ReactNode; // only row is passed
-}
-
-export type Column<T> = DataColumn<T> | CustomColumn<T>;
 
 interface TableConfig
 {
@@ -51,189 +31,154 @@ interface TableConfig
     alternateRowColors?: boolean;
 }
 
-interface TableProps<T>
+interface TableProps<T, K extends keyof T | string = keyof T>
 {
+    columns: Column<T, K>[];
     data: T[];
-    columns: Column<T>[];
+    total?: number;
+    page?: number;
+    rowsPerPage?: number;
+    onPageChange?: (page: number) => void;
+    onRowsPerPageChange?: (rows: number) => void;
+    onSearch?: (query: string) => void;
+    onSort?: (key: K, direction: 'asc' | 'desc') => void;
+    onRefresh?: () => void;
+    loading?: boolean;
     config?: TableConfig;
-    page: number;
-    rowsPerPage: number;
-    total: number;
-    onPageChange: (page: number) => void;
-    onRowsPerPageChange: (rows: number) => void;
     className?: string;
-    onSearch: (searchTerm: string) => void
 }
 
-function isDataColumn<T>(col: Column<T>): col is DataColumn<T>
-{
-    return typeof col.render === 'function' && col.render.length === 3;
-}
-
-function Table<T extends object>({
-    data,
+export default function Table<T extends object, K extends keyof T | string = keyof T>({
     columns,
-    className = '',
-    config = {},
+    data,
+    total = 0,
+    page = 1,
+    rowsPerPage = 10,
     onPageChange,
-    rowsPerPage,
     onRowsPerPageChange,
-    total,
-    page,
-    onSearch
-}: TableProps<T>)
+    onSearch,
+    onSort,
+    onRefresh,
+    loading = false,
+    config = {
+        enablePagination: true,
+        enableSearch: true,
+        rowsPerPageOptions: [5, 10, 20],
+        alternateRowColors: true,
+    },
+    className = '',
+}: TableProps<T, K>)
 {
-    const {
-        enableSearch = true,
-        enablePagination = true,
-        rowsPerPageOptions = [5, 10, 20],
-        alternateRowColors = true,
-    } = config;
+    const [sortKey, setSortKey] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const search = '';
-    const [sortKey, setSortKey] = useState<keyof T | null>(null);
-    const [sortAsc, setSortAsc] = useState(true);
-    // const [page, setPage] = useState(1);
-    // const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
-
-    // Sorting handler
-    const handleSort = (col: Column<T>) =>
+    const handleSort = (col: Column<T, K>) =>
     {
         if (!col.sortable) return;
-        if (isDataColumn(col))
-        { // only DataColumn has keyof T keys
-            if (sortKey === col.key) setSortAsc(!sortAsc);
-            else
-            {
-                setSortKey(col.key);
-                setSortAsc(true);
-            }
-        }
+        const direction =
+            sortKey === col.key && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortKey(col.key.toString());
+        setSortDirection(direction);
+        onSort?.(col.key, direction);
     };
 
-    // Filter data
-    // const filteredData = useMemo(() =>
-    // {
-    //     const searchLower = search.toLowerCase();
-    //     return data.filter((row) =>
-    //         Object.values(row as { [key: string]: unknown })
-    //             .map((v) => (v == null ? '' : String(v)))
-    //             .join(' ')
-    //             .toLowerCase()
-    //             .includes(searchLower)
-    //     );
-    // }, [data, search]);
-
-    // Sort data
-    // const sortedData = useMemo(() =>
-    // {
-    //     if (!sortKey) return filteredData;
-    //     const col = columns.find((c) => c.key === sortKey);
-    //     if (!col || !col.sortable) return filteredData;
-
-    //     return [...filteredData].sort((a, b) =>
-    //     {
-    //         const aValue = a[sortKey];
-    //         const bValue = b[sortKey];
-
-    //         if (aValue == null) return 1;
-    //         if (bValue == null) return -1;
-
-    //         if (aValue < bValue) return sortAsc ? -1 : 1;
-    //         if (aValue > bValue) return sortAsc ? 1 : -1;
-    //         return 0;
-    //     });
-    // }, [filteredData, sortKey, sortAsc, columns]);
-
-    // Pagination
-    // const paginatedData = useMemo(() =>
-    // {
-    //     if (!enablePagination) return sortedData;
-    //     const start = (page - 1) * rowsPerPage;
-    //     return sortedData.slice(start, start + rowsPerPage);
-    // }, [sortedData, page, rowsPerPage, enablePagination]);
-
-    const totalPages = Math.ceil(total / rowsPerPage);
-
-    function renderCell(value: unknown): React.ReactNode
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
     {
-        if (value === null || value === undefined) return null;
-        if (typeof value === 'boolean') return null; // ignore booleans
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint')
-        {
-            return value;
-        }
-        if (React.isValidElement(value)) return value; // already a React node
-        if (Array.isArray(value)) return value.map((v, i) => <React.Fragment key={i}>{renderCell(v)}</React.Fragment>);
-        // fallback for objects
-        return JSON.stringify(value);
-    }
+        const term = e.target.value;
+        setSearchTerm(term);
+        onSearch?.(term);
+        if (onPageChange) onPageChange(1);
+    };
+
+    // const totalPages = Math.ceil(total / rowsPerPage);
 
     return (
-        <div className={`space-y-3 ${className}`}>
-            {/* Search */}
-            <div className="flex gap-5 flex-row-reverse">
-                {enableSearch && (
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={search}
-                        onChange={(e) =>
-                        {
-                            onSearch(e.target.value);
-                            onPageChange(1);
-                        }}
-                        className="px-3 py-2 border border-gray-300 bg-white rounded-md text-sm w-full max-w-xs"
-                    />
-                )}
+        <div
+            className={`w-full bg-white rounded-lg shadow border border-gray-200 p-3 space-y-3 ${className}`}
+        >
+            {/* Header Controls */}
+            {
+                (config.enableSearch || onRefresh || config.enablePagination) &&
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                    {config.enableSearch && (
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="px-3 py-2 border border-gray-300 bg-white rounded-md text-sm w-full max-w-xs focus:outline-none focus:ring focus:ring-gray-200"
+                        />
+                    )}
 
-                <div className="flex items-center space-x-2">
-                    <span>Rows per page:</span>
-                    <select
-                        value={rowsPerPage}
-                        onChange={(e) =>
-                        {
-                            onRowsPerPageChange(Number(e.target.value));
-                            onPageChange(1)
-                        }}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-                    >
-                        {rowsPerPageOptions.map((opt) => (
-                            <option key={opt} value={opt}>
-                                {opt}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="flex items-center gap-2">
+                        {onRefresh && (
+                            <button
+                                onClick={onRefresh}
+                                className="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200 border border-gray-300"
+                            >
+                                Refresh
+                            </button>
+                        )}
+
+                        {config.enablePagination && onRowsPerPageChange && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <span>Rows per page:</span>
+                                <select
+                                    value={rowsPerPage}
+                                    onChange={(e) =>
+                                    {
+                                        onRowsPerPageChange(Number(e.target.value));
+                                        onPageChange?.(1);
+                                    }}
+                                    className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring focus:ring-gray-100"
+                                >
+                                    {config.rowsPerPageOptions?.map((opt) => (
+                                        <option key={opt} value={opt}>
+                                            {opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            }
+
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-200">
-                <table className="min-w-full text-sm border-collapse">
-                    <thead>
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+                <table className="min-w-full text-sm text-left border-collapse">
+                    <thead className="bg-primary text-white">
                         <tr>
-                            {columns.map((col) => (
+                            {columns.map((col, idx) => (
                                 <th
-                                    key={String(col.key)}
+                                    key={idx}
                                     onClick={() => handleSort(col)}
+                                    style={{ width: col.width || `${100 / columns.length}%` }}
                                     className={`
-                    px-4 py-3 select-none cursor-${col.sortable ? 'pointer' : 'default'}
-                    uppercase text-xs border-b border-gray-200
-                    ${col.headerStyle?.bgColor ?? 'bg-gray-100'}
-                    ${col.headerStyle?.textColor ?? 'text-gray-800'}
-                    ${col.headerStyle?.fontWeight ?? 'font-semibold'}
-                    ${col.headerStyle?.textAlign === Align.LEFT
+                                                        px-4 py-3 select-none cursor-${col.sortable ? 'pointer' : 'default'}
+                                                        uppercase text-xs border-b border-gray-200
+                                                        ${col.headerStyle?.backgroundColor ?? 'bg-gray-100'}
+                                                        ${col.headerStyle?.color ?? 'text-gray-800'}
+                                                        ${col.headerStyle?.fontWeight ?? 'font-semibold'}
+                                                        ${col.headerStyle?.textAlign === Align.LEFT
                                             ? 'text-center'
                                             : col.headerStyle?.textAlign === Align.RIGHT
                                                 ? 'text-right'
                                                 : 'text-left'}
-                  `}
-                                    style={{ width: col.width || `${100 / columns.length}%` }}
+                                                      `}
                                 >
-                                    <div>
-                                        <span>{col.label}</span>
-                                        {col.sortable && sortKey === col.key && (
-                                            <span className="ml-1 text-gray-500">{sortAsc ? '▲' : '▼'}</span>
+                                    <div className="flex items-center gap-1">
+                                        {col.label}
+                                        {col.sortable && (
+                                            <span className="text-xs text-white">
+                                                {sortKey === col.key
+                                                    ? sortDirection === 'asc'
+                                                        ? '▲'
+                                                        : '▼'
+                                                    : '⇵'}
+                                            </span>
                                         )}
                                     </div>
                                 </th>
@@ -242,74 +187,72 @@ function Table<T extends object>({
                     </thead>
 
                     <tbody>
-                        {data.length > 0 ? (
-                            data.map((row, idx) => (
-                                <tr
-                                    key={idx}
-                                    className={`${alternateRowColors && idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 transition`}
+                        {loading ? (
+                            <tr>
+                                <td
+                                    colSpan={columns.length}
+                                    className="text-center py-6 text-gray-500"
                                 >
-                                    {columns.map((col) => (
+                                    Loading...
+                                </td>
+                            </tr>
+                        ) : data.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={columns.length}
+                                    className="text-center py-6 text-gray-500"
+                                >
+                                    No records found.
+                                </td>
+                            </tr>
+                        ) : (
+                            data.map((row, rowIndex) => (
+                                <tr
+                                    key={rowIndex}
+                                    className={`${config.alternateRowColors && rowIndex % 2 === 1 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 transition`}
+                                >
+                                    {columns.map((col, colIndex) => (
                                         <td
-                                            key={String(col.key)}
+                                            key={colIndex}
                                             className={`
-                        px-4 py-3 border-b border-gray-100
-                        ${col.bodyStyle?.textColor ?? 'text-gray-700'}
-                        ${col.bodyStyle?.fontWeight ?? 'font-normal'}
-                        ${col.bodyStyle?.textAlign === Align.CENTER
+                                                                    px-4 py-3 border-b border-gray-100
+                                                                    ${col.bodyStyle?.color ?? 'text-gray-700'}
+                                                                    ${col.bodyStyle?.fontWeight ?? 'font-normal'}
+                                                                    ${col.bodyStyle?.textAlign === Align.CENTER
                                                     ? 'text-center'
                                                     : col.bodyStyle?.textAlign === Align.RIGHT
                                                         ? 'text-right'
                                                         : 'text-left'}
-                      `}
+                                                                  `}
+                                            style={col.bodyStyle}
                                         >
                                             {col.render
-                                                ? isDataColumn(col)
-                                                    ? col.render(row[col.key as keyof T], row, idx)
-                                                    : col.render(row, idx)
-                                                : renderCell(col.key in row ? row[col.key as keyof T] : undefined)
-                                            }
+                                                ? col.render(row, rowIndex)
+                                                : (col.key in row
+                                                    ? (row[col.key as keyof T] as React.ReactNode)
+                                                    : null)}
                                         </td>
                                     ))}
                                 </tr>
                             ))
-                        ) : (
-                            <tr>
-                                <td colSpan={columns.length} className="text-center py-6 text-gray-500">
-                                    No data available
-                                </td>
-                            </tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
             {/* Pagination */}
-            {enablePagination && totalPages > 1 && (
+            {config.enablePagination && (
                 <div className="flex items-center justify-end text-sm text-gray-700">
-
-                    <div className="space-x-2 flex items-center">
-                        <button
-                            onClick={() => onPageChange(Math.max(1, page - 1))}
-                            disabled={page === 1}
-                            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
-                        >
-                            Prev
-                        </button>
-                        <button
-                            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-                            disabled={page === totalPages}
-                            className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
-                        >
-                            Next
-                        </button>
-                        <span>
-                            Page {page} of {totalPages}
-                        </span>
-                    </div>
+                    <Pagination
+                        total={total}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        onPageChange={onPageChange}
+                        onRowsPerPageChange={onRowsPerPageChange}
+                        rowsPerPageOptions={config.rowsPerPageOptions ?? [5, 10, 20]}
+                    />
                 </div>
             )}
         </div>
     );
 }
-
-export default Table;

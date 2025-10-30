@@ -5,7 +5,7 @@ export interface ICustomer
 {
     id: number
     User: IUser
-    address: string
+    address?: string | null
     city: string
     area: string
     Orders?: IOrder[]

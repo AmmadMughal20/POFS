@@ -99,7 +99,7 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
     },
     ];
 
-    const columnsWithActions: Column<IBusiness>[] = [
+    const columnsWithActions: Column<IBusiness, string>[] = [
         ...businessCols,
         {
             key: 'actions', // ✅ now allowed
@@ -170,7 +170,7 @@ export default function BusinessClientComponent({ initialBusinesses, permissions
             <div className='pt-3'>
                 {
                     displayType == "list" &&
-                    <Table<IBusiness>
+                    <Table<IBusiness, string>
                         columns={columnsWithActions}
                         data={data}
                         page={page}

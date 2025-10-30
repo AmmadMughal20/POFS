@@ -1,0 +1,156 @@
+import Button from '@/components/ui/Button/Button'
+import Form from '@/components/ui/Form/Form'
+import FormGroup from '@/components/ui/FormGroup/FormGroup'
+import Input from '@/components/ui/Input/Input'
+import Label from '@/components/ui/Label/Label'
+import { IExpense } from '@/schemas/ExpenseSchema'
+import { ExpenseState, handleExpenseAddAction, handleExpenseEditAction } from '@/server/ExpensesFormHandlers'
+import { format } from 'date-fns'
+import React, { useActionState, useEffect, useTransition } from 'react'
+
+type ExpenseFormProps = {
+    mode?: 'add' | 'edit';
+    businessId: string,
+    branchId: string,
+    initialData?: Partial<IExpense>;
+    onSubmitAction: (prevState: ExpenseState, formData: FormData) => Promise<ExpenseState>;
+    mutate: () => void
+}
+
+const ExpenseForm = ({ mode, initialData, businessId, branchId, mutate }: ExpenseFormProps) =>
+{
+    const initialState = { errors: {} }
+
+    const [isPending, startTransition] = useTransition();
+    const [state, formAction] = useActionState(
+        async (prevState: ExpenseState, formData: FormData) =>
+        {
+            if (mode === "add")
+            {
+                return await handleExpenseAddAction(prevState, formData);
+            } else
+            {
+                return await handleExpenseEditAction(prevState, formData)
+            }
+        },
+        initialState
+    );
+
+    useEffect(() =>
+    {
+        if (state.success)
+        {
+            mutate()
+        }
+    }, [state.success]);
+    return (
+        <Form title='Add Expense' onSubmit={(e: React.FormEvent<HTMLFormElement>) =>
+        {
+            e.preventDefault(); // prevent page reload
+
+            const formData = new FormData(e.currentTarget);
+            startTransition(() =>
+            {
+                formAction(formData); // call your useActionState handler
+            })
+        }}>
+            <FormGroup >
+                <Label htmlFor='businessId'>Business</Label>
+                <Input name='businessId' readOnly defaultValue={state.values?.businessId || businessId} />
+                {state.errors?.businessId && (
+                    <p className="text-error">{state.errors.businessId[0]}</p>
+                )}
+            </FormGroup>
+            <FormGroup >
+                <Label htmlFor='branchId'>Branch</Label>
+                <Input name='branchId' readOnly defaultValue={state.values?.branchId || branchId} />
+                {state.errors?.branchId && (
+                    <p className="text-error">{state.errors.branchId[0]}</p>
+                )}
+            </FormGroup>
+            {
+                mode === "edit" ? (
+                    <FormGroup >
+                        <Label htmlFor='id'>Expense Id</Label>
+                        <Input name='id' readOnly defaultValue={state.values?.id || initialData?.id} />
+                        {state.errors?.branchId && (
+                            <p className="text-error">{state.errors.branchId[0]}</p>
+                        )}
+                    </FormGroup>) : <></>
+            }
+            <FormGroup >
+                <Label htmlFor='title'>Title</Label>
+                <Input name='title' placeholder='Enter expense title e.g. Fridge' defaultValue={state.values?.title || initialData?.title} />
+                {state.errors?.title && (
+                    <p className="text-error">{state.errors.title[0]}</p>
+                )}
+            </FormGroup>
+            <FormGroup >
+                <Label htmlFor='notes'>Notes</Label>
+                <Input name='notes' placeholder='Enter expense notes e.g. 15 cbft black color double-door' defaultValue={state.values?.notes || initialData?.notes || ''} />
+                {state.errors?.notes && (
+                    <p className="text-error">{state.errors.notes[0]}</p>
+                )}
+            </FormGroup>
+            <FormGroup >
+                <Label htmlFor='amount'>Amount</Label>
+                <Input name='amount' type='number' placeholder='Enter stock keeping unit e.g. No.' defaultValue={state.values?.amount || initialData?.amount} />
+                {state.errors?.amount && (
+                    <p className="text-error">{state.errors.amount[0]}</p>
+                )}
+            </FormGroup>
+            <FormGroup >
+                <Label htmlFor='date'>Date</Label>
+                <Input name='date' type='date' defaultValue={state.values?.date
+                    ? format(new Date(state.values.date), 'yyyy-MM-dd')
+                    : initialData?.date
+                        ? format(new Date(initialData.date), 'yyyy-MM-dd')
+                        : ''
+                } />
+                {state.errors?.date && (
+                    <p className="text-error">{state.errors.date[0]}</p>
+                )}
+            </FormGroup>
+
+            {/* Error Message */}
+            {
+                !state.success && state.message ? (
+                    <div className="text-center mb-4">
+                        <p className="text-error font-medium">{state.message}</p>
+
+                        {/* Show any unknown field errors */}
+                        {Object.entries(state.errors || {}).map(([key, value]) =>
+                        {
+                            if (['title', 'notes', 'date', 'amount', 'businessId', 'branchId'].includes(key)) return null;
+                            return (
+                                <p key={key} className="text-error text-sm">
+                                    {value?.[0]}
+                                </p>
+                            );
+                        })}
+                    </div>
+                ) : <></>
+            }
+
+            {/* Success Message */}
+            {
+                state.success ? (
+                    <div className="text-center mt-3">
+                        <p className="text-success font-bold text-lg">
+                            {state.message ?? 'Expense added successfully.'}
+                        </p>
+                    </div>
+                ) : <></>
+            }
+
+
+            <FormGroup>
+                <Button disabled={isPending}>
+                    {isPending ? 'Processing...' : 'Submit'}
+                </Button>
+            </FormGroup>
+        </Form >
+    )
+}
+
+export default ExpenseForm

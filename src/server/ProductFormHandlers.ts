@@ -14,7 +14,7 @@ export interface ProductState
 }
 
 
-export const getProducts = async (skip?: number, take?: number, orderBy?: Prisma.ProductOrderByWithRelationInput, filter?: Prisma.ProductWhereInput) =>
+export const getProducts = async (skip?: number, take?: number, orderBy?: Prisma.ProductOrderByWithRelationInput, filter?: Prisma.ProductWhereInput & { search?: string }) =>
 {
     const { permissions } = await getUserSession()
     if (!hasPermission(permissions, 'product:view'))
@@ -22,27 +22,37 @@ export const getProducts = async (skip?: number, take?: number, orderBy?: Prisma
         throw new Error("Forbidden: You don’t have permission to view products list.")
     }
 
-    const findManyArgs: Prisma.ProductFindManyArgs = {
-        skip,
-        take,
-        orderBy: orderBy ?? { id: 'asc' },
-        where: filter,
-        include: {
-            Branch: true,
-            Business: true,
-            Category: true,
-            Supplier: true,
-            stocks: true
-        }
-    }
+    const { search, ...restFilters } = filter ?? {};
 
-    const countArgs: Prisma.ProductCountArgs = {
-        where: filter,
+    const where: Prisma.ProductWhereInput = {
+        ...restFilters,
     };
 
+    if (search && search.trim() !== '')
+    {
+        where.OR = [
+            { title: { contains: search, mode: 'insensitive' } },
+            { Branch: { area: { contains: search, mode: 'insensitive' } } },
+            { Business: { name: { contains: search, mode: 'insensitive' } } },
+            { Supplier: { name: { contains: search, mode: 'insensitive' } } },
+        ];
+    }
+
     const [items, total] = await Promise.all([
-        prisma.product.findMany(findManyArgs),
-        prisma.product.count(countArgs),
+        prisma.product.findMany({
+            skip,
+            take,
+            orderBy: orderBy ?? { id: 'asc' },
+            where,
+            include: {
+                Branch: true,
+                Business: true,
+                Category: true,
+                Supplier: true,
+                stocks: true
+            },
+        }),
+        prisma.product.count({ where }),
     ]);
 
     const itemsToSend = items.map((prod) => ({
@@ -98,7 +108,7 @@ export const handleProductAddAction = async (prevState: ProductState, formData: 
         }
     })
 
-    revalidatePath('/businesses')
+    revalidatePath(`/branch/${formData.get("branchId")}/products`)
 
     return { success: true, message: 'Product added successfully' }
 

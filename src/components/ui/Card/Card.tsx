@@ -7,7 +7,7 @@ export interface ICard
 const Card: React.FC<ICard> = ({ children, className = '' }) =>
 {
     return (
-        <div className={`rounded min-h-5 min-w-5 shadow-md p-5 ${className}`}>{children}</div>
+        <div className={`rounded min-h-5 min-w-5 bg-white shadow p-5 ${className}`}>{children}</div>
     )
 }
 
